@@ -1,0 +1,17 @@
+src/**
+tests/**
+scripts/**
+node_modules/**
+.local/**
+.git/**
+artifacts/**
+*.ts
+**/*.map
+package-lock.json
+STATE.md
+AGENTS.md
+helpers/**
+tsconfig.json
+.gitignore
+docs/performance-data/**
+PERFORMANCE.md

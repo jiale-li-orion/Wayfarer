@@ -1,0 +1,21 @@
+[
+  {
+    "stage": "disconnect",
+    "state": "failed",
+    "bytes": 4194304,
+    "sourceRetained": true,
+    "otherEndpointResponsive": true,
+    "error": "Error: Endpoint connection closed"
+  },
+  {
+    "stage": "resume",
+    "state": "completed",
+    "bytes": 67108864,
+    "sha256": "46fe538f5f51bd7ca60d73507c87e40330d3fce756fd48f4bd7bf94b892c8394"
+  },
+  {
+    "stage": "windows_case_and_alias",
+    "caseRename": true,
+    "selfMoveRejected": true
+  }
+]

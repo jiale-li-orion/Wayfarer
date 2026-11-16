@@ -1,0 +1,215 @@
+{
+  "environment": {
+    "node": "v22.23.2",
+    "platform": "linux",
+    "cpus": 256
+  },
+  "samples": [
+    {
+      "name": "idle_2_seconds",
+      "wallMs": 2000.1028890000002,
+      "cpuUserMs": 2.376,
+      "cpuSystemMs": 0.12,
+      "rssStart": 87617536,
+      "rssEnd": 87916544,
+      "peakRss": 87916544,
+      "heapStart": 8981880,
+      "heapEnd": 9251304
+    },
+    {
+      "name": "first_directory_page_200",
+      "wallMs": 4.71358599999985,
+      "cpuUserMs": 3.684,
+      "cpuSystemMs": 1.442,
+      "rssStart": 91422720,
+      "rssEnd": 92254208,
+      "peakRss": 91422720,
+      "heapStart": 10345760,
+      "heapEnd": 11596856,
+      "result": {
+        "entries": 200
+      }
+    },
+    {
+      "name": "directory_2000_paged",
+      "wallMs": 30.03088200000002,
+      "cpuUserMs": 18.839,
+      "cpuSystemMs": 20.845,
+      "rssStart": 92254208,
+      "rssEnd": 92524544,
+      "peakRss": 92524544,
+      "heapStart": 11597536,
+      "heapEnd": 10349552,
+      "result": {
+        "entries": 2000
+      }
+    },
+    {
+      "name": "d3_1000_nodes_20_layouts",
+      "wallMs": 10.264494999999897,
+      "cpuUserMs": 26.223,
+      "cpuSystemMs": 2.533,
+      "rssStart": 92524544,
+      "rssEnd": 94744576,
+      "peakRss": 92524544,
+      "heapStart": 10350232,
+      "heapEnd": 11913792,
+      "result": {
+        "nodes": 1000,
+        "layouts": 20
+      }
+    },
+    {
+      "name": "verified_copy_64_MiB",
+      "wallMs": 121.82130000000006,
+      "cpuUserMs": 127.138,
+      "cpuSystemMs": 58.371,
+      "rssStart": 127877120,
+      "rssEnd": 182444032,
+      "peakRss": 182444032,
+      "heapStart": 8452544,
+      "heapEnd": 7623576,
+      "result": {
+        "bytes": 67108864
+      }
+    },
+    {
+      "name": "idle_after_transfer_2_seconds",
+      "wallMs": 2000.0582800000002,
+      "cpuUserMs": 0.877,
+      "cpuSystemMs": 1.238,
+      "rssStart": 182444032,
+      "rssEnd": 182444032,
+      "peakRss": 182444032,
+      "heapStart": 7624224,
+      "heapEnd": 7763968
+    }
+  ],
+  "metrics": [
+    {
+      "at": "2026-11-16T12:36:52.102Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": false,
+      "ms": 3.85,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.106Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": false,
+      "ms": 3.28,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.109Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.94,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.112Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.8,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.115Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 3.39,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.118Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.77,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.121Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.75,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.124Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 3.09,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.127Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 3.03,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.130Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.78,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.133Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 2.97,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.133Z",
+      "stage": "directory.read",
+      "endpoint": "a",
+      "path": "/data/users/lijiale/tmp/workspace-map-bench-cSd2gf/source",
+      "cursor": true,
+      "ms": 0.03,
+      "ok": true
+    },
+    {
+      "at": "2026-11-16T12:36:52.164Z",
+      "stage": "job.start",
+      "job": "3c92be87-0967-498a-8b20-32c80535db1d",
+      "kind": "transfer",
+      "queueMs": 0
+    },
+    {
+      "at": "2026-11-16T12:36:52.275Z",
+      "stage": "job.end",
+      "job": "3c92be87-0967-498a-8b20-32c80535db1d",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 110.92910500000016,
+      "bytes": 67108864,
+      "MiBps": 576.9215600770274
+    }
+  ]
+}

@@ -1,0 +1,803 @@
+[
+  {
+    "name": "map_sessions",
+    "description": "List running VS Code map sessions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_bind",
+    "description": "Bind this MCP client to one map session.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "session"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_endpoints",
+    "description": "List endpoints and roots.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_list",
+    "description": "Read one directory page; hidden entries included. Use returned cursor for next page.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "cursor": {
+          "type": "string"
+        },
+        "refresh": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_stat",
+    "description": "File metadata, link identity and resolved target.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_read",
+    "description": "Read at most 1 MiB, returned base64. Offset supports large files.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "offset": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_write",
+    "description": "Write file content, replaces prior content. Encoding utf8 or base64.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "content": {
+          "type": "string"
+        },
+        "encoding": {
+          "enum": [
+            "utf8",
+            "base64"
+          ]
+        },
+        "exclusive": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ref",
+        "content"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_view",
+    "description": "Read current root, expanded branches, viewport, bookmarks and Agent focus.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_navigate",
+    "description": "Mark Agent focus; camera follows only when user enabled follow.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_search",
+    "description": "Start cancellable scoped filename search; returns job id.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "query": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "query"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_size",
+    "description": "Start cancellable subtree size calculation; links are not followed.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "ref"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_transfer",
+    "description": "Start copy or move. Move deletes each source only after verified target commit. Explicit conflict rule.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpoint": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string",
+                "description": "Absolute display path on the specified endpoint"
+              }
+            },
+            "required": [
+              "endpoint",
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "mode": {
+          "enum": [
+            "copy",
+            "move"
+          ]
+        },
+        "conflict": {
+          "enum": [
+            "skip",
+            "rename",
+            "overwrite"
+          ]
+        }
+      },
+      "required": [
+        "sources",
+        "target",
+        "mode",
+        "conflict"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_mkdir",
+    "description": "Create named child directory.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_rename",
+    "description": "Rename selected file in its current parent.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_delete",
+    "description": "Delete selected paths: Windows recycle bin; WSL and Linux SSH PERMANENT deletion.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "endpoint": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string",
+                "description": "Absolute display path on the specified endpoint"
+              }
+            },
+            "required": [
+              "endpoint",
+              "path"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "refs"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_jobs",
+    "description": "List background tasks, including failures and paused tasks.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_job",
+    "description": "Get task state, bounded result page and command output tail; paths identify complete persisted records.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_jobControl",
+    "description": "Pause, resume or cancel a task. Package cancellation preserves actual manager state.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "pause",
+            "resume",
+            "cancel"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_packageCapabilities",
+    "description": "List supported package managers and their actual actions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_packageDiscover",
+    "description": "Discover manager executables on one endpoint; does not install or enumerate packages.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string",
+          "description": "Optional project directory for wrapper/interpreter discovery"
+        }
+      },
+      "required": [
+        "endpoint"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_packagePlan",
+    "description": "Preview exact command and source for a package action.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "manager": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "python": {
+          "type": "string"
+        },
+        "executable": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "entry": {
+          "type": "string"
+        },
+        "cacheRoot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint",
+        "cwd",
+        "manager",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_package",
+    "description": "Run a package action in selected endpoint/environment/project; returns job id.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "cwd": {
+          "type": "string"
+        },
+        "manager": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "packages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "python": {
+          "type": "string"
+        },
+        "executable": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "entry": {
+          "type": "string"
+        },
+        "cacheRoot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint",
+        "cwd",
+        "manager",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_resources",
+    "description": "Read endpoint process CPU time, resident and peak memory, active cursors and package processes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true
+    }
+  },
+  {
+    "name": "map_endpointControl",
+    "description": "Connect or disconnect an SSH/WSL endpoint. Disconnect closes its helper; cached paths remain visible.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "connect",
+            "disconnect"
+          ]
+        }
+      },
+      "required": [
+        "endpoint",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  }
+]

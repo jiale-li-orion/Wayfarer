@@ -1,0 +1,8 @@
+[
+  {
+    "windowsJunctionPreserved": true,
+    "unsupportedPosixTargetRejected": true,
+    "sourceRetained": true,
+    "targetContent": "junction target"
+  }
+]

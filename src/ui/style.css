@@ -1,0 +1,454 @@
+:root {
+  font-family: var(--vscode-font-family, system-ui);
+  font-size: 13px;
+  color: var(--vscode-foreground, #ddd);
+  background: var(--vscode-editor-background, #1e1e1e);
+  --surface: var(--vscode-editorWidget-background, #252526);
+  --border: var(--vscode-widget-border, #454545);
+  --accent: var(--vscode-focusBorder, #007acc);
+  --muted: var(--vscode-descriptionForeground, #aaa);
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root,
+main {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 32px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+button:hover {
+  background: var(--vscode-toolbar-hoverBackground, #ffffff13);
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+input,
+select {
+  background: var(--vscode-input-background, #313131);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 4px;
+  padding: 8px;
+  width: 100%;
+  min-width: 0;
+}
+select {
+  height: 36px;
+}
+h2 {
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+h2 button:last-child {
+  margin-left: auto;
+}
+p {
+  line-height: 1.5;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 200px;
+  overflow: auto;
+  font: 12px/1.6 var(--vscode-editor-font-family, monospace);
+  background: var(--vscode-textCodeBlock-background, #161616);
+  padding: 12px;
+  border-radius: 5px;
+}
+.codicon {
+  font-size: 17px;
+}
+.react-flow {
+  --xy-background-color: var(--vscode-editor-background, #1e1e1e);
+  --xy-edge-stroke: var(--vscode-tree-inactiveIndentGuidesStroke, #555);
+  --xy-controls-button-background-color: var(--surface);
+  --xy-controls-button-color: var(--vscode-foreground, #ddd);
+  --xy-controls-button-border-color: var(--border);
+  --xy-minimap-background-color: var(--surface);
+}
+.react-flow__node:focus {
+  outline: 0;
+}
+.react-flow__handle {
+  width: 4px;
+  height: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+.react-flow__controls {
+  box-shadow: none;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  margin: 20px 20px 38px;
+}
+.file-node {
+  display: flex;
+  align-items: center;
+  width: 258px;
+  height: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 7px;
+  contain: layout style;
+  box-shadow: 0 1px 2px #0002;
+}
+.file-node.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.file-node.drop {
+  outline: 3px solid var(--vscode-list-dropBackground, #298153);
+}
+.file-node.agent {
+  border-left: 3px solid var(--vscode-charts-purple, #b294de);
+}
+.expand {
+  width: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  min-height: 36px;
+}
+.node-label {
+  min-width: 0;
+  flex: 1;
+  padding: 4px 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+}
+.node-label strong {
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.node-label span {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.move-handle {
+  padding: 4px;
+  width: 24px;
+  cursor: grab;
+  color: var(--muted);
+}
+.agent-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vscode-charts-purple, #b294de);
+  flex-shrink: 0;
+}
+.cached {
+  color: var(--muted);
+  margin: 0 4px;
+}
+.cached .codicon {
+  font-size: 12px;
+}
+.toolbar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  padding: 5px;
+  box-shadow: 0 3px 14px #0002;
+  z-index: 5;
+}
+.top {
+  top: 18px;
+  left: 20px;
+  max-width: calc(100% - 370px);
+}
+.top-right {
+  top: 18px;
+  right: 20px;
+}
+.breadcrumb {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 350px;
+}
+.divider {
+  height: 20px;
+  width: 1px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.active {
+  background: var(--vscode-button-secondaryBackground, #444);
+}
+.selection {
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 140px);
+}
+.selection > span {
+  max-width: 260px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0 12px;
+}
+.status {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 7px 20px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+  pointer-events: none;
+  background: var(--vscode-editor-background, #1e1e1e);
+}
+.floating {
+  position: absolute;
+  z-index: 10;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  box-shadow: 0 12px 36px #0003;
+  padding: 18px;
+  max-height: calc(100% - 115px);
+  overflow: auto;
+}
+.bookmarks {
+  left: 20px;
+  top: 70px;
+  width: 420px;
+}
+.bookmark-row {
+  display: flex;
+}
+.bookmark-row > button:first-child {
+  flex: 1;
+  justify-content: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.search {
+  top: 70px;
+  left: 20px;
+  width: 500px;
+}
+.search form {
+  display: flex;
+  gap: 6px;
+}
+.results {
+  max-height: 420px;
+  overflow: auto;
+  margin-top: 16px;
+}
+.results button {
+  display: flex;
+  width: 100%;
+  justify-content: start;
+  white-space: normal;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.jobs {
+  top: 70px;
+  right: 20px;
+  width: 390px;
+}
+.job-list article {
+  border-top: 1px solid var(--border);
+  padding: 14px 0;
+}
+.job-title {
+  display: flex;
+  justify-content: space-between;
+}
+.job-title span {
+  color: var(--muted);
+}
+.job-list p {
+  margin: 5px 0;
+  font-size: 12px;
+}
+.actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.actions button {
+  border-color: var(--border);
+  margin-top: 6px;
+}
+.failure,
+.notice {
+  color: var(--vscode-errorForeground, #f88);
+}
+.notice {
+  position: absolute;
+  left: 50%;
+  bottom: 110px;
+  transform: translateX(-50%);
+  padding: 10px 12px;
+  max-width: 80%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 30;
+  overflow-wrap: anywhere;
+}
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  background: #0005;
+}
+.modal {
+  width: min(580px, 90%);
+  max-height: 86%;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 20px 80px #0005;
+}
+.modal label {
+  display: block;
+  margin: 14px 0 8px;
+  line-height: 1.7;
+}
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-row > label {
+  flex: 1;
+  min-width: 0;
+}
+.primary {
+  background: var(--vscode-button-background, #007acc);
+  color: var(--vscode-button-foreground, white);
+  margin-top: 16px;
+}
+.primary:hover {
+  background: var(--vscode-button-hoverBackground, #006bb3);
+}
+.package label {
+  margin: 9px 0;
+}
+.package input {
+  padding: 6px;
+}
+.package pre {
+  max-height: 140px;
+}
+@media (max-width: 850px) {
+  .top {
+    max-width: calc(100% - 40px);
+    right: 20px;
+  }
+  .top-right {
+    top: 70px;
+  }
+  .breadcrumb {
+    max-width: 180px;
+  }
+  .floating {
+    top: 120px;
+    max-width: calc(100% - 40px);
+  }
+  .selection > span {
+    max-width: 100px;
+  }
+  .selection {
+    max-width: 96%;
+  }
+  .selection button {
+    padding: 4px;
+  }
+  .status span:last-child {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+.breadcrumb-parts {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  max-width: 360px;
+}
+.breadcrumb-parts button {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.overview-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}

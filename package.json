@@ -1,0 +1,105 @@
+{
+  "name": "workspace-map",
+  "displayName": "Workspace Map",
+  "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
+  "version": "0.1.0",
+  "publisher": "orion-workspace",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "onStartupFinished",
+    "onFileSystem:workspacemap",
+    "onFileSystem:workspacemap-win",
+    "onWebviewPanel:workspaceMap"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "workspaceMap.open",
+        "title": "Workspace Map: 打开目录地图"
+      },
+      {
+        "command": "workspaceMap.addEndpoint",
+        "title": "Workspace Map: 添加 SSH 连接"
+      },
+      {
+        "command": "workspaceMap.connectCodex",
+        "title": "Workspace Map: 接入 Codex"
+      },
+      {
+        "command": "workspaceMap.connectDsh",
+        "title": "Workspace Map: 接入 dsh"
+      },
+      {
+        "command": "workspaceMap.mcpConfig",
+        "title": "Workspace Map: 获取 MCP 配置"
+      },
+      {
+        "command": "workspaceMap.logs",
+        "title": "Workspace Map: 查看性能日志"
+      }
+    ],
+    "configuration": {
+      "title": "Workspace Map",
+      "properties": {
+        "workspaceMap.endpoints": {
+          "type": "array",
+          "default": [],
+          "description": "Generic SSH endpoints: id, name, host (OpenSSH alias), sshConfig, distro (Windows WSL transport), root, python."
+        },
+        "workspaceMap.pageSize": {
+          "type": "number",
+          "default": 200,
+          "minimum": 20,
+          "maximum": 1000
+        },
+        "workspaceMap.transferConcurrency": {
+          "type": "number",
+          "default": 2,
+          "minimum": 1,
+          "maximum": 8
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "bench": "tsx scripts/benchmark.ts",
+    "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix",
+    "vscode:prepublish": "npm run build"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.10.0",
+    "cross-spawn": "^7.0.6",
+    "d3-hierarchy": "^3.1.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/d3-hierarchy": "^3.1.7",
+    "@types/node": "^22.19.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/vscode": "^1.95.0",
+    "@vscode/codicons": "^0.0.38",
+    "@vscode/vsce": "^3.7.0",
+    "esbuild": "^0.27.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "license": "MIT",
+  "type": "module"
+}

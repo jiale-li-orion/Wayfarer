@@ -1,0 +1,159 @@
+[
+  {
+    "label": "list_windows-c",
+    "seconds": 0.0472,
+    "result": {
+      "count": 41,
+      "error": null
+    }
+  },
+  {
+    "label": "list_wsl-ubuntu",
+    "seconds": 0.0031,
+    "result": {
+      "count": 31,
+      "error": null
+    }
+  },
+  {
+    "label": "list_accept-train",
+    "seconds": 0.7812,
+    "result": {
+      "count": 24,
+      "error": null
+    }
+  },
+  {
+    "label": "list_accept-infer",
+    "seconds": 0.0232,
+    "result": {
+      "count": 13,
+      "error": null
+    }
+  },
+  {
+    "label": "list_accept-extra",
+    "seconds": 0.0348,
+    "result": {
+      "count": 100,
+      "error": null
+    }
+  },
+  {
+    "label": "windows-c_to_accept-train",
+    "seconds": 0.5116,
+    "result": {
+      "bytes": 210000,
+      "files": 1,
+      "state": "completed"
+    }
+  },
+  {
+    "label": "accept-train_to_accept-infer",
+    "seconds": 0.5132,
+    "result": {
+      "bytes": 210000,
+      "files": 1,
+      "state": "completed"
+    }
+  },
+  {
+    "label": "accept-infer_to_wsl-ubuntu",
+    "seconds": 0.4136,
+    "result": {
+      "bytes": 210000,
+      "files": 1,
+      "state": "completed"
+    }
+  },
+  {
+    "label": "pip_install",
+    "seconds": 3.3728,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/venv/bin/python\",\"-m\",\"pip\",\"install\",\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/workspace_map_fixture-1.0.0-py3-none-any.whl\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}Processing ./workspace_map_fixture-1.0.0-py3-none-any.whl\nInstalling collected packages: workspace-map-fixture\nSuccessfully installed workspace-map-fixture-1.0.0\n"
+    }
+  },
+  {
+    "label": "pip_list",
+    "seconds": 0.3103,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/venv/bin/python\",\"-m\",\"pip\",\"list\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}Package               Version\n--------------------- -------\npip                   26.3\nworkspace-map-fixture 1.0.0\n"
+    }
+  },
+  {
+    "label": "pip_uninstall",
+    "seconds": 0.512,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/venv/bin/python\",\"-m\",\"pip\",\"uninstall\",\"-y\",\"workspace-map-fixture\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}Found existing installation: workspace-map-fixture 1.0.0\nUninstalling workspace-map-fixture-1.0.0:\n  Successfully uninstalled workspace-map-fixture-1.0.0\n"
+    }
+  },
+  {
+    "label": "npm_install",
+    "seconds": 0.9148,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/npm\",\"install\",\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/node-package\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/node-project\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}\nadded 1 package in 642ms\n"
+    }
+  },
+  {
+    "label": "npm_list",
+    "seconds": 0.3078,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/npm\",\"ls\",\"--depth=0\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/node-project\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}workspace-map-test@1.0.0 /tmp/workspace-map-acceptance-08abf87dd3icva5y/node-project\n└── workspace-map-fixture@1.0.0 -> ./../node-package\n\n"
+    }
+  },
+  {
+    "label": "npm_uninstall",
+    "seconds": 0.5152,
+    "result": {
+      "state": "completed",
+      "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/npm\",\"uninstall\",\"workspace-map-fixture\"],\"cwd\":\"/tmp/workspace-map-acceptance-08abf87dd3icva5y/node-project\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}\nremoved 1 package in 185ms\n"
+    }
+  },
+  {
+    "label": "resources_wsl-ubuntu",
+    "seconds": 0.0022,
+    "result": {
+      "pid": 301923,
+      "rss": 20901888,
+      "peakRss": 20733952,
+      "cpuUserMs": 132.02800000000002,
+      "cpuSystemMs": 54.86899999999999,
+      "cursors": 0,
+      "processes": 0,
+      "watches": 0
+    }
+  },
+  {
+    "label": "resources_accept-train",
+    "seconds": 0.078,
+    "result": {
+      "pid": 1148272,
+      "rss": 26370048,
+      "peakRss": 27144192,
+      "cpuUserMs": 26.067,
+      "cpuSystemMs": 13.611999999999998,
+      "cursors": 0,
+      "processes": 0,
+      "watches": 0
+    }
+  },
+  {
+    "label": "resources_accept-infer",
+    "seconds": 0.0418,
+    "result": {
+      "pid": 2793172,
+      "rss": 18898944,
+      "peakRss": 19800064,
+      "cpuUserMs": 22.898,
+      "cpuSystemMs": 9.817,
+      "cursors": 0,
+      "processes": 0,
+      "watches": 0
+    }
+  }
+]

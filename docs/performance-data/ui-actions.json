@@ -1,0 +1,14 @@
+{
+  "handlePayload": "[{\"endpoint\":\"wsl-ubuntu\",\"path\":\"/tmp/workspace-map-actions-dOmEOj/中文 文件.txt\"}]",
+  "dialog": "文件传输源wsl-ubuntu: /tmp/workspace-map-actions-dOmEOj/中文 文件.txt目标wsl-ubuntu: /tmp/workspace-map-actions-dOmEOj/目标目录操作移动复制同名冲突保留两份，自动改名跳过合并目录，覆盖同名文件开始移动",
+  "moved": "workspace-map-drag-test",
+  "sourceRemoved": true,
+  "subtree": {
+    "endpoint": "wsl-ubuntu",
+    "path": "/tmp/workspace-map-actions-dOmEOj/目标目录"
+  },
+  "back": {
+    "endpoint": "wsl-ubuntu",
+    "path": "/tmp/workspace-map-actions-dOmEOj"
+  }
+}
