@@ -62,3 +62,7 @@ Windows VS Code 1.146.0、同一 WSL 工作区及临时 TS／Python／Markdown f
 本机完整产物：`artifacts/environment-audit-20261118/`。仓库保留资源摘要与开发探针，`scripts/**` 排除于 VSIX；本轮产品源码与公共 API 保持现状。
 
 下一阶段评审见 [共享环境方案](SHARED_ENVIRONMENT_REVIEW.md)：优先复用 Codex 已有实验 LSP MCP，再核对 VS Code 公共工具 API、语言服务宿主、缓冲区版本和跨 harness 消费方式。
+
+## Windows／WSL 全进程复核
+
+补齐日常 Windows 进程树与 WSL 同步采样：Windows 私有提交量中位值约 2220 MiB，WSL 编辑器与 Agent 相关进程 PSS 约 1061 MiB。最大开销集中于 Windows 渲染进程与 WSL 扩展宿主／Codex；本地另有 Kotlin／Gradle 构建进程。两项界面动画配置及连续采样结果见 [双端资源复核](WINDOWS_WSL_RESOURCE_AUDIT.md)。这是 Agent 活跃期间记录，和上文独立窗口的短时待机对照分别解释。

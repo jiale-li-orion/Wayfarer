@@ -31,3 +31,5 @@ PR #3 交付 Agent resume、自动续传与资源生命周期，已完成连接�
 - 产品关系见 ARCHITECTURE.md；升级、回退和配置见 docs/RELEASE.md；性能原始记录见 docs/performance-data。
 
 发布沿 GitHub PR、main 检查与 v0.3.0 标签生成 VSIX、SHA-256 和提交元数据。交付后清理开发工作树。协同整理与 Marketplace 按后续需求推进。
+
+双端资源复核已补齐 Windows 整棵进程树及 WSL 同步采样，保留实际活跃窗口与独立待机验收的区别。详见 docs/WINDOWS_WSL_RESOURCE_AUDIT.md；仅追加减少过渡动画、关闭光标闪烁两项用户设置。

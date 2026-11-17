@@ -145,3 +145,7 @@ CPU 按单核累计时间计算，Webview 使用 CDP TaskDuration，宿主使用
 ## 日常扩展环境精简（2026-11-18）
 
 相同 WSL 工作区与探针的约 60 秒对照：WSL 宿主 PSS 中位数 413.95 → 263.01 MiB，Windows UI 宿主私有内存 122.24 → 126.61 MiB；WSL CPU 2.846% → 5.336%（单核百分比）。本轮主要观测到 WSL 宿主内存减少，CPU 与初始化成本继续分别核对。完整条件、原值、边界和验证见 [ENVIRONMENT_AUDIT](docs/ENVIRONMENT_AUDIT.md)。产品仍为 0.3.1，公共 API 保持现状。
+
+## Windows／WSL 双端复核 · 2026-11-18
+
+日常活跃窗口完整进程树、构建进程归属及两项界面配置的采样见 [双端资源复核](docs/WINDOWS_WSL_RESOURCE_AUDIT.md)。Windows 提交量、工作集、Linux PSS 和虚拟机内存分别记录。

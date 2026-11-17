@@ -103,3 +103,9 @@ VS Code 的 Language Model Tools API 是可复用的工具机制；逐项验证�
 - [VS Code Language Model Tool API](https://code.visualstudio.com/api/extension-guides/ai/tools)、[API reference](https://code.visualstudio.com/api/references/vscode-api#lm)。
 - [Remote extensions](https://code.visualstudio.com/api/advanced-topics/remote-extensions)、[Virtual workspaces](https://code.visualstudio.com/api/extension-guides/virtual-workspaces)。
 - [Kotlin LSP](https://kotlinlang.org/docs/kotlin-lsp.html)、[gopls](https://go.dev/gopls/)、[rust-analyzer](https://rust-analyzer.github.io/book/vs_code.html)、[clangd compile commands](https://clangd.llvm.org/design/compile-commands)。
+
+## 轻量运行的归属
+
+Windows 承担编辑器、Webview、GPU 和 UI 扩展宿主，WSL 承担远端扩展宿主、Agent、语言服务与端点助手。[实际双端采样](WINDOWS_WSL_RESOURCE_AUDIT.md)发现渲染开销高于 Windows 本地扩展宿主，资源治理据此分层：能力目录按需读取；语言服务绑定选定项目；Webview 隐藏时释放渲染上下文并恢复持久视图；构建进程随任务管理。保留工具安装与调用入口，启动和释放由实际项目／任务负责。
+
+Wayfarer 后续环境能力视图同时标明 Windows／WSL／SSH、提供者、PID、项目、CPU 时间和内存口径，先复用现有实例再启动新实例。Agent 任务状态与编辑器面板独立，关闭面板释放页面订阅，任务继续受 Core 管理。逐页渲染优化需要在可控窗口记录目标页面和相同操作；当前采样为日常活跃窗口的定位依据。
