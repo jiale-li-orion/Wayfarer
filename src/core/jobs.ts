@@ -30,6 +30,28 @@ export class Jobs extends EventEmitter {
   private writes = Promise.resolve();
   private timers = new Map<string, NodeJS.Timeout>();
   private closed = false;
+  private get historyDir() {
+    return path.join(this.dir, "history");
+  }
+  private historyCount = 0;
+  private readonly recentLimit = 100;
+  private terminal(j: Pick<Job, "state">) {
+    return j.state === "completed" || j.state === "cancelled";
+  }
+  private archiveName(j: Pick<Job, "created" | "id">) {
+    return String(j.created).padStart(16, "0") + "-" + j.id + ".json";
+  }
+  private trimHistory() {
+    const recent = [...this.records.values()]
+      .filter((j) => this.terminal(j))
+      .sort((a, b) => b.updated - a.updated);
+    for (const j of recent.slice(this.recentLimit)) {
+      this.records.delete(j.id);
+      this.locks.delete(j.id);
+      this.dirty.delete(j.id);
+      this.inputs.delete(j.id);
+    }
+  }
   private dirty = new Map<string, Set<string>>();
   private inputs = new Set<string>();
   constructor(
@@ -43,7 +65,9 @@ export class Jobs extends EventEmitter {
     this.runners.set(kind, runner);
   }
   async init() {
-    await fs.mkdir(this.dir, { recursive: true, mode: 0o700 });
+    await fs.mkdir(this.historyDir, { recursive: true, mode: 0o700 });
+    for await (const entry of await fs.opendir(this.historyDir))
+      if (entry.name.endsWith(".json")) this.historyCount++;
     for (const f of await fs.readdir(this.dir)) {
       if (
         !f.endsWith(".json") ||
@@ -56,6 +80,15 @@ export class Jobs extends EventEmitter {
           await fs.readFile(path.join(this.dir, f), "utf8"),
         );
         const version = (j as any).journalVersion;
+        if (this.terminal(j)) {
+          // Legacy journals keep their payload and remain readable by id.
+          await fs.rename(
+            path.join(this.dir, f),
+            path.join(this.historyDir, this.archiveName(j)),
+          );
+          this.historyCount++;
+          continue;
+        }
         if (version === 2) {
           if (j.state !== "completed")
             j.input = JSON.parse(
@@ -162,10 +195,91 @@ export class Jobs extends EventEmitter {
     const { checkpoint, input, result, logs, ...summary } = j;
     return summary;
   }
+  stats() {
+    const states: Record<string, number> = {};
+    for (const j of this.records.values())
+      states[j.state] = (states[j.state] ?? 0) + 1;
+    return {
+      records: this.records.size,
+      historyOnDisk: this.historyCount,
+      retainedTerminal: [...this.records.values()].filter((j) =>
+        this.terminal(j),
+      ).length,
+      running: this.running.size,
+      heldLocks: this.held.size,
+      progressTimers: this.timers.size,
+      states,
+    };
+  }
   list() {
     return [...this.records.values()]
       .sort((a, b) => b.created - a.created)
       .map((j) => this.summary(j));
+  }
+  busyCount() {
+    let count = 0;
+    for (const j of this.records.values())
+      if (j.state === "running" || j.state === "queued") count++;
+    return count;
+  }
+  active() {
+    return this.list().filter((j) => !this.terminal(j));
+  }
+  /** Cursor is an immutable created/id key. Concurrent completions cannot shift a page. */
+  async page(cursor?: string, limit = 50) {
+    limit = Math.max(1, Math.min(200, Math.floor(Number(limit) || 50)));
+    await this.writes;
+    const names: string[] = [];
+    for await (const entry of await fs.opendir(this.historyDir)) {
+      if (!entry.name.endsWith(".json") || (cursor && entry.name >= cursor))
+        continue;
+      names.push(entry.name);
+      names.sort((a, b) => b.localeCompare(a));
+      if (names.length > limit + 1) names.pop();
+    }
+    const hasMore = names.length > limit;
+    const chosen = names.slice(0, limit);
+    const history = [];
+    for (const name of chosen) {
+      try {
+        history.push(
+          this.summary(
+            JSON.parse(
+              await fs.readFile(path.join(this.historyDir, name), "utf8"),
+            ),
+          ),
+        );
+      } catch (error) {
+        this.profile.record("journal.read", {
+          file: name,
+          error: String(error),
+        });
+      }
+    }
+    return {
+      active: this.active(),
+      history,
+      cursor: hasMore ? chosen.at(-1) : undefined,
+      total: this.historyCount,
+    };
+  }
+  private async stored(id: string) {
+    if (!id || path.basename(id) !== id || id.includes("\\"))
+      throw Error("Invalid task id");
+    const current = await fs
+      .readFile(path.join(this.dir, id + ".json"), "utf8")
+      .catch((error) => {
+        if (error.code !== "ENOENT") throw error;
+        return undefined;
+      });
+    if (current) return JSON.parse(current);
+    for await (const entry of await fs.opendir(this.historyDir)) {
+      if (entry.name.endsWith("-" + id + ".json"))
+        return JSON.parse(
+          await fs.readFile(path.join(this.historyDir, entry.name), "utf8"),
+        );
+    }
+    throw Error("Unknown task");
   }
   private detailPage(j: Job, offset: number, limit: number) {
     const { checkpoint, ...detail } = j;
@@ -189,16 +303,15 @@ export class Jobs extends EventEmitter {
   async details(id: string, offset = 0, limit = 200) {
     offset = Math.max(0, Math.floor(offset));
     limit = Math.max(1, Math.min(1000, Math.floor(limit)));
-    const j = this.get(id);
-    if (j.state !== "completed") return this.detailPage(j, offset, limit);
+    const j = this.records.get(id);
+    if (j && !this.terminal(j)) return this.detailPage(j, offset, limit);
     try {
       await this.writes;
     } catch {
-      return this.detailPage(j, offset, limit);
+      if (j) return this.detailPage(j, offset, limit);
+      throw Error("Task journal write failed");
     }
-    const stored = JSON.parse(
-      await fs.readFile(path.join(this.dir, id + ".json"), "utf8"),
-    );
+    const stored = await this.stored(id);
     const payload = await fs
       .readFile(path.join(this.dir, id + ".result.json"), "utf8")
       .then(JSON.parse, () => ({
@@ -234,9 +347,14 @@ export class Jobs extends EventEmitter {
       if (this.running.has(id)) this.requests.set(id, state);
       else j.state = state;
     }
-    void this.save(j).catch((error) =>
-      this.profile.record("journal.write", { job: j.id, error: String(error) }),
-    );
+    void this.save(j)
+      .then(() => this.trimHistory())
+      .catch((error) =>
+        this.profile.record("journal.write", {
+          job: j.id,
+          error: String(error),
+        }),
+      );
     this.emit("change", j);
     this.pump();
     return j;
@@ -341,7 +459,7 @@ export class Jobs extends EventEmitter {
           error: String(error),
         });
       });
-      if (j.state === "completed" && stored) {
+      if (this.terminal(j) && stored) {
         j.result = undefined;
         j.input = undefined;
         j.logs = [];
@@ -356,6 +474,7 @@ export class Jobs extends EventEmitter {
         MiBps: j.bytes / 1048576 / ((performance.now() - start) / 1000),
         error: j.error,
       });
+      this.trimHistory();
       this.pump();
     }
   }
@@ -377,7 +496,7 @@ export class Jobs extends EventEmitter {
   }
   private save(j: Job) {
     const { input, checkpoint, result, logs, ...metadata } = j;
-    const completed = metadata.state === "completed";
+    const completed = this.terminal(metadata);
     const payload = completed ? JSON.stringify({ result, logs }) : undefined;
     const data = JSON.stringify({
       ...metadata,
@@ -395,7 +514,9 @@ export class Jobs extends EventEmitter {
       )
       .join("\n");
     dirty.clear();
-    const file = path.join(this.dir, j.id + ".json"),
+    const file = completed
+        ? path.join(this.historyDir, this.archiveName(j))
+        : path.join(this.dir, j.id + ".json"),
       journal = path.join(this.dir, j.id + ".checkpoint.jsonl");
     this.writes = this.writes
       .catch(() => {})
@@ -408,7 +529,7 @@ export class Jobs extends EventEmitter {
           );
           this.inputs.add(j.id);
         }
-        if (changes && metadata.state !== "completed")
+        if (changes && !completed)
           await fs.appendFile(journal, changes + "\n", { mode: 0o600 });
         if (payload !== undefined)
           await fs.writeFile(
@@ -418,9 +539,15 @@ export class Jobs extends EventEmitter {
           );
         await fs.writeFile(file + ".tmp", data, { mode: 0o600 });
         await fs.rename(file + ".tmp", file);
-        if (metadata.state === "completed") {
+        if (completed) {
+          const previous = await fs
+            .stat(path.join(this.dir, j.id + ".json"))
+            .catch(() => undefined);
+          await fs.rm(path.join(this.dir, j.id + ".json"), { force: true });
+          if (previous) this.historyCount++;
           await fs.rm(journal, { force: true });
           this.dirty.delete(j.id);
+          this.inputs.delete(j.id);
         }
       });
     return this.writes;

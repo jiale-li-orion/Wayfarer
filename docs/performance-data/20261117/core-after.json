@@ -1,0 +1,583 @@
+{
+  "environment": {
+    "node": "v22.23.2",
+    "platform": "linux"
+  },
+  "events": [
+    {
+      "at": "2026-11-17T06:02:06.932Z",
+      "stage": "job.start",
+      "job": "90bcfff2-a1c6-4602-9b67-c5f2d04b0626",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:06.933Z",
+      "stage": "job.start",
+      "job": "b5fd9b77-8558-4fec-81b9-c72efbf7be0d",
+      "kind": "transfer",
+      "queueMs": 2
+    },
+    {
+      "at": "2026-11-17T06:02:07.073Z",
+      "stage": "job.end",
+      "job": "90bcfff2-a1c6-4602-9b67-c5f2d04b0626",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 140.382896,
+      "bytes": 67108864,
+      "MiBps": 455.8815111526141
+    },
+    {
+      "at": "2026-11-17T06:02:07.074Z",
+      "stage": "job.end",
+      "job": "b5fd9b77-8558-4fec-81b9-c72efbf7be0d",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 141.34688800000004,
+      "bytes": 67108864,
+      "MiBps": 452.7844894824459
+    },
+    {
+      "at": "2026-11-17T06:02:07.074Z",
+      "stage": "job.start",
+      "job": "d3d5591e-a21a-4f4c-9a94-26a59c2a8591",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.152Z",
+      "stage": "job.end",
+      "job": "d3d5591e-a21a-4f4c-9a94-26a59c2a8591",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 78.14898900000003,
+      "bytes": 67108864,
+      "MiBps": 818.9407796922746
+    },
+    {
+      "at": "2026-11-17T06:02:07.152Z",
+      "stage": "job.start",
+      "job": "b652f0f5-95df-4b47-86aa-64e71ce1d19b",
+      "kind": "transfer",
+      "queueMs": 79
+    },
+    {
+      "at": "2026-11-17T06:02:07.229Z",
+      "stage": "job.end",
+      "job": "b652f0f5-95df-4b47-86aa-64e71ce1d19b",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 76.823577,
+      "bytes": 67108864,
+      "MiBps": 833.0677170678669
+    },
+    {
+      "at": "2026-11-17T06:02:07.235Z",
+      "stage": "job.start",
+      "job": "90c4e1d5-ce74-42a6-ae20-cfa3e7d87219",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.235Z",
+      "stage": "job.start",
+      "job": "4c4c675c-658b-44ec-8c1e-f70da167d766",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.369Z",
+      "stage": "job.end",
+      "job": "90c4e1d5-ce74-42a6-ae20-cfa3e7d87219",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 134.01217799999995,
+      "bytes": 67108864,
+      "MiBps": 477.5523602958253
+    },
+    {
+      "at": "2026-11-17T06:02:07.371Z",
+      "stage": "job.end",
+      "job": "4c4c675c-658b-44ec-8c1e-f70da167d766",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 136.02861000000001,
+      "bytes": 67108864,
+      "MiBps": 470.4873918568189
+    },
+    {
+      "at": "2026-11-17T06:02:07.381Z",
+      "stage": "job.start",
+      "job": "d1f47ffc-0b57-4395-8ed8-2ccd1bbc2b65",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.457Z",
+      "stage": "job.end",
+      "job": "d1f47ffc-0b57-4395-8ed8-2ccd1bbc2b65",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 76.36924699999997,
+      "bytes": 67108864,
+      "MiBps": 838.0262036914089
+    },
+    {
+      "at": "2026-11-17T06:02:07.457Z",
+      "stage": "job.start",
+      "job": "ce5a0048-db68-41af-a26b-9878250ca557",
+      "kind": "transfer",
+      "queueMs": 77
+    },
+    {
+      "at": "2026-11-17T06:02:07.531Z",
+      "stage": "job.end",
+      "job": "ce5a0048-db68-41af-a26b-9878250ca557",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 74.55463399999996,
+      "bytes": 67108864,
+      "MiBps": 858.4208618588383
+    },
+    {
+      "at": "2026-11-17T06:02:07.544Z",
+      "stage": "job.start",
+      "job": "a391d5e0-f40d-4499-9c81-9d0e4d963122",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.544Z",
+      "stage": "job.start",
+      "job": "a2e3d76a-ae1e-46e4-a51a-32a2642160c7",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.678Z",
+      "stage": "job.end",
+      "job": "a391d5e0-f40d-4499-9c81-9d0e4d963122",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 134.733968,
+      "bytes": 67108864,
+      "MiBps": 474.992611267279
+    },
+    {
+      "at": "2026-11-17T06:02:07.680Z",
+      "stage": "job.end",
+      "job": "a2e3d76a-ae1e-46e4-a51a-32a2642160c7",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 136.35765099999992,
+      "bytes": 67108864,
+      "MiBps": 469.3501482717454
+    },
+    {
+      "at": "2026-11-17T06:02:07.688Z",
+      "stage": "job.start",
+      "job": "4675819c-fb82-48a5-8bdb-2a4f0f164a04",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:02:07.764Z",
+      "stage": "job.end",
+      "job": "4675819c-fb82-48a5-8bdb-2a4f0f164a04",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 75.97540599999991,
+      "bytes": 67108864,
+      "MiBps": 842.2295363423756
+    },
+    {
+      "at": "2026-11-17T06:02:07.764Z",
+      "stage": "job.start",
+      "job": "3036ebda-3a4a-42c3-8990-5705cfcb442d",
+      "kind": "transfer",
+      "queueMs": 77
+    },
+    {
+      "at": "2026-11-17T06:02:07.838Z",
+      "stage": "job.end",
+      "job": "3036ebda-3a4a-42c3-8990-5705cfcb442d",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 73.52171300000009,
+      "bytes": 67108864,
+      "MiBps": 870.480605807712
+    }
+  ],
+  "cursorAfterCollapse": {
+    "scope": "shared-extension-host",
+    "pid": 1369484,
+    "rss": 98914304,
+    "heapTotal": 18718720,
+    "heapUsed": 9909072,
+    "external": 4586728,
+    "arrayBuffers": 2150436,
+    "cpu": {
+      "user": 151537,
+      "system": 45846
+    },
+    "cursors": 0,
+    "processes": 0,
+    "children": []
+  },
+  "transfers": [
+    {
+      "round": 0,
+      "conflict": "overwrite",
+      "wallMs": 142.246098,
+      "cpuMs": 247.106,
+      "peakRss": 112599040,
+      "rssStart": 98914304,
+      "maxRunning": 2,
+      "browseP95Ms": 28.673350999999997,
+      "browseCount": 5
+    },
+    {
+      "round": 0,
+      "conflict": "rename",
+      "wallMs": 161.176225,
+      "cpuMs": 254.81,
+      "peakRss": 126271488,
+      "rssStart": 112599040,
+      "maxRunning": 1,
+      "browseP95Ms": 12.188416999999959,
+      "browseCount": 9
+    },
+    {
+      "round": 1,
+      "conflict": "overwrite",
+      "wallMs": 145.556153,
+      "cpuMs": 224.195,
+      "peakRss": 136740864,
+      "rssStart": 126283776,
+      "maxRunning": 2,
+      "browseP95Ms": 35.159329999999954,
+      "browseCount": 5
+    },
+    {
+      "round": 1,
+      "conflict": "rename",
+      "wallMs": 163.08612800000003,
+      "cpuMs": 224.831,
+      "peakRss": 127340544,
+      "rssStart": 115003392,
+      "maxRunning": 1,
+      "browseP95Ms": 15.877401999999961,
+      "browseCount": 9
+    },
+    {
+      "round": 2,
+      "conflict": "overwrite",
+      "wallMs": 144.3820310000001,
+      "cpuMs": 219.216,
+      "peakRss": 129269760,
+      "rssStart": 127377408,
+      "maxRunning": 2,
+      "browseP95Ms": 32.084464000000025,
+      "browseCount": 5
+    },
+    {
+      "round": 2,
+      "conflict": "rename",
+      "wallMs": 160.58582400000012,
+      "cpuMs": 230.586,
+      "peakRss": 129269760,
+      "rssStart": 129269760,
+      "maxRunning": 1,
+      "browseP95Ms": 17.373064,
+      "browseCount": 9
+    }
+  ],
+  "browseCycles": [
+    {
+      "round": 0,
+      "wallMs": 86.76678100000004,
+      "cpuMs": 62.465,
+      "naturalMemory": {
+        "rss": 129200128,
+        "heapTotal": 27893760,
+        "heapUsed": 13358488,
+        "external": 10983115,
+        "arrayBuffers": 8539303
+      },
+      "memory": {
+        "rss": 129200128,
+        "heapTotal": 27893760,
+        "heapUsed": 9698016,
+        "external": 10983115,
+        "arrayBuffers": 8528359
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 129200128,
+        "heapTotal": 27893760,
+        "heapUsed": 9699184,
+        "external": 10983115,
+        "arrayBuffers": 8526159,
+        "cpu": {
+          "user": 1047071,
+          "system": 624724
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 1,
+      "wallMs": 87.46827199999984,
+      "cpuMs": 78.493,
+      "naturalMemory": {
+        "rss": 130822144,
+        "heapTotal": 27893760,
+        "heapUsed": 15527064,
+        "external": 4749667,
+        "arrayBuffers": 2305855
+      },
+      "memory": {
+        "rss": 130822144,
+        "heapTotal": 27893760,
+        "heapUsed": 9682448,
+        "external": 4749667,
+        "arrayBuffers": 2296455
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 130822144,
+        "heapTotal": 27893760,
+        "heapUsed": 9683696,
+        "external": 4749667,
+        "arrayBuffers": 2294855,
+        "cpu": {
+          "user": 1105271,
+          "system": 656131
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 2,
+      "wallMs": 89.63215600000012,
+      "cpuMs": 87.944,
+      "naturalMemory": {
+        "rss": 132730880,
+        "heapTotal": 28155904,
+        "heapUsed": 15477208,
+        "external": 4746467,
+        "arrayBuffers": 2302655
+      },
+      "memory": {
+        "rss": 132820992,
+        "heapTotal": 28155904,
+        "heapUsed": 9728056,
+        "external": 4746467,
+        "arrayBuffers": 2290055
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 132820992,
+        "heapTotal": 28155904,
+        "heapUsed": 9729176,
+        "external": 4746467,
+        "arrayBuffers": 2289055,
+        "cpu": {
+          "user": 1164160,
+          "system": 696975
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 3,
+      "wallMs": 88.66252399999985,
+      "cpuMs": 79.041,
+      "naturalMemory": {
+        "rss": 130899968,
+        "heapTotal": 28155904,
+        "heapUsed": 15327248,
+        "external": 4743267,
+        "arrayBuffers": 2299455
+      },
+      "memory": {
+        "rss": 131158016,
+        "heapTotal": 28155904,
+        "heapUsed": 9687072,
+        "external": 4743267,
+        "arrayBuffers": 2291911
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 131158016,
+        "heapTotal": 28155904,
+        "heapUsed": 9688192,
+        "external": 4743267,
+        "arrayBuffers": 2290311,
+        "cpu": {
+          "user": 1218686,
+          "system": 732064
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 4,
+      "wallMs": 87.87709199999995,
+      "cpuMs": 86.48,
+      "naturalMemory": {
+        "rss": 131641344,
+        "heapTotal": 28155904,
+        "heapUsed": 15329912,
+        "external": 4743267,
+        "arrayBuffers": 2299455
+      },
+      "memory": {
+        "rss": 131641344,
+        "heapTotal": 28155904,
+        "heapUsed": 9728272,
+        "external": 4743267,
+        "arrayBuffers": 2291655
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 131641344,
+        "heapTotal": 28155904,
+        "heapUsed": 9729392,
+        "external": 4743267,
+        "arrayBuffers": 2290055,
+        "cpu": {
+          "user": 1283082,
+          "system": 764185
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 5,
+      "wallMs": 87.0211119999999,
+      "cpuMs": 76.757,
+      "naturalMemory": {
+        "rss": 130887680,
+        "heapTotal": 28155904,
+        "heapUsed": 15396152,
+        "external": 4743267,
+        "arrayBuffers": 2299455
+      },
+      "memory": {
+        "rss": 130887680,
+        "heapTotal": 28155904,
+        "heapUsed": 9687792,
+        "external": 4743267,
+        "arrayBuffers": 2291055
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 130887680,
+        "heapTotal": 28155904,
+        "heapUsed": 9688912,
+        "external": 4743267,
+        "arrayBuffers": 2289255,
+        "cpu": {
+          "user": 1333255,
+          "system": 800502
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 6,
+      "wallMs": 87.60154199999988,
+      "cpuMs": 85.946,
+      "naturalMemory": {
+        "rss": 130023424,
+        "heapTotal": 28155904,
+        "heapUsed": 15435832,
+        "external": 4746467,
+        "arrayBuffers": 2302655
+      },
+      "memory": {
+        "rss": 130023424,
+        "heapTotal": 28155904,
+        "heapUsed": 9731096,
+        "external": 4746467,
+        "arrayBuffers": 2295255
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 130023424,
+        "heapTotal": 28155904,
+        "heapUsed": 9732216,
+        "external": 4746467,
+        "arrayBuffers": 2293911,
+        "cpu": {
+          "user": 1398479,
+          "system": 830979
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    },
+    {
+      "round": 7,
+      "wallMs": 87.68914299999983,
+      "cpuMs": 77.606,
+      "naturalMemory": {
+        "rss": 130867200,
+        "heapTotal": 28155904,
+        "heapUsed": 15333856,
+        "external": 4743267,
+        "arrayBuffers": 2299455
+      },
+      "memory": {
+        "rss": 130867200,
+        "heapTotal": 28155904,
+        "heapUsed": 9691192,
+        "external": 4743267,
+        "arrayBuffers": 2292511
+      },
+      "resources": {
+        "scope": "shared-extension-host",
+        "pid": 1369484,
+        "rss": 130867200,
+        "heapTotal": 28155904,
+        "heapUsed": 9692312,
+        "external": 4743267,
+        "arrayBuffers": 2291055,
+        "cpu": {
+          "user": 1453990,
+          "system": 862999
+        },
+        "cursors": 0,
+        "processes": 0,
+        "children": []
+      }
+    }
+  ],
+  "burst": {
+    "invalidations": 600,
+    "events": 1,
+    "wallMs": 250.97045999999978
+  }
+}

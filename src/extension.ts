@@ -98,6 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "dist")],
     };
+    core.directories.setVisible(panel.visible);
     panel.iconPath = new vscode.ThemeIcon("map");
     const webview = panel.webview;
     const nonce = randomUUID().replaceAll("-", "");
@@ -127,19 +128,34 @@ export async function activate(context: vscode.ExtensionContext) {
       '" src="' +
       asset("ui.js") +
       '"></script></body></html>';
+    let jobsSubscribed = false;
+    let lastJobCount = -1;
     const send = (event: any) => {
-      if (panel?.visible) void webview.postMessage(event);
+      if (event.type === "job" && panel?.visible) {
+        const count = core.jobs.busyCount();
+        if (count !== lastJobCount) {
+          lastJobCount = count;
+          void webview.postMessage({ type: "jobCount", count });
+        }
+      }
+      if (panel?.visible && (event.type !== "job" || jobsSubscribed))
+        void webview.postMessage(event);
     };
     core.on("event", send);
     webview.onDidReceiveMessage(async (m) => {
       try {
         let result: any;
         switch (m.method) {
+          case "jobSubscription":
+            jobsSubscribed = !!m.args.enabled;
+            result = true;
+            break;
           case "bootstrap":
             result = {
               endpoints: core.endpoints.configs(),
               view: core.view,
-              jobs: core.jobs.list(),
+              jobs: core.jobs.active(),
+              projects: core.inspector.projects(),
               capabilities,
               restored: core.restored,
             };
@@ -186,12 +202,13 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
     panel.onDidChangeViewState((e) => {
-      if (!e.webviewPanel.visible) core.directories.watch([]);
-      else void core.dispatch("setView", { expanded: core.view.expanded });
+      core.directories.setVisible(e.webviewPanel.visible);
+      if (!e.webviewPanel.visible) jobsSubscribed = false;
     });
     panel.onDidDispose(() => {
       core.off("event", send);
       panel = undefined;
+      core.directories.setVisible(false);
       core.directories.watch([]);
     });
   };
@@ -441,7 +458,8 @@ export async function activate(context: vscode.ExtensionContext) {
       cpuUserMs: (next.user - cpu.user) / 1000,
       cpuSystemMs: (next.system - cpu.system) / 1000,
       intervalMs: now - at,
-      jobs: core.jobs.records.size,
+      jobs: core.jobs.stats(),
+      directories: core.directories.stats(),
     });
     cpu = next;
     at = now;

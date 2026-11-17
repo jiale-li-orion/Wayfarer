@@ -1,3 +1,4 @@
+import { trimBranches } from "./branchCache";
 import React, {
   memo,
   useCallback,
@@ -40,33 +41,9 @@ import {
   parentPath,
   breadcrumbsFor,
 } from "../shared/displayPaths";
-declare const acquireVsCodeApi: () => {
-  postMessage: (m: any) => void;
-  setState: (state: unknown) => void;
-};
-const vscode = acquireVsCodeApi();
-vscode.setState({ version: 1 });
-const pageId = crypto.randomUUID();
-let seq = 0;
-const pending = new Map<
-  string,
-  { resolve: (v: any) => void; reject: (e: Error) => void }
->();
-const listeners = new Set<(v: any) => void>();
-function rpc<T = any>(method: string, args: any = {}): Promise<T> {
-  const id = pageId + ":" + ++seq;
-  vscode.postMessage({ id, method, args });
-  return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
-}
-window.addEventListener("message", (e) => {
-  const m = e.data;
-  if (m.id) {
-    const p = pending.get(m.id);
-    pending.delete(m.id);
-    if (m.error) p?.reject(Error(m.error));
-    else p?.resolve(m.result);
-  } else for (const l of listeners) l(m);
-});
+import { rpc, subscribe } from "./rpc";
+import { DetailPanel } from "./DetailPanel";
+import { TaskPanel } from "./TaskPanel";
 const Icon = ({ name }: { name: string }) => (
   <i aria-hidden="true" className={"codicon codicon-" + name} />
 );
@@ -90,6 +67,7 @@ type Data = Record<string, unknown> & {
   cached?: boolean;
   stamp?: number;
   agent?: boolean;
+  project?: boolean;
   onExpand: (ref: Ref) => void;
   onMore?: (key: string) => void;
   onDrop: (target: Ref, refs: Ref[]) => void;
@@ -170,7 +148,12 @@ const FileNode = memo(function FileNode({
               : "")
           }
         >
-          <strong>{data.label}</strong>
+          <strong>
+            {data.label}
+            {data.project && (
+              <i title="已登记项目" className="codicon codicon-project" />
+            )}
+          </strong>
           <span>
             {data.error
               ? "读取失败"
@@ -211,10 +194,14 @@ function App() {
   const [endpoints, setEndpoints] = useState<EndpointConfig[]>([]);
   const [view, setView] = useState<ViewState>(defaultView);
   const [branches, setBranches] = useState<Record<string, Page>>({});
+  const branchesRef = useRef(branches);
+  branchesRef.current = branches;
   const [nodes, setNodes] = useState<MapNode[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selected, setSelected] = useState<Ref[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [busy, setBusy] = useState(0);
+  const [projects, setProjects] = useState<Ref[]>([]);
+  const projectKeys = useMemo(() => new Set(projects.map(refKey)), [projects]);
   const [error, setError] = useState("");
   const [jobsOpen, setJobsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -229,6 +216,7 @@ function App() {
   const [conflict, setConflict] = useState("rename");
   const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [packageOpen, setPackageOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [caps, setCaps] = useState<Record<string, string[]>>({});
   const [pkg, setPkg] = useState({
     manager: "uv",
@@ -253,6 +241,7 @@ function App() {
   const viewRef = useRef(view);
   const selectionRef = useRef(selected);
   const loadPending = useRef(new Set<string>());
+  const refreshPending = useRef(new Set<string>());
   const worker = useRef<Worker | null>(null);
   const layoutId = useRef(0);
   const requestedFocus = useRef(true);
@@ -272,9 +261,12 @@ function App() {
     [],
   );
   const load = useCallback(
-    async (ref: Ref, refresh = false, cursor?: string) => {
+    async (ref: Ref, refresh = false, cursor?: string): Promise<void> => {
       const key = refKey(ref);
-      if (loadPending.current.has(key)) return;
+      if (loadPending.current.has(key)) {
+        if (refresh) refreshPending.current.add(key);
+        return;
+      }
       loadPending.current.add(key);
       try {
         const p = await rpc<Page>("list", { ref, cursor, refresh });
@@ -290,30 +282,32 @@ function App() {
               ? { ...p, entries: [...(prev[key]?.entries ?? []), ...p.entries] }
               : p,
           };
-          let count = Object.values(next).reduce(
-            (n, b) => n + b.entries.length,
-            0,
-          );
-          for (const k of Object.keys(next)) {
-            if (count <= 16000) break;
-            if (k !== key && !dataRef.current.has(k)) {
-              count -= next[k].entries.length;
-              delete next[k];
-            }
-          }
-          return next;
+          return trimBranches(next, key, dataRef.current);
         });
       } catch (e) {
-        setBranches((prev) => ({
-          ...prev,
-          [key]: {
-            entries: prev[key]?.entries ?? [],
-            stamp: Date.now(),
-            error: String(e),
-          },
-        }));
+        setBranches((prev) =>
+          trimBranches(
+            {
+              ...prev,
+              [key]: {
+                entries: prev[key]?.entries ?? [],
+                stamp: Date.now(),
+                error: String(e),
+              },
+            },
+            key,
+            dataRef.current,
+          ),
+        );
       } finally {
         loadPending.current.delete(key);
+        if (
+          refreshPending.current.delete(key) &&
+          (viewRef.current.expanded.includes(key) ||
+            (viewRef.current.root && refKey(viewRef.current.root) === key))
+        ) {
+          void load(ref, true);
+        }
       }
     },
     [],
@@ -451,6 +445,7 @@ function App() {
         setView(m.view);
         if (m.focus) requestedFocus.current = true;
       }
+      if (m.type === "projects") setProjects(m.projects);
       if (m.type === "endpoints") setEndpoints(m.endpoints);
       if (
         m.type === "branch" &&
@@ -459,10 +454,7 @@ function App() {
             refKey(viewRef.current.root) === refKey(m.ref)))
       )
         void load(m.ref, true);
-      if (m.type === "job")
-        setJobs((old) =>
-          [m.job, ...old.filter((j) => j.id !== m.job.id)].slice(0, 100),
-        );
+      if (m.type === "jobCount") setBusy(m.count);
       if (m.type === "search")
         setSearchResults((old) => [...old, ...m.entries].slice(0, 10000));
       if (m.type === "offline")
@@ -472,19 +464,23 @@ function App() {
           return { ...old, [k]: { ...old[k], cached: true, error: m.error } };
         });
     };
-    listeners.add(listen);
+    const unsubscribe = subscribe(listen);
     void rpc("bootstrap")
       .then((b) => {
         setEndpoints(b.endpoints);
+        setProjects(b.projects ?? []);
         setView(b.view);
-        setJobs(b.jobs);
+        setBusy(
+          b.jobs.filter((j: Job) => ["running", "queued"].includes(j.state))
+            .length,
+        );
         if (b.restored) requestedFocus.current = false;
         setCaps(b.capabilities);
         void flow.setViewport(b.view.viewport);
       })
       .catch((e) => setError(String(e)));
     return () => {
-      listeners.delete(listen);
+      unsubscribe();
     };
   }, [load, flow]);
   useEffect(() => {
@@ -529,6 +525,7 @@ function App() {
         cached: page?.cached,
         stamp: page?.stamp,
         agent: !!isAgent,
+        project: projectKeys.has(id),
         onExpand: expand,
         onMore: more,
         onDrop,
@@ -630,6 +627,7 @@ function App() {
       );
   }, [
     endpoints,
+    projectKeys,
     branches,
     view.root,
     view.expanded,
@@ -662,6 +660,11 @@ function App() {
           heapBytes: memory?.usedJSHeapSize,
           heapLimit: memory?.jsHeapSizeLimit,
           nodes: dataRef.current.size,
+          cachedBranches: Object.keys(branchesRef.current).length,
+          cachedEntries: Object.values(branchesRef.current).reduce(
+            (n, page) => n + page.entries.length,
+            0,
+          ),
           longTasks,
           longTaskMs: longMs,
         },
@@ -696,9 +699,6 @@ function App() {
       setSelected(nodes.flatMap((n) => (n.data.ref ? [n.data.ref] : []))),
     [],
   );
-  const busy = jobs.filter((j) =>
-    ["running", "queued"].includes(j.state),
-  ).length;
   const act = (method: string, args: any) =>
     safe(rpc(method, args).then(() => setJobsOpen(true)));
   const command = (name: string) => safe(rpc("command", { name }));
@@ -915,7 +915,12 @@ function App() {
           <Icon name="hubot" />
           跟随 Agent {view.follow ? "开" : "关"}
         </button>
-        <button onClick={() => setJobsOpen((v) => !v)}>
+        <button
+          onClick={() => {
+            setJobsOpen((v) => !v);
+            setDetailOpen(false);
+          }}
+        >
           <Icon name="tasklist" />
           任务{busy > 0 ? " " + busy : ""}
         </button>
@@ -928,6 +933,15 @@ function App() {
           <span>
             {selected.length === 1 ? selected[0].path : selected.length + " 项"}
           </span>
+          <button
+            onClick={() => {
+              setDetailOpen(true);
+              setJobsOpen(false);
+            }}
+            title="详情与环境"
+          >
+            <Icon name="info" />
+          </button>
           <button onClick={() => context("open")} title="打开">
             <Icon name="go-to-file" />
           </button>
@@ -1073,71 +1087,16 @@ function App() {
         </section>
       )}
       {jobsOpen && (
-        <section className="floating jobs">
-          <h2>
-            后台任务
-            <button title="性能日志" onClick={() => command("logs")}>
-              <Icon name="output" />
-            </button>
-            <button onClick={() => setJobsOpen(false)}>
-              <Icon name="close" />
-            </button>
-          </h2>
-          <div className="job-list">
-            {jobs.length === 0 ? (
-              <p>暂无任务</p>
-            ) : (
-              jobs.map((j) => (
-                <article key={j.id}>
-                  <div className="job-title">
-                    <strong>{j.kind}</strong>
-                    <span>{j.state}</span>
-                  </div>
-                  <p>{j.progress ?? j.id}</p>
-                  <p>
-                    {j.files} 项 · {(j.bytes / 1048576).toFixed(1)} MiB
-                  </p>
-                  {j.error && <p className="failure">{j.error}</p>}
-                  <div className="actions">
-                    {["running", "queued"].includes(j.state) &&
-                      j.kind !== "package" && (
-                        <button
-                          onClick={() =>
-                            act("jobControl", { id: j.id, action: "pause" })
-                          }
-                        >
-                          暂停
-                        </button>
-                      )}
-                    {["paused", "failed"].includes(j.state) && (
-                      <button
-                        onClick={() =>
-                          act("jobControl", { id: j.id, action: "resume" })
-                        }
-                      >
-                        继续
-                      </button>
-                    )}
-                    {!["completed", "cancelled"].includes(j.state) && (
-                      <button
-                        onClick={() =>
-                          act("jobControl", { id: j.id, action: "cancel" })
-                        }
-                      >
-                        取消
-                      </button>
-                    )}
-                    <button
-                      onClick={() => safe(rpc("jobDetails", { id: j.id }))}
-                    >
-                      详情与日志
-                    </button>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-        </section>
+        <TaskPanel close={() => setJobsOpen(false)} onError={setError} />
+      )}
+      {detailOpen && selectionPath && (
+        <DetailPanel
+          target={selectionPath}
+          close={() => setDetailOpen(false)}
+          navigate={navigate}
+          packages={() => setPackageOpen(true)}
+          onError={setError}
+        />
       )}
       {transfer && (
         <div className="modal-backdrop">

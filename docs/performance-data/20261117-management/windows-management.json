@@ -1,0 +1,2060 @@
+{
+  "at": "2026-11-17T10:02:26.656Z",
+  "transfer": {
+    "seconds": 4.803514407999999,
+    "bytes": 16777216,
+    "digest": "bed6dd886803911448139eb2974b1c90cfdf6987b3a26f2abc84a48d1e95ef65",
+    "directoryLatencyMs": [
+      5.998854999998002,
+      3.4498319999984233,
+      2.9024910000007367,
+      3.051224999999249,
+      2.8236790000009933,
+      9.34786399999939,
+      3.372496999996656,
+      3.2571960000022955,
+      3.7982090000004973,
+      2.919624999998632,
+      3.752058999998553,
+      4.295493000001443,
+      2.6598620000004303,
+      2.5935969999991357,
+      2.8047010000009323,
+      6.719020000000455,
+      2.9389479999990726,
+      2.6141849999985425
+    ]
+  },
+  "cycles": {
+    "count": 30,
+    "before": {
+      "metrics": [
+        {
+          "name": "Timestamp",
+          "value": 16277.073346
+        },
+        {
+          "name": "AudioHandlers",
+          "value": 0
+        },
+        {
+          "name": "AudioWorkletProcessors",
+          "value": 0
+        },
+        {
+          "name": "Documents",
+          "value": 2
+        },
+        {
+          "name": "Frames",
+          "value": 3
+        },
+        {
+          "name": "JSEventListeners",
+          "value": 254
+        },
+        {
+          "name": "LayoutObjects",
+          "value": 170
+        },
+        {
+          "name": "MediaKeySessions",
+          "value": 0
+        },
+        {
+          "name": "MediaKeys",
+          "value": 0
+        },
+        {
+          "name": "Nodes",
+          "value": 309
+        },
+        {
+          "name": "Resources",
+          "value": 2
+        },
+        {
+          "name": "ContextLifecycleStateObservers",
+          "value": 6
+        },
+        {
+          "name": "V8PerContextDatas",
+          "value": 2
+        },
+        {
+          "name": "WorkerGlobalScopes",
+          "value": 1
+        },
+        {
+          "name": "UACSSResources",
+          "value": 0
+        },
+        {
+          "name": "RTCPeerConnections",
+          "value": 0
+        },
+        {
+          "name": "ResourceFetchers",
+          "value": 3
+        },
+        {
+          "name": "AdSubframes",
+          "value": 0
+        },
+        {
+          "name": "DetachedScriptStates",
+          "value": 0
+        },
+        {
+          "name": "ArrayBufferContents",
+          "value": 0
+        },
+        {
+          "name": "LayoutCount",
+          "value": 4
+        },
+        {
+          "name": "RecalcStyleCount",
+          "value": 4
+        },
+        {
+          "name": "LayoutDuration",
+          "value": 0.007077
+        },
+        {
+          "name": "RecalcStyleDuration",
+          "value": 0.000829
+        },
+        {
+          "name": "DevToolsCommandDuration",
+          "value": 0.012637
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.041203
+        },
+        {
+          "name": "V8CompileDuration",
+          "value": 0
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.088893
+        },
+        {
+          "name": "TaskOtherDuration",
+          "value": 0.027147
+        },
+        {
+          "name": "ThreadTime",
+          "value": 0.073127
+        },
+        {
+          "name": "ProcessTime",
+          "value": 1.216434
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 3821816
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 4718592
+        },
+        {
+          "name": "FirstMeaningfulPaint",
+          "value": 0
+        },
+        {
+          "name": "DomContentLoaded",
+          "value": 16086.998427
+        },
+        {
+          "name": "NavigationStart",
+          "value": 16086.878508
+        }
+      ],
+      "dom": {
+        "documents": 2,
+        "nodes": 309,
+        "jsEventListeners": 254
+      },
+      "visibility": "visible"
+    },
+    "after": {
+      "metrics": [
+        {
+          "name": "Timestamp",
+          "value": 16278.90172
+        },
+        {
+          "name": "AudioHandlers",
+          "value": 0
+        },
+        {
+          "name": "AudioWorkletProcessors",
+          "value": 0
+        },
+        {
+          "name": "Documents",
+          "value": 2
+        },
+        {
+          "name": "Frames",
+          "value": 3
+        },
+        {
+          "name": "JSEventListeners",
+          "value": 254
+        },
+        {
+          "name": "LayoutObjects",
+          "value": 213
+        },
+        {
+          "name": "MediaKeySessions",
+          "value": 0
+        },
+        {
+          "name": "MediaKeys",
+          "value": 0
+        },
+        {
+          "name": "Nodes",
+          "value": 319
+        },
+        {
+          "name": "Resources",
+          "value": 2
+        },
+        {
+          "name": "ContextLifecycleStateObservers",
+          "value": 6
+        },
+        {
+          "name": "V8PerContextDatas",
+          "value": 2
+        },
+        {
+          "name": "WorkerGlobalScopes",
+          "value": 1
+        },
+        {
+          "name": "UACSSResources",
+          "value": 0
+        },
+        {
+          "name": "RTCPeerConnections",
+          "value": 0
+        },
+        {
+          "name": "ResourceFetchers",
+          "value": 3
+        },
+        {
+          "name": "AdSubframes",
+          "value": 0
+        },
+        {
+          "name": "DetachedScriptStates",
+          "value": 0
+        },
+        {
+          "name": "ArrayBufferContents",
+          "value": 0
+        },
+        {
+          "name": "LayoutCount",
+          "value": 5
+        },
+        {
+          "name": "RecalcStyleCount",
+          "value": 5
+        },
+        {
+          "name": "LayoutDuration",
+          "value": 0.009657
+        },
+        {
+          "name": "RecalcStyleDuration",
+          "value": 0.001323
+        },
+        {
+          "name": "DevToolsCommandDuration",
+          "value": 0.032077
+        },
+        {
+          "name": "ScriptDuration",
+          "value": 0.18066
+        },
+        {
+          "name": "V8CompileDuration",
+          "value": 0
+        },
+        {
+          "name": "TaskDuration",
+          "value": 0.282355
+        },
+        {
+          "name": "TaskOtherDuration",
+          "value": 0.058638
+        },
+        {
+          "name": "ThreadTime",
+          "value": 0.262884
+        },
+        {
+          "name": "ProcessTime",
+          "value": 1.493215
+        },
+        {
+          "name": "JSHeapUsedSize",
+          "value": 3968260
+        },
+        {
+          "name": "JSHeapTotalSize",
+          "value": 4980736
+        },
+        {
+          "name": "FirstMeaningfulPaint",
+          "value": 0
+        },
+        {
+          "name": "DomContentLoaded",
+          "value": 16086.998427
+        },
+        {
+          "name": "NavigationStart",
+          "value": 16086.878508
+        }
+      ],
+      "dom": {
+        "documents": 2,
+        "nodes": 319,
+        "jsEventListeners": 254
+      },
+      "visibility": "visible"
+    },
+    "diagnostics": {
+      "directories": {
+        "cachedBranches": 5,
+        "cachedEntries": 302,
+        "uiCursors": 0,
+        "pendingUiReads": 0,
+        "watches": 1,
+        "editorWatches": 0,
+        "pendingChanges": 0,
+        "polling": true,
+        "visible": true
+      },
+      "jobs": {
+        "records": 9,
+        "historyOnDisk": 9,
+        "retainedTerminal": 9,
+        "running": 0,
+        "heldLocks": 0,
+        "progressTimers": 0,
+        "states": {
+          "completed": 9
+        }
+      },
+      "inspector": {
+        "snapshots": 7,
+        "snapshotBytes": 6206,
+        "pending": 0,
+        "projects": 1
+      },
+      "endpoints": [
+        {
+          "id": "windows-c",
+          "connected": false,
+          "enabled": true
+        },
+        {
+          "id": "windows-d",
+          "connected": false,
+          "enabled": true
+        },
+        {
+          "id": "windows-e",
+          "connected": false,
+          "enabled": true
+        },
+        {
+          "id": "windows-f",
+          "connected": false,
+          "enabled": true
+        },
+        {
+          "id": "wsl-ubuntu",
+          "connected": true,
+          "enabled": true
+        },
+        {
+          "id": "train",
+          "connected": true,
+          "enabled": true
+        },
+        {
+          "id": "infer",
+          "connected": true,
+          "enabled": true
+        },
+        {
+          "id": "offline-fixture",
+          "connected": false,
+          "enabled": false
+        }
+      ]
+    }
+  },
+  "closed": {
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 16279.027618
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 2
+      },
+      {
+        "name": "Frames",
+        "value": 3
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 234
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 213
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 213
+      },
+      {
+        "name": "Resources",
+        "value": 2
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 6
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 1
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 3
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 0
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 0
+      },
+      {
+        "name": "LayoutCount",
+        "value": 5
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 5
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.009657
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.001323
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.032743
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.181848
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.297793
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.072222
+      },
+      {
+        "name": "ThreadTime",
+        "value": 0.277964
+      },
+      {
+        "name": "ProcessTime",
+        "value": 1.536965
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 3951072
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 4456448
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 0
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 16086.998427
+      },
+      {
+        "name": "NavigationStart",
+        "value": 16086.878508
+      }
+    ],
+    "dom": {
+      "documents": 2,
+      "nodes": 213,
+      "jsEventListeners": 234
+    },
+    "visibility": "visible"
+  },
+  "healthyAfterOffline": 84,
+  "inventory": [
+    {
+      "endpoint": "windows-c",
+      "ms": 14932.059981999999,
+      "tools": [
+        {
+          "name": "uv",
+          "exitCode": 0
+        },
+        {
+          "name": "node",
+          "exitCode": 0
+        },
+        {
+          "name": "python3",
+          "exitCode": 9009
+        },
+        {
+          "name": "python",
+          "exitCode": 0
+        },
+        {
+          "name": "npm",
+          "exitCode": 0
+        },
+        {
+          "name": "rustup",
+          "exitCode": 0
+        },
+        {
+          "name": "cargo",
+          "exitCode": 0
+        },
+        {
+          "name": "winget",
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "endpoint": "wsl-ubuntu",
+      "ms": 1940.5674999999992,
+      "tools": [
+        {
+          "name": "uv",
+          "exitCode": 0
+        },
+        {
+          "name": "node",
+          "exitCode": 0
+        },
+        {
+          "name": "python3",
+          "exitCode": 0
+        },
+        {
+          "name": "npm",
+          "exitCode": 0
+        },
+        {
+          "name": "bun",
+          "exitCode": 0
+        },
+        {
+          "name": "java",
+          "exitCode": 0
+        },
+        {
+          "name": "rustup",
+          "exitCode": 0
+        },
+        {
+          "name": "cargo",
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "endpoint": "train",
+      "ms": 1639.9592940000002,
+      "tools": [
+        {
+          "name": "uv",
+          "exitCode": 0
+        },
+        {
+          "name": "python3",
+          "exitCode": 0
+        },
+        {
+          "name": "python",
+          "exitCode": 0
+        }
+      ]
+    },
+    {
+      "endpoint": "infer",
+      "ms": 1126.6998310000017,
+      "tools": [
+        {
+          "name": "python3",
+          "exitCode": 0
+        },
+        {
+          "name": "python",
+          "exitCode": 0
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "input": {
+        "endpoint": "wsl-ubuntu",
+        "cwd": "/home/orion",
+        "manager": "flutter",
+        "action": "info",
+        "executable": "/home/orion/flutter/bin/flutter"
+      },
+      "plan": {
+        "argv": [
+          "/home/orion/flutter/bin/flutter",
+          "--version"
+        ],
+        "cwd": "/home/orion",
+        "source": "当前环境中管理器已配置的源",
+        "mutating": false
+      },
+      "ms": 311.85358299999996,
+      "state": "completed"
+    },
+    {
+      "input": {
+        "endpoint": "wsl-ubuntu",
+        "cwd": "/home/orion",
+        "manager": "android",
+        "action": "list",
+        "executable": "/home/orion/Android/cmdline-tools/latest/bin/sdkmanager"
+      },
+      "plan": {
+        "argv": [
+          "/home/orion/Android/cmdline-tools/latest/bin/sdkmanager",
+          "--list"
+        ],
+        "cwd": "/home/orion",
+        "source": "当前环境中管理器已配置的源",
+        "mutating": false
+      },
+      "ms": 3572.848772,
+      "state": "completed"
+    },
+    {
+      "input": {
+        "endpoint": "windows-c",
+        "cwd": "C:\\Users\\29461",
+        "manager": "winget",
+        "action": "list"
+      },
+      "plan": {
+        "argv": [
+          "winget",
+          "list"
+        ],
+        "cwd": "C:\\Users\\29461",
+        "source": "当前环境中管理器已配置的源",
+        "mutating": false
+      },
+      "ms": 17945.345312999998,
+      "state": "completed"
+    }
+  ],
+  "idle": [
+    {
+      "label": "baseline",
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 16670.48082
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 352
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 670
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 661
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 6
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 1
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 3
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 0
+          },
+          {
+            "name": "LayoutCount",
+            "value": 2
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 2
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.000256
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.000107
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 3.3e-05
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.020261
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.03315
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.012493
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.031867
+          },
+          {
+            "name": "ProcessTime",
+            "value": 0.62763
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4884196
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5767168
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 16435.689495
+          },
+          {
+            "name": "NavigationStart",
+            "value": 16435.627447
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 661,
+          "jsEventListeners": 352
+        },
+        "visibility": "visible"
+      },
+      "resourcesBefore": {
+        "windows-c": {
+          "scope": "shared-extension-host",
+          "pid": 26148,
+          "rss": 150990848,
+          "heapTotal": 41746432,
+          "heapUsed": 39008160,
+          "external": 7515414,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 953000,
+            "system": 812000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        "wsl-ubuntu": {
+          "pid": 180729,
+          "rss": 19963904,
+          "peakRss": 19726336,
+          "cpuUserMs": 149.857,
+          "cpuSystemMs": 50.364,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 1,
+          "children": [],
+          "transport": {
+            "calls": 88,
+            "failures": 0,
+            "sentBytes": 35385,
+            "receivedBytes": 178869,
+            "serializeMs": 0.652800000164234,
+            "parseMs": 1.9737999999256317,
+            "rpcElapsedMs": 594.3890000000088,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "train": {
+          "pid": 1505229,
+          "rss": 24096768,
+          "peakRss": 24096768,
+          "cpuUserMs": 35.257,
+          "cpuSystemMs": 6.508,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 23,
+            "failures": 0,
+            "sentBytes": 1050,
+            "receivedBytes": 25973,
+            "serializeMs": 0.053899999998975545,
+            "parseMs": 0.40619999997579725,
+            "rpcElapsedMs": 1834.778600000005,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "infer": {
+          "pid": 2349508,
+          "rss": 16355328,
+          "peakRss": 16355328,
+          "cpuUserMs": 28.732999999999997,
+          "cpuSystemMs": 4.125,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 23,
+            "failures": 0,
+            "sentBytes": 1042,
+            "receivedBytes": 15308,
+            "serializeMs": 0.09120000006078044,
+            "parseMs": 0.4024000000572414,
+            "rpcElapsedMs": 1352.7199000000692,
+            "peakPending": 1,
+            "pending": 0
+          },
+          "transferUsers": 0
+        }
+      },
+      "viewBefore": {
+        "expanded": [],
+        "viewport": {
+          "x": 50,
+          "y": 403,
+          "zoom": 1
+        },
+        "bookmarks": [],
+        "follow": false,
+        "history": [
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          }
+        ],
+        "historyIndex": 1,
+        "agent": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        },
+        "agentEntry": {
+          "name": "orion",
+          "path": "/home/orion",
+          "kind": "directory",
+          "size": 4096,
+          "mtime": 1794896708236.446,
+          "ctime": 1794896708236.446,
+          "mode": 488,
+          "identity": "2096:688",
+          "tags": [],
+          "resolved": "/home/orion"
+        },
+        "root": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        }
+      },
+      "elapsedMs": 60128.173641999994,
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 16732.213574
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 352
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 670
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 661
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 6
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 1
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 3
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 0
+          },
+          {
+            "name": "LayoutCount",
+            "value": 2
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 2
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.000256
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.000107
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.000363
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.024891
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.054229
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.028612
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.063709
+          },
+          {
+            "name": "ProcessTime",
+            "value": 0.661701
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4897340
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6029312
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 16435.689495
+          },
+          {
+            "name": "NavigationStart",
+            "value": 16435.627447
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 661,
+          "jsEventListeners": 352
+        },
+        "visibility": "visible"
+      },
+      "resourcesAfter": {
+        "windows-c": {
+          "scope": "shared-extension-host",
+          "pid": 26148,
+          "rss": 147927040,
+          "heapTotal": 41746432,
+          "heapUsed": 39213544,
+          "external": 7521317,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 968000,
+            "system": 828000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        "wsl-ubuntu": {
+          "pid": 180729,
+          "rss": 19963904,
+          "peakRss": 19726336,
+          "cpuUserMs": 158.692,
+          "cpuSystemMs": 50.364,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 1,
+          "children": [],
+          "transport": {
+            "calls": 106,
+            "failures": 0,
+            "sentBytes": 36130,
+            "receivedBytes": 180561,
+            "serializeMs": 0.7708000001809978,
+            "parseMs": 2.2911999999255386,
+            "rpcElapsedMs": 613.4404000000054,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "train": {
+          "pid": 1505229,
+          "rss": 24096768,
+          "peakRss": 24096768,
+          "cpuUserMs": 36.412,
+          "cpuSystemMs": 6.508,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 28,
+            "failures": 0,
+            "sentBytes": 1255,
+            "receivedBytes": 26797,
+            "serializeMs": 0.061000000103376806,
+            "parseMs": 0.4765999999435735,
+            "rpcElapsedMs": 2001.1644000000524,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "infer": {
+          "pid": 2349508,
+          "rss": 16355328,
+          "peakRss": 16355328,
+          "cpuUserMs": 29.994,
+          "cpuSystemMs": 4.282,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 28,
+            "failures": 0,
+            "sentBytes": 1247,
+            "receivedBytes": 16170,
+            "serializeMs": 0.09790000008797506,
+            "parseMs": 0.6354000001228997,
+            "rpcElapsedMs": 1492.6291000000638,
+            "peakPending": 1,
+            "pending": 0
+          },
+          "transferUsers": 0
+        }
+      },
+      "viewAfter": {
+        "expanded": [],
+        "viewport": {
+          "x": 50,
+          "y": 403,
+          "zoom": 1
+        },
+        "bookmarks": [],
+        "follow": false,
+        "history": [
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          }
+        ],
+        "historyIndex": 1,
+        "agent": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        },
+        "agentEntry": {
+          "name": "orion",
+          "path": "/home/orion",
+          "kind": "directory",
+          "size": 4096,
+          "mtime": 1794896708236.446,
+          "ctime": 1794896708236.446,
+          "mode": 488,
+          "identity": "2096:688",
+          "tags": [],
+          "resolved": "/home/orion"
+        },
+        "root": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        }
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 4,
+          "cachedEntries": 300,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "label": "candidate",
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 16670.564958
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 356
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 672
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 674
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 6
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 1
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 2
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 0
+          },
+          {
+            "name": "LayoutCount",
+            "value": 3
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 4
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.006961
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.008315
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 4.3e-05
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.052768
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.107867
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.03978
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.104773
+          },
+          {
+            "name": "ProcessTime",
+            "value": 11.871912
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 5643768
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6291456
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 16086.998427
+          },
+          {
+            "name": "NavigationStart",
+            "value": 16086.878508
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 674,
+          "jsEventListeners": 356
+        },
+        "visibility": "visible"
+      },
+      "resourcesBefore": {
+        "windows-c": {
+          "scope": "shared-extension-host",
+          "pid": 28180,
+          "rss": 74919936,
+          "heapTotal": 42127360,
+          "heapUsed": 40123668,
+          "external": 7963300,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 2015000,
+            "system": 1453000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        "wsl-ubuntu": {
+          "pid": 177527,
+          "rss": 20557824,
+          "peakRss": 19902464,
+          "cpuUserMs": 175.988,
+          "cpuSystemMs": 92.543,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 1,
+          "children": [],
+          "transport": {
+            "calls": 199,
+            "failures": 6,
+            "sentBytes": 47289,
+            "receivedBytes": 644252,
+            "serializeMs": 1.1388000002087892,
+            "parseMs": 5.141300000087767,
+            "rpcElapsedMs": 4013.4278000001605,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "train": {
+          "pid": 1501706,
+          "rss": 26550272,
+          "peakRss": 31797248,
+          "cpuUserMs": 74.764,
+          "cpuSystemMs": 35.251,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 95,
+            "failures": 6,
+            "sentBytes": 6231,
+            "receivedBytes": 22417472,
+            "serializeMs": 0.5273999997298233,
+            "parseMs": 14.732299999712268,
+            "rpcElapsedMs": 6024.34829999978,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 24,
+            "failures": 1,
+            "sentBytes": 22373780,
+            "receivedBytes": 1544,
+            "serializeMs": 23.854800000059186,
+            "parseMs": 0.23919999998179264,
+            "rpcElapsedMs": 3801.7850000000035,
+            "peakPending": 4
+          }
+        },
+        "infer": {
+          "pid": 2329368,
+          "rss": 18980864,
+          "peakRss": 18980864,
+          "cpuUserMs": 35.183,
+          "cpuSystemMs": 10.034999999999998,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 79,
+            "failures": 6,
+            "sentBytes": 4040,
+            "receivedBytes": 34810,
+            "serializeMs": 0.23550000015529804,
+            "parseMs": 0.9213999998755753,
+            "rpcElapsedMs": 3784.334600000293,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0
+        }
+      },
+      "viewBefore": {
+        "expanded": [],
+        "viewport": {
+          "x": 50,
+          "y": 405,
+          "zoom": 1
+        },
+        "bookmarks": [],
+        "follow": false,
+        "history": [
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          },
+          {
+            "endpoint": "windows-c",
+            "path": "C:\\Users\\29461\\AppData\\Local\\Temp\\workspace-map-daily-077b55e3"
+          },
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          },
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/"
+          },
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          }
+        ],
+        "historyIndex": 6,
+        "agent": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        },
+        "agentEntry": {
+          "name": "orion",
+          "path": "/home/orion",
+          "kind": "directory",
+          "size": 4096,
+          "mtime": 1794896708236.446,
+          "ctime": 1794896708236.446,
+          "mode": 488,
+          "identity": "2096:688",
+          "tags": [],
+          "resolved": "/home/orion"
+        },
+        "root": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        }
+      },
+      "elapsedMs": 60202.515387,
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 16732.367755
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 356
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 672
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 674
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 6
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 1
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 2
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 0
+          },
+          {
+            "name": "LayoutCount",
+            "value": 3
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 4
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.006961
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.008315
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.000489
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.057868
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.129936
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.056303
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.138294
+          },
+          {
+            "name": "ProcessTime",
+            "value": 11.908544
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 5656060
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6553600
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 16086.998427
+          },
+          {
+            "name": "NavigationStart",
+            "value": 16086.878508
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 674,
+          "jsEventListeners": 356
+        },
+        "visibility": "visible"
+      },
+      "resourcesAfter": {
+        "windows-c": {
+          "scope": "shared-extension-host",
+          "pid": 28180,
+          "rss": 66023424,
+          "heapTotal": 42389504,
+          "heapUsed": 40326152,
+          "external": 7969399,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 2015000,
+            "system": 1468000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        "wsl-ubuntu": {
+          "pid": 177527,
+          "rss": 20561920,
+          "peakRss": 19902464,
+          "cpuUserMs": 180.149,
+          "cpuSystemMs": 96.139,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 1,
+          "children": [],
+          "transport": {
+            "calls": 216,
+            "failures": 6,
+            "sentBytes": 48003,
+            "receivedBytes": 645899,
+            "serializeMs": 1.2707000002454834,
+            "parseMs": 5.371600000141598,
+            "rpcElapsedMs": 4029.069800000153,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        "train": {
+          "pid": 1501706,
+          "rss": 26550272,
+          "peakRss": 31797248,
+          "cpuUserMs": 75.43699999999998,
+          "cpuSystemMs": 35.753,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 100,
+            "failures": 6,
+            "sentBytes": 6437,
+            "receivedBytes": 22418324,
+            "serializeMs": 0.5397999996202998,
+            "parseMs": 14.83159999983036,
+            "rpcElapsedMs": 6149.476799999655,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 24,
+            "failures": 1,
+            "sentBytes": 22373780,
+            "receivedBytes": 1544,
+            "serializeMs": 23.854800000059186,
+            "parseMs": 0.23919999998179264,
+            "rpcElapsedMs": 3801.7850000000035,
+            "peakPending": 4
+          }
+        },
+        "infer": {
+          "pid": 2329368,
+          "rss": 18980864,
+          "peakRss": 18980864,
+          "cpuUserMs": 36.253,
+          "cpuSystemMs": 10.34,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 84,
+            "failures": 6,
+            "sentBytes": 4245,
+            "receivedBytes": 35637,
+            "serializeMs": 0.25140000027022325,
+            "parseMs": 0.9706999998306856,
+            "rpcElapsedMs": 3904.1908000003314,
+            "peakPending": 15,
+            "pending": 0
+          },
+          "transferUsers": 0
+        }
+      },
+      "viewAfter": {
+        "expanded": [],
+        "viewport": {
+          "x": 50,
+          "y": 405,
+          "zoom": 1
+        },
+        "bookmarks": [],
+        "follow": false,
+        "history": [
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          },
+          {
+            "endpoint": "windows-c",
+            "path": "C:\\Users\\29461\\AppData\\Local\\Temp\\workspace-map-daily-077b55e3"
+          },
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          },
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/"
+          },
+          null,
+          {
+            "endpoint": "wsl-ubuntu",
+            "path": "/home/orion"
+          }
+        ],
+        "historyIndex": 6,
+        "agent": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        },
+        "agentEntry": {
+          "name": "orion",
+          "path": "/home/orion",
+          "kind": "directory",
+          "size": 4096,
+          "mtime": 1794896708236.446,
+          "ctime": 1794896708236.446,
+          "mode": 488,
+          "identity": "2096:688",
+          "tags": [],
+          "resolved": "/home/orion"
+        },
+        "root": {
+          "endpoint": "wsl-ubuntu",
+          "path": "/home/orion"
+        }
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 9,
+          "cachedEntries": 527,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 11,
+          "historyOnDisk": 11,
+          "retainedTerminal": 11,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "completed": 11
+          }
+        },
+        "inspector": {
+          "snapshots": 6,
+          "snapshotBytes": 4822,
+          "pending": 0,
+          "projects": 0
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "infer",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "offline-fixture",
+            "connected": false,
+            "enabled": false
+          }
+        ]
+      }
+    }
+  ],
+  "agent": {
+    "codex": [
+      "map_endpoints",
+      "map_inspect",
+      "map_jobsPage",
+      "map_navigate"
+    ],
+    "dsh-verified": [
+      "mcp__workspace_map_daily__map_endpoints",
+      "mcp__workspace_map_daily__map_jobsPage",
+      "mcp__workspace_map_daily__map_inspect",
+      "mcp__workspace_map_daily__map_navigate"
+    ]
+  }
+}

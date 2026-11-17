@@ -1,0 +1,95 @@
+{
+  "connected": {
+    "sampleSeconds": 468.702,
+    "resources": [
+      {
+        "endpoint": "windows-c",
+        "cpuPercentSingleCore": 0.043524456904387006,
+        "rssMinMiB": 58.22265625,
+        "rssMaxMiB": 147.515625
+      },
+      {
+        "endpoint": "wsl-ubuntu",
+        "cpuPercentSingleCore": 0.006055446744413292,
+        "rssMinMiB": 18.921875,
+        "rssMaxMiB": 19.09765625
+      },
+      {
+        "endpoint": "profile-train",
+        "cpuPercentSingleCore": 0.0023535210005504576,
+        "rssMinMiB": 24.8203125,
+        "rssMaxMiB": 24.8203125
+      },
+      {
+        "endpoint": "profile-infer",
+        "cpuPercentSingleCore": 0.003904613165721503,
+        "rssMinMiB": 15.6640625,
+        "rssMaxMiB": 15.6640625
+      }
+    ],
+    "maxWatches": 0,
+    "visible": true
+  },
+  "canvas": {
+    "sampleSeconds": 471.536,
+    "resources": [
+      {
+        "endpoint": "windows-c",
+        "cpuPercentSingleCore": 0.08292049811679278,
+        "rssMinMiB": 39.74609375,
+        "rssMaxMiB": 62.93359375
+      },
+      {
+        "endpoint": "wsl-ubuntu",
+        "cpuPercentSingleCore": 0.015280699670862876,
+        "rssMinMiB": 18.20703125,
+        "rssMaxMiB": 18.98828125
+      },
+      {
+        "endpoint": "profile-train",
+        "cpuPercentSingleCore": 0.0037186980421431226,
+        "rssMinMiB": 24.8203125,
+        "rssMaxMiB": 24.8203125
+      },
+      {
+        "endpoint": "profile-infer",
+        "cpuPercentSingleCore": 0.008128753690068203,
+        "rssMinMiB": 15.6328125,
+        "rssMaxMiB": 15.6328125
+      }
+    ],
+    "maxWatches": 4,
+    "visible": true
+  },
+  "hidden": {
+    "sampleSeconds": 471.79,
+    "resources": [
+      {
+        "endpoint": "windows-c",
+        "cpuPercentSingleCore": 0.04641895758706204,
+        "rssMinMiB": 178.90625,
+        "rssMaxMiB": 179.97265625
+      },
+      {
+        "endpoint": "wsl-ubuntu",
+        "cpuPercentSingleCore": 0.01238283982280253,
+        "rssMinMiB": 20.9375,
+        "rssMaxMiB": 20.9375
+      },
+      {
+        "endpoint": "profile-train",
+        "cpuPercentSingleCore": 0.0027711481803344706,
+        "rssMinMiB": 22.953125,
+        "rssMaxMiB": 22.953125
+      },
+      {
+        "endpoint": "profile-infer",
+        "cpuPercentSingleCore": 0.003696559910129508,
+        "rssMinMiB": 15.65234375,
+        "rssMaxMiB": 15.65234375
+      }
+    ],
+    "maxWatches": 0,
+    "visible": false
+  }
+}

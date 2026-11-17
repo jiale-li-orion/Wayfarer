@@ -1,0 +1,17 @@
+[
+  {
+    "endpoint": "wsl-ubuntu",
+    "pid": 78383,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "endpoint": "profile-train",
+    "pid": 1405517,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "endpoint": "profile-infer",
+    "pid": 1145505,
+    "aliveAfterWindowClose": false
+  }
+]

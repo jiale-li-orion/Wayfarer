@@ -16,12 +16,15 @@ import {
   type Page,
 } from "../shared/types";
 import { alias, assertName, pathApi } from "../shared/paths";
-import { capabilities, discover, recipe } from "../packages/catalog";
+import { capabilities, recipe } from "../packages/catalog";
+import { Inspector } from "./inspect";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
   readonly endpoints: Endpoints;
   readonly directories: Directories;
   readonly jobs: Jobs;
+  readonly inspector: Inspector;
+  private inventories = new Map<string, string>();
   view = defaultView();
   restored = false;
   private timer?: NodeJS.Timeout;
@@ -52,17 +55,26 @@ export class Core extends EventEmitter {
       profile,
       options.transferConcurrency,
     );
+    this.inspector = new Inspector(this.endpoints, storage, profile);
+    this.jobs.register("inventory", (c) => this.inspector.inventory(c));
     const transfers = new Transfers(this.endpoints, (r) =>
       this.invalidateParent(r),
     );
     this.jobs.register("transfer", (c) => transfers.run(c));
     this.jobs.register("package", (c) => runPackage(this.endpoints, c));
     this.jobs.register("search", (c) => this.scan(c, "search"));
-    this.jobs.register("size", (c) => this.scan(c, "size"));
+    this.jobs.register("size", async (c) => {
+      const result = await this.scan(c, "size");
+      this.inspector.rememberUsage(c.job.input.ref, result);
+      return result;
+    });
     this.jobs.register("mutation", (c) => this.mutate(c));
-    this.jobs.on("change", (j) =>
-      this.emit("event", { type: "job", job: this.jobs.summary(j) }),
-    );
+    this.jobs.on("change", (j) => {
+      if (!["running", "queued"].includes(j.state))
+        for (const [key, id] of this.inventories)
+          if (id === j.id) this.inventories.delete(key);
+      this.emit("event", { type: "job", job: this.jobs.summary(j) });
+    });
     this.directories.on("change", (ref) =>
       this.emit("event", { type: "branch", ref }),
     );
@@ -74,6 +86,7 @@ export class Core extends EventEmitter {
     await fs.mkdir(this.storage, { recursive: true, mode: 0o700 });
     await this.endpoints.discover(configs);
     await this.jobs.init();
+    await this.inspector.init();
     try {
       const s = JSON.parse(
         await fs.readFile(path.join(this.storage, "view.json"), "utf8"),
@@ -87,16 +100,15 @@ export class Core extends EventEmitter {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => void this.persist(), 300);
   }
-  private async persist() {
+  private async persist(cache = this.directories.snapshot()) {
     const p = path.join(this.storage, "view.json");
-    await fs.writeFile(
-      p + ".tmp",
-      JSON.stringify({ view: this.view, cache: this.directories.snapshot() }),
-      { mode: 0o600 },
-    );
+    await fs.writeFile(p + ".tmp", JSON.stringify({ view: this.view, cache }), {
+      mode: 0o600,
+    });
     await fs.rename(p + ".tmp", p);
   }
   invalidateParent(r: Ref) {
+    this.inspector.invalidate(r.endpoint);
     const c = this.endpoints.get(r.endpoint).config;
     this.directories.invalidate({
       endpoint: r.endpoint,
@@ -158,6 +170,17 @@ export class Core extends EventEmitter {
         return this.endpoints.configs();
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
+      case "diagnostics":
+        return {
+          directories: this.directories.stats(),
+          jobs: this.jobs.stats(),
+          inspector: this.inspector.stats(),
+          endpoints: [...this.endpoints.items.values()].map((e) => ({
+            id: e.config.id,
+            connected: !!e.connected,
+            enabled: this.endpoints.enabled(e.config.id),
+          })),
+        };
       case "addEndpoint": {
         this.endpoints.add(a);
         this.emit("event", {
@@ -309,7 +332,22 @@ export class Core extends EventEmitter {
           !["skip", "rename", "overwrite"].includes(i.conflict)
         )
           throw Error("Explicit mode and conflict rule required");
-        const keys = [...i.sources, i.target].map((r) =>
+        const targetConfig = this.endpoints.get(i.target.endpoint).config;
+        // Auto-rename can choose another sibling, so it reserves the directory.
+        // Fixed destinations reserve their actual paths; independent files can run together.
+        const targets =
+          i.conflict === "rename"
+            ? [i.target]
+            : i.sources.map((source) => ({
+                endpoint: i.target.endpoint,
+                path: pathApi(targetConfig).join(
+                  i.target.path,
+                  pathApi(this.endpoints.get(source.endpoint).config).basename(
+                    source.path,
+                  ),
+                ),
+              }));
+        const keys = [...i.sources, ...targets].map((r) =>
           alias(this.endpoints.get(r.endpoint).config, r.path),
         );
         return this.jobs.submit("transfer", i, keys);
@@ -347,6 +385,36 @@ export class Core extends EventEmitter {
         return this.jobs.submit(method, a);
       case "size":
         return this.jobs.submit(method, a);
+      case "inspect":
+        return this.inspector.detail(a.ref, !!a.refresh);
+      case "projects":
+        return this.inspector.projects(a.endpoint);
+      case "registerProject": {
+        if (!a.remove) {
+          const entry = await this.endpoints
+            .get(a.ref.endpoint)
+            .call("stat", { path: a.ref.path });
+          if (entry.kind !== "directory")
+            throw Error("Select a directory to register a project");
+        }
+        const projects = this.inspector.register(a.ref, !!a.remove);
+        this.emit("event", { type: "projects", projects });
+        return projects;
+      }
+      case "inventory": {
+        const key = JSON.stringify([a.endpoint, a.cwd ?? ""]);
+        const previous = this.inventories.get(key);
+        if (previous) {
+          const job = this.jobs.records.get(previous);
+          if (job && ["running", "queued"].includes(job.state))
+            return this.jobs.summary(job);
+        }
+        const job = this.jobs.submit("inventory", a);
+        this.inventories.set(key, job.id);
+        return this.jobs.summary(job);
+      }
+      case "jobsPage":
+        return this.jobs.page(a.cursor, a.limit);
       case "jobs":
         return this.jobs.list();
       case "job":
@@ -356,7 +424,8 @@ export class Core extends EventEmitter {
       case "packageCapabilities":
         return capabilities;
       case "packageDiscover":
-        return discover(this.endpoints.get(a.endpoint), a.cwd);
+        return (await this.inspector.discovery(a.endpoint, a.cwd, !!a.refresh))
+          .value;
       case "packagePlan":
         return recipe(a);
       case "package": {
@@ -474,6 +543,7 @@ export class Core extends EventEmitter {
       if (a.method === "mkdir") {
         assertName(e.config, a.name);
         await e.call("mkdir", { path: pathApi(e.config).join(r.path, a.name) });
+        this.inspector.invalidate(r.endpoint);
         this.directories.invalidate(r);
       }
       if (a.method === "rename") {
@@ -588,9 +658,11 @@ export class Core extends EventEmitter {
   }
   async dispose() {
     clearTimeout(this.timer);
+    const cache = this.directories.snapshot();
     this.directories.dispose();
     await this.jobs.dispose();
-    await this.persist();
+    await this.inspector.dispose();
+    await this.persist(cache);
     this.endpoints.dispose();
     this.profile.stop();
   }

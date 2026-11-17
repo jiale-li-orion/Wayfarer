@@ -1,0 +1,193 @@
+{
+  "environment": {
+    "platform": "linux",
+    "node": "v22.23.2"
+  },
+  "samples": [
+    {
+      "direction": "upload",
+      "wallMs": 7519.304897,
+      "cpuMs": 648.156,
+      "rssStart": 52064256,
+      "peakRss": 125784064,
+      "browseMs": [
+        19.410619999999994,
+        18.032359999999926,
+        956.2108920000001,
+        333.8150119999998,
+        270.94342000000006,
+        236.66735299999982,
+        227.13474899999983,
+        222.43446300000005,
+        586.9930690000001,
+        529.8142589999998,
+        641.0915279999999,
+        337.60749399999986,
+        283.5418300000001,
+        316.1387249999998,
+        283.1593119999998,
+        302.63900400000057,
+        383.3155200000001,
+        429.8263730000008,
+        49.11094800000046,
+        23.213020000000142
+      ],
+      "before": {
+        "pid": 1382838,
+        "rss": 23982080,
+        "peakRss": 23982080,
+        "cpuUserMs": 21.224999999999998,
+        "cpuSystemMs": 14.499,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 2,
+          "failures": 0,
+          "sentBytes": 120,
+          "receivedBytes": 195,
+          "serializeMs": 0.033310000000028595,
+          "parseMs": 0.05005700000003799,
+          "rpcElapsedMs": 394.91820600000005,
+          "peakPending": 1,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1382838,
+        "rss": 35414016,
+        "peakRss": 35414016,
+        "cpuUserMs": 176.503,
+        "cpuSystemMs": 56.349999999999994,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 95,
+          "failures": 1,
+          "sentBytes": 89493752,
+          "receivedBytes": 13717,
+          "serializeMs": 244.0430000000024,
+          "parseMs": 1.4798690000015995,
+          "rpcElapsedMs": 26252.71035599999,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    },
+    {
+      "direction": "download",
+      "wallMs": 6888.4195230000005,
+      "cpuMs": 1313.665,
+      "rssStart": 108044288,
+      "peakRss": 137945088,
+      "browseMs": [
+        21.27161299999989,
+        590.1188510000011,
+        495.1859850000001,
+        425.6133460000001,
+        296.60153999999966,
+        152.8531669999993,
+        74.68788099999983,
+        307.2724500000004,
+        230.13973199999964,
+        366.24710400000004,
+        253.3540979999998,
+        252.76654899999994,
+        282.7401260000006,
+        437.0545060000004,
+        226.07928700000048,
+        497.1624619999984,
+        346.1460790000001,
+        254.64477799999986,
+        323.4746930000001,
+        21.054846999999427
+      ],
+      "before": {
+        "pid": 1382838,
+        "rss": 35414016,
+        "peakRss": 35414016,
+        "cpuUserMs": 176.606,
+        "cpuSystemMs": 56.382999999999996,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 96,
+          "failures": 1,
+          "sentBytes": 89493793,
+          "receivedBytes": 13891,
+          "serializeMs": 244.04792100000213,
+          "parseMs": 1.4938940000020011,
+          "rpcElapsedMs": 26278.81698599999,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1382838,
+        "rss": 35033088,
+        "peakRss": 47034368,
+        "cpuUserMs": 363.032,
+        "cpuSystemMs": 163.55599999999998,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 186,
+          "failures": 1,
+          "sentBytes": 89504353,
+          "receivedBytes": 89502514,
+          "serializeMs": 244.4111800000046,
+          "parseMs": 150.47418099999686,
+          "rpcElapsedMs": 50342.85914599996,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    }
+  ],
+  "sha256": "a32282d78083208d646756b24b2b1976f6c979a54df4cd0265a88f35263edc9a",
+  "events": [
+    {
+      "at": "2026-11-17T06:38:55.422Z",
+      "stage": "job.start",
+      "job": "d5fdbd4a-eb4c-44ef-8c60-71e1e2b5342d",
+      "kind": "transfer",
+      "queueMs": 3
+    },
+    {
+      "at": "2026-11-17T06:39:03.546Z",
+      "stage": "job.end",
+      "job": "d5fdbd4a-eb4c-44ef-8c60-71e1e2b5342d",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 7393.518147000001,
+      "bytes": 67108864,
+      "MiBps": 8.656221526504716
+    },
+    {
+      "at": "2026-11-17T06:39:03.696Z",
+      "stage": "job.start",
+      "job": "be8e1d67-b1cc-494c-b87a-732eb2d44c1b",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:39:10.509Z",
+      "stage": "job.end",
+      "job": "be8e1d67-b1cc-494c-b87a-732eb2d44c1b",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 6812.85565,
+      "bytes": 67108864,
+      "MiBps": 9.393996525094927
+    }
+  ]
+}

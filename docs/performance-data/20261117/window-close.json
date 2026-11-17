@@ -1,0 +1,38 @@
+[
+  {
+    "run": "baseline-30min.jsonl",
+    "endpoint": "wsl-ubuntu",
+    "pid": 12409,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "run": "baseline-30min.jsonl",
+    "endpoint": "profile-train",
+    "pid": 1376324,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "run": "baseline-30min.jsonl",
+    "endpoint": "profile-infer",
+    "pid": 657137,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "run": "candidate-30min.jsonl",
+    "endpoint": "wsl-ubuntu",
+    "pid": 25649,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "run": "candidate-30min.jsonl",
+    "endpoint": "profile-train",
+    "pid": 1376361,
+    "aliveAfterWindowClose": false
+  },
+  {
+    "run": "candidate-30min.jsonl",
+    "endpoint": "profile-infer",
+    "pid": 657182,
+    "aliveAfterWindowClose": false
+  }
+]

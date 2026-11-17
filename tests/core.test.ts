@@ -473,8 +473,9 @@ test("completed result payload is loaded on demand and search result pages stay 
       query: "match",
     });
     assert.equal((await finish(f.core, j.id)).state, "completed");
-    assert.equal(f.core.jobs.get(j.id).result, undefined);
+    // The public details request waits for the durable result write before returning.
     const first = await f.core.dispatch("job", { id: j.id, limit: 100 });
+    assert.equal(f.core.jobs.get(j.id).result, undefined);
     assert.equal(first.result.entries.length, 100);
     assert.equal(first.result.total, 230);
     assert(first.result.hasMore);
@@ -503,4 +504,368 @@ test("canvas path controls retain Windows drive, UNC and POSIX filename semantic
     breadcrumbsFor("/tmp/a\\b", false).map((p) => p.label),
     ["/", "tmp", "a\\b"],
   );
+});
+
+test("late directory reply releases its cursor after collapse; hidden map keeps editor watchers", async () => {
+  const f = await fixture();
+  try {
+    for (let n = 0; n < 205; n++)
+      await fs.writeFile(path.join(f.a, `item-${n}`), "x");
+    const endpoint = f.core.endpoints.get("a"),
+      original = endpoint.call.bind(endpoint);
+    let release!: () => void, arrived!: () => void;
+    const gate = new Promise<void>((r) => (release = r)),
+      response = new Promise<void>((r) => (arrived = r));
+    endpoint.call = async (method, args) => {
+      const result = await original(method, args);
+      if (method === "list") {
+        arrived();
+        await gate;
+      }
+      return result;
+    };
+    const ref = { endpoint: "a", path: f.a };
+    f.core.directories.watch([ref]);
+    const read = f.core.directories.list(ref, undefined, true);
+    await response;
+    f.core.directories.watch([]);
+    release();
+    const page = await read;
+    assert.equal(page.entries.length, 200);
+    assert.equal(page.cursor, undefined);
+    assert.equal((await original("resources")).cursors, 0);
+    endpoint.call = original;
+    const releaseEditor = f.core.directories.retain(ref);
+    f.core.directories.watch([ref]);
+    f.core.directories.setVisible(false);
+    f.core.directories.watch([{ endpoint: "b", path: f.b }]);
+    assert.equal(f.core.directories.stats().watches, 1);
+    assert.equal(f.core.directories.stats().editorWatches, 1);
+    releaseEditor();
+    assert.equal(f.core.directories.stats().watches, 0);
+    f.core.directories.setVisible(true);
+    assert.equal(f.core.directories.stats().watches, 1);
+  } finally {
+    await f.close();
+  }
+});
+
+test("file bursts invalidate cached data immediately and notify each branch once", async () => {
+  const f = await fixture();
+  try {
+    const ref = { endpoint: "a", path: f.a };
+    await f.core.directories.list(ref);
+    let changes = 0;
+    f.core.directories.on("change", () => changes++);
+    for (let i = 0; i < 600; i++) f.core.directories.invalidate(ref);
+    await fs.writeFile(path.join(f.a, "new.txt"), "new");
+    const fresh = await f.core.directories.list(ref);
+    assert.equal(fresh.entries[0].name, "new.txt");
+    await new Promise((r) => setTimeout(r, 200));
+    assert.equal(changes, 1);
+    f.core.directories.invalidate(ref);
+    f.core.directories.dispose();
+    await new Promise((r) => setTimeout(r, 200));
+    assert.equal(changes, 1);
+    assert.equal(f.core.directories.stats().cachedEntries, 0);
+  } finally {
+    await f.close();
+  }
+});
+
+test("fixed distinct targets share a directory concurrently; same target and auto-rename remain serialized", async () => {
+  const f = await fixture();
+  const endpoint = f.core.endpoints.get("b"),
+    original = endpoint.call.bind(endpoint);
+  let release!: () => void;
+  try {
+    for (const file of ["one", "two"])
+      await fs.writeFile(path.join(f.a, file), file.repeat(1024));
+    for (const [conflict, names, expected] of [
+      ["overwrite", ["one", "two"], 2],
+      ["overwrite", ["one", "one"], 1],
+      ["rename", ["one", "two"], 1],
+    ] as const) {
+      const gate = new Promise<void>((r) => (release = r));
+      endpoint.call = async (method, args) => {
+        if (method === "stat" && args?.path === f.b) await gate;
+        return original(method, args);
+      };
+      const jobs = await Promise.all(
+        names.map((name) =>
+          f.core.dispatch("transfer", {
+            sources: [{ endpoint: "a", path: path.join(f.a, name) }],
+            target: { endpoint: "b", path: f.b },
+            mode: "copy",
+            conflict,
+          }),
+        ),
+      );
+      for (
+        let n = 0;
+        n < 100 && jobs.filter((j) => j.state === "running").length < expected;
+        n++
+      )
+        await new Promise((r) => setTimeout(r, 10));
+      assert.equal(jobs.filter((j) => j.state === "running").length, expected);
+      release();
+      for (const j of jobs)
+        assert.equal((await finish(f.core, j.id)).state, "completed");
+      assert.equal(
+        await fs.readFile(path.join(f.b, "one"), "utf8"),
+        "one".repeat(1024),
+      );
+      assert.equal(
+        await fs.readFile(path.join(f.b, "two"), "utf8"),
+        "two".repeat(1024),
+      );
+    }
+  } finally {
+    release?.();
+    endpoint.call = original;
+    await f.close();
+  }
+});
+
+test("current dsh bundle patch inserts one MCP plugin and preserves unrelated overlays", async () => {
+  const f = await fixture();
+  try {
+    const { connectDsh } = await import("../src/mcp/integrations");
+    const { parse } = await import("yaml");
+    const file = path.join(f.a, "cordis.patch.yml");
+    await fs.writeFile(
+      file,
+      "# user policy\n- id: permissions\n  config:\n    mode: ask\n- insert:\n    - id: unrelated\n      name: example\n",
+    );
+    const bridge: any = {
+      connections: [{ endpoint: "a" }],
+      config: () => ({
+        command: "python3",
+        args: ["mcp.py", "--session", "first"],
+      }),
+    };
+    await connectDsh(f.core, bridge, "a", file);
+    bridge.config = () => ({
+      command: "python3",
+      args: ["mcp.py", "--session", "second"],
+    });
+    await connectDsh(f.core, bridge, "a", file);
+    const raw = await fs.readFile(file, "utf8"),
+      rows = parse(raw);
+    const plugins = rows.flatMap((r: any) => r.insert ?? []);
+    assert.equal(
+      plugins.filter((p: any) => p.id === "mcp-workspace-map").length,
+      1,
+    );
+    assert.equal(
+      plugins.find((p: any) => p.id === "mcp-workspace-map").config.args.at(-1),
+      "second",
+    );
+    assert.equal(rows[0].config.mode, "ask");
+    assert.ok(plugins.find((p: any) => p.id === "unrelated"));
+    assert.ok(raw.includes("# user policy"));
+  } finally {
+    await f.close();
+  }
+});
+
+test("canvas retention bounds empty and failed off-screen directories while preserving visible pages", async () => {
+  const { trimBranches } = await import("../src/ui/branchCache");
+  let pages: any = {};
+  for (let n = 0; n < 1000; n++)
+    pages = trimBranches(
+      {
+        ...pages,
+        [String(n)]: {
+          entries: [],
+          stamp: n,
+          error: n % 2 ? "offline" : undefined,
+        },
+      },
+      String(n),
+      new Set(["0"]),
+    );
+  assert.equal(Object.keys(pages).length, 128);
+  assert.ok(pages["0"]);
+  assert.ok(pages["999"]);
+  assert.equal(pages["1"], undefined);
+});
+
+test("subscribing a branch during its first page preserves the live pagination cursor", async () => {
+  const f = await fixture();
+  try {
+    for (let n = 0; n < 205; n++)
+      await fs.writeFile(path.join(f.a, String(n)), "x");
+    const endpoint = f.core.endpoints.get("a"),
+      original = endpoint.call.bind(endpoint);
+    let release!: () => void, arrived!: () => void;
+    const response = new Promise<void>((r) => (arrived = r)),
+      gate = new Promise<void>((r) => (release = r));
+    endpoint.call = async (method, args) => {
+      const result = await original(method, args);
+      if (method === "list") {
+        arrived();
+        await gate;
+      }
+      return result;
+    };
+    const ref = { endpoint: "a", path: f.a },
+      read = f.core.directories.list(ref, undefined, true);
+    await response;
+    f.core.directories.watch([ref]);
+    release();
+    const page = await read;
+    assert.ok(page.cursor);
+    endpoint.call = original;
+    const next = await f.core.directories.list(ref, page.cursor);
+    assert.equal(next.entries.length, 5);
+  } finally {
+    await f.close();
+  }
+});
+
+test("transfer scopes release after completion, failure and cancellation", async () => {
+  const f = await fixture();
+  let leases = 0;
+  const endpoint = f.core.endpoints.get("b"),
+    original = endpoint.call.bind(endpoint);
+  endpoint.openTransfer = () => {
+    leases++;
+    return {
+      endpoint,
+      release() {
+        leases--;
+      },
+    };
+  };
+  let release: (() => void) | undefined;
+  try {
+    const source = path.join(f.a, "payload");
+    await fs.writeFile(source, Buffer.alloc(1048576, 71));
+    const submit = (p: string) =>
+      f.core.dispatch("transfer", {
+        sources: [{ endpoint: "a", path: p }],
+        target: { endpoint: "b", path: f.b },
+        mode: "copy",
+        conflict: "overwrite",
+      });
+    assert.equal(
+      (await finish(f.core, (await submit(source)).id)).state,
+      "completed",
+    );
+    assert.equal(leases, 0);
+    assert.equal(
+      (await finish(f.core, (await submit(path.join(f.a, "missing"))).id))
+        .state,
+      "failed",
+    );
+    assert.equal(leases, 0);
+    let reached!: () => void;
+    const entered = new Promise<void>((r) => (reached = r)),
+      gate = new Promise<void>((r) => (release = r));
+    endpoint.call = async (method, args) => {
+      if (method === "stat" && args?.path === f.b) {
+        reached();
+        await gate;
+      }
+      return original(method, args);
+    };
+    const job = await submit(source);
+    await entered;
+    f.core.jobs.control(job.id, "cancel");
+    release!();
+    assert.equal((await finish(f.core, job.id)).state, "cancelled");
+    assert.equal(leases, 0);
+    assert.equal((await fs.stat(source)).size, 1048576);
+  } finally {
+    release?.();
+    endpoint.call = original;
+    await f.close();
+  }
+});
+
+test("bounded small-file batches preserve distinct bytes across pause and resume", async () => {
+  const f = await fixture();
+  const source = path.join(f.a, "batch"),
+    target = path.join(f.b, "batch");
+  await fs.mkdir(source);
+  const expected = new Map<string, Buffer>();
+  for (let n = 0; n < 24; n++) {
+    const bytes = Buffer.alloc([0, 1, 1023, 65537, 262144][n % 5], n + 11);
+    expected.set(`file-${n}`, bytes);
+    await fs.writeFile(path.join(source, `file-${n}`), bytes);
+  }
+  const endpoint = f.core.endpoints.get("b"),
+    write = endpoint.writeBuffer!.bind(endpoint);
+  let release!: () => void, reached!: () => void;
+  const gate = new Promise<void>((r) => (release = r)),
+    entered = new Promise<void>((r) => (reached = r));
+  endpoint.writeBuffer = async (...args) => {
+    reached();
+    await gate;
+    return write(...args);
+  };
+  try {
+    const job = await f.core.dispatch("transfer", {
+      sources: [{ endpoint: "a", path: source }],
+      target: { endpoint: "b", path: f.b },
+      mode: "move",
+      conflict: "overwrite",
+    });
+    await entered;
+    f.core.jobs.control(job.id, "pause");
+    release();
+    assert.equal((await finish(f.core, job.id)).state, "paused");
+    endpoint.writeBuffer = write;
+    f.core.jobs.control(job.id, "resume");
+    assert.equal((await finish(f.core, job.id)).state, "completed");
+    assert.equal(
+      await fs.stat(source).then(
+        () => true,
+        () => false,
+      ),
+      false,
+    );
+    for (const [name, bytes] of expected)
+      assert.deepEqual(await fs.readFile(path.join(target, name)), bytes);
+  } finally {
+    release?.();
+    endpoint.writeBuffer = write;
+    await f.close();
+  }
+});
+
+test("dsh discovery selects current patch files and excludes dependency directories", async () => {
+  const f = await fixture();
+  const endpoint = f.core.endpoints.get("a"),
+    original = endpoint.call.bind(endpoint);
+  try {
+    const profiles = path.join(f.dir, ".dsh/profiles");
+    for (const name of ["current", "legacy", "node_modules"])
+      await fs.mkdir(path.join(profiles, name), { recursive: true });
+    await fs.writeFile(
+      path.join(profiles, "current/package.json"),
+      JSON.stringify({ dsh: { profile: { bundles: ["example"] } } }),
+    );
+    await fs.writeFile(path.join(profiles, "legacy/cordis.yml"), "[]\n");
+    endpoint.call = (async (method: string, args?: Record<string, any>) =>
+      method === "info"
+        ? { home: f.dir }
+        : method === "which"
+          ? "/fixture/dsh"
+          : original(method, args)) as typeof endpoint.call;
+    const { dshProfiles } = await import("../src/mcp/integrations");
+    const result = await dshProfiles(f.core, "a");
+    assert.deepEqual(result.profiles.map((p) => p.name).sort(), [
+      "current",
+      "legacy",
+    ]);
+    assert.equal(
+      result.profiles.find((p) => p.name === "current")?.path,
+      path.join(profiles, "current/cordis.patch.yml"),
+    );
+  } finally {
+    endpoint.call = original;
+    await f.close();
+  }
 });

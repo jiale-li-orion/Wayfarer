@@ -7,6 +7,11 @@ import { refKey, parseKey } from "../shared/types";
 import type { Profiler } from "./log";
 export class Directories extends EventEmitter {
   private mapRefs: Ref[] = [];
+  private visible = true;
+  private uiReads = new Map<string, object>();
+  private changes = new Map<string, Ref>();
+  private changeTimer?: NodeJS.Timeout;
+  private remoteUpdates = new Map<string, Promise<void>>();
   private external = new Map<string, { ref: Ref; count: number }>();
   private cache = new Map<string, Page>();
   private entries = 0;
@@ -56,12 +61,15 @@ export class Directories extends EventEmitter {
     )
       return { ...known, cached: true };
     if (!cursor && scope === "ui") this.closeUiCursor(key);
+    const request = {};
+    if (scope === "ui") this.uiReads.set(key, request);
+    const endpoint = this.endpoints.get(ref.endpoint);
     try {
       const page = await this.profile.time(
         "directory.read",
         { endpoint: ref.endpoint, path: ref.path, cursor: !!cursor, scope },
         () =>
-          this.endpoints.get(ref.endpoint).call<Page>("list", {
+          endpoint.call<Page>("list", {
             path: ref.path,
             cursor,
             limit: this.pageSize,
@@ -72,6 +80,16 @@ export class Directories extends EventEmitter {
           (a.kind === "directory" ? 0 : 1) - (b.kind === "directory" ? 0 : 1) ||
           a.name.localeCompare(b.name),
       );
+      if (
+        scope === "ui" &&
+        (this.disposed || !this.visible || this.uiReads.get(key) !== request)
+      ) {
+        if (page.cursor)
+          await endpoint
+            .call("scanClose", { cursor: page.cursor })
+            .catch(() => {});
+        return { ...page, hasMore: !!page.cursor, cursor: undefined };
+      }
       if (scope === "ui") {
         if (page.cursor) this.uiCursors.set(key, page.cursor);
         else this.uiCursors.delete(key);
@@ -92,9 +110,12 @@ export class Directories extends EventEmitter {
       if (!cursor && known)
         return { ...known, cached: true, error: String(error) };
       throw error;
+    } finally {
+      if (this.uiReads.get(key) === request) this.uiReads.delete(key);
     }
   }
-  private closeUiCursor(key: string) {
+  private closeUiCursor(key: string, retireRead = true) {
+    if (retireRead) this.uiReads.delete(key);
     const cursor = this.uiCursors.get(key);
     this.uiCursors.delete(key);
     if (!cursor) return;
@@ -115,9 +136,18 @@ export class Directories extends EventEmitter {
     }
   }
   invalidate(ref: Ref) {
-    this.closeUiCursor(refKey(ref));
+    this.closeUiCursor(refKey(ref), false);
     this.evict(refKey(ref));
-    this.emit("change", ref);
+    if (this.disposed) return;
+    this.changes.set(refKey(ref), ref);
+    // Coalesce a transfer/watch burst per branch, with a fixed flush window.
+    if (!this.changeTimer)
+      this.changeTimer = setTimeout(() => {
+        this.changeTimer = undefined;
+        const changes = [...this.changes.values()];
+        this.changes.clear();
+        for (const ref of changes) this.emit("change", ref);
+      }, 150);
   }
   snapshot() {
     return [...this.cache.entries()];
@@ -127,6 +157,23 @@ export class Directories extends EventEmitter {
       this.cache.set(k, { ...p, cached: true });
       this.entries += p.entries.length;
     }
+  }
+  setVisible(visible: boolean) {
+    this.visible = visible;
+    this.reconcile();
+  }
+  stats() {
+    return {
+      cachedBranches: this.cache.size,
+      cachedEntries: this.entries,
+      uiCursors: this.uiCursors.size,
+      pendingUiReads: this.uiReads.size,
+      watches: this.watched.size,
+      editorWatches: this.external.size,
+      pendingChanges: this.changes.size,
+      polling: !!this.timer,
+      visible: this.visible,
+    };
   }
   watch(refs: Ref[]) {
     this.mapRefs = refs;
@@ -147,13 +194,16 @@ export class Directories extends EventEmitter {
   }
   private reconcile() {
     let refs = [
-      ...this.mapRefs,
+      ...(this.visible ? this.mapRefs : []),
       ...[...this.external.values()].map((v) => v.ref),
     ];
     refs = refs.filter((r) => this.endpoints.enabled(r.endpoint));
     const next = new Set(refs.map(refKey));
-    const visible = new Set(this.mapRefs.map(refKey));
-    for (const key of this.uiCursors.keys())
+    const visible = new Set(this.visible ? this.mapRefs.map(refKey) : []);
+    for (const key of new Set([
+      ...this.uiCursors.keys(),
+      ...this.uiReads.keys(),
+    ]))
       if (!visible.has(key)) this.closeUiCursor(key);
     for (const [k, w] of this.watched)
       if (!next.has(k)) {
@@ -217,13 +267,29 @@ export class Directories extends EventEmitter {
       const key = paths.join("\0");
       if (this.remoteKeys.get(id) === key) continue;
       this.remoteKeys.set(id, key);
-      void this.endpoints
-        .get(id)
-        .call<boolean>("watchSet", { paths })
-        .then(
-          (ok) => this.remoteWatches.set(id, ok),
-          () => this.remoteWatches.set(id, false),
-        );
+      const endpoint = this.endpoints.get(id);
+      const previous = this.remoteUpdates.get(id) ?? Promise.resolve();
+      const update = previous
+        .catch(() => {})
+        .then(async () => {
+          if (
+            !this.endpoints.enabled(id) ||
+            this.endpoints.items.get(id) !== endpoint
+          )
+            return;
+          try {
+            const ok = await endpoint.call<boolean>("watchSet", { paths });
+            if (this.remoteKeys.get(id) === key) this.remoteWatches.set(id, ok);
+          } catch {
+            if (this.remoteKeys.get(id) === key)
+              this.remoteWatches.set(id, false);
+          }
+        });
+      this.remoteUpdates.set(id, update);
+      void update.finally(() => {
+        if (this.remoteUpdates.get(id) === update)
+          this.remoteUpdates.delete(id);
+      });
     }
     if (this.watched.size && !this.timer) {
       this.timer = setInterval(() => void this.poll(), 5000);
@@ -302,5 +368,10 @@ export class Directories extends EventEmitter {
     this.disposed = true;
     this.external.clear();
     this.watch([]);
+    clearTimeout(this.changeTimer);
+    this.changeTimer = undefined;
+    this.changes.clear();
+    this.cache.clear();
+    this.entries = 0;
   }
 }

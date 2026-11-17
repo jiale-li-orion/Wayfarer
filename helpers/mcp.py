@@ -63,7 +63,7 @@ def handle(m):
         if method=='notifications/initialized':subscribe()
         return
     try:
-        if method=='initialize':r=dict(protocolVersion=p.get('protocolVersion') if p.get('protocolVersion') in ('2024-11-05','2025-03-26','2025-06-18') else '2025-06-18',capabilities=dict(tools=dict(listChanged=False),logging={}),serverInfo=dict(name='workspace-map',version='0.1.0'),instructions='Bind a map session. Paths are endpoint-specific. File and package tools act with the endpoint user permissions. Windows delete uses recycle bin; WSL/Linux SSH delete is permanent. Long tasks return a job id; query or control jobs.')
+        if method=='initialize':r=dict(protocolVersion=p.get('protocolVersion') if p.get('protocolVersion') in ('2024-11-05','2025-03-26','2025-06-18') else '2025-06-18',capabilities=dict(tools=dict(listChanged=False),logging={}),serverInfo=dict(name='workspace-map',version='0.2.0'),instructions='Bind a map session. Paths are endpoint-specific. File and package tools act with the endpoint user permissions. Windows delete uses recycle bin; WSL/Linux SSH delete is permanent. Long tasks return a job id; query or control jobs.')
         elif method in ('ping','logging/setLevel'):r={}
         elif method=='tools/list':r=dict(tools=TOOLS)
         elif method=='tools/call':

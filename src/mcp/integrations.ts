@@ -54,12 +54,39 @@ export async function dshProfiles(core: Core, endpoint: string) {
     entries.push(...p.entries.filter((v: any) => v.kind === "directory"));
     cursor = p.cursor;
   } while (cursor);
+  const profiles = await Promise.all(
+    entries.map(async (v) => {
+      let file = "cordis.yml";
+      try {
+        const manifest = JSON.parse(
+          Buffer.from(
+            await e.call("read", {
+              path: path.posix.join(v.path, "package.json"),
+              length: 1048576,
+            }),
+            "base64",
+          ).toString("utf8"),
+        );
+        if (Array.isArray(manifest.dsh?.profile?.bundles))
+          file = "cordis.patch.yml";
+      } catch {}
+      const profilePath = path.posix.join(v.path, file);
+      if (file === "cordis.yml") {
+        try {
+          const stat = await e.call("stat", { path: profilePath });
+          if (!["file", "symlink"].includes(stat.kind)) return null;
+        } catch {
+          return null;
+        }
+      }
+      return { name: v.name, path: profilePath };
+    }),
+  );
   return {
     launcher,
-    profiles: entries.map((v) => ({
-      name: v.name,
-      path: path.posix.join(v.path, "cordis.yml"),
-    })),
+    profiles: profiles.filter(
+      (p): p is { name: string; path: string } => p !== null,
+    ),
   };
 }
 export async function connectDsh(
@@ -71,16 +98,28 @@ export async function connectDsh(
   const e = core.endpoints.get(endpoint);
   const c = bridge.connections.find((x) => x.endpoint === endpoint);
   if (!c) throw Error("Choose a local or WSL MCP endpoint");
-  const stat = await e.call("stat", { path: profile });
-  if (stat.size > 1048576)
-    throw Error("Profile too large for inline configuration editing");
-  const text = Buffer.from(
-    await e.call("read", { path: profile, length: 1048576 }),
-    "base64",
-  ).toString("utf8");
+  const patch = path.posix.basename(profile) === "cordis.patch.yml";
+  let text = "[]\n";
+  try {
+    const stat = await e.call("stat", { path: profile });
+    if (stat.size > 1048576)
+      throw Error("Profile too large for inline configuration editing");
+    text = Buffer.from(
+      await e.call("read", { path: profile, length: 1048576 }),
+      "base64",
+    ).toString("utf8");
+  } catch (error: any) {
+    if (
+      !patch ||
+      !(
+        ["ENOENT", 2].includes(error.code) || error.type === "FileNotFoundError"
+      )
+    )
+      throw error;
+  }
   const doc = parseDocument(text);
   if (doc.errors.length) throw Error(doc.errors[0].message);
-  // Cordis profiles use a root plugins sequence; preserve all unrelated YAML nodes and comments.
+  // Current bundle profiles use ordered patch layers; legacy profiles contain plugins directly.
   const plugins = (
     isSeq(doc.contents) ? doc.contents : doc.get("plugins", true)
   ) as any;
@@ -94,17 +133,19 @@ export async function connectDsh(
     name: "@deepseek-ai/dsh-mcp-client",
     config: { serverName: "workspace_map", transport: "stdio", ...config },
   };
-  const existing = plugins.items.findIndex(
-    (n: any) => n?.get?.("id") === "mcp-workspace-map",
-  );
-  if (existing >= 0) {
-    const node = plugins.items[existing];
+  const containers = patch
+    ? plugins.items.map((n: any) => n?.get?.("insert", true)).filter(isSeq)
+    : [plugins];
+  const node = containers
+    .flatMap((seq: any) => seq.items)
+    .find((n: any) => n?.get?.("id") === own.id);
+  if (node) {
     node.set("name", own.name);
     if (!node.get("config", true)) node.set("config", doc.createNode({}));
     const configuration = node.get("config", true);
     for (const [key, value] of Object.entries(own.config))
       configuration.set(key, doc.createNode(value));
-  } else plugins.add(doc.createNode(own));
+  } else plugins.add(doc.createNode(patch ? { insert: [own] } : own));
   const job = await core.dispatch("write", {
     ref: { endpoint, path: profile },
     content: doc.toString(),

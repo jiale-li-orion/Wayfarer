@@ -1,0 +1,6975 @@
+{
+  "started": "2026-11-17T07:19:04.134Z",
+  "browse": [
+    {
+      "kind": "real-root",
+      "endpoint": "windows-c",
+      "count": 179,
+      "ms": 66.51088600000003
+    },
+    {
+      "kind": "real-root",
+      "endpoint": "wsl-ubuntu",
+      "count": 84,
+      "ms": 9.694171000000097
+    },
+    {
+      "kind": "real-root",
+      "endpoint": "load-train",
+      "count": 24,
+      "ms": 132.53760799999964
+    },
+    {
+      "kind": "real-root",
+      "endpoint": "load-infer",
+      "count": 13,
+      "ms": 24.62630999999965
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 0,
+      "latency": [
+        41.624494000000595,
+        35.040022999999564,
+        34.02490399999988,
+        38.73284599999988,
+        40.2264269999996,
+        35.26300600000013,
+        46.79468700000052,
+        32.63951199999974,
+        33.70591400000012,
+        32.77146300000004,
+        32.263920000000326,
+        32.662013000000115,
+        38.30947500000002,
+        40.36793400000079,
+        38.846136000000115,
+        36.381813999999395,
+        37.07753099999991,
+        36.53523099999984,
+        32.10845100000006,
+        37.19156100000055
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6453.935874
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 3108
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 13947
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 12510
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 15
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 14
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.098113
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.052145
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.001154
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.396397
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.611087
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.063278
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.59298
+          },
+          {
+            "name": "ProcessTime",
+            "value": 1.441086
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 23161236
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 48254976
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 12510,
+          "jsEventListeners": 3108
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6454.734342
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 51
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 50
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.108532
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.059621
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.00975
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.648338
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.97913
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.152889
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.95639
+          },
+          {
+            "name": "ProcessTime",
+            "value": 1.960179
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4468528
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6553600
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 110,
+          "cachedEntries": 2632,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 1,
+      "latency": [
+        50.74523000000045,
+        33.50873999999931,
+        32.47594600000048,
+        30.800242000000253,
+        34.16834700000072,
+        33.92950900000051,
+        33.57193300000017,
+        38.665031000000454,
+        39.48800599999959,
+        39.782679999999345,
+        33.82703600000059,
+        47.500466999999844,
+        34.722758000000795,
+        34.11974800000007,
+        36.36504800000057,
+        37.49913800000013,
+        38.29742600000009,
+        31.319590000000062,
+        31.64569399999982,
+        39.234190000000126
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6454.742486
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 51
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 50
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.108532
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.059621
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.010428
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.648338
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 0.979886
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.152967
+          },
+          {
+            "name": "ThreadTime",
+            "value": 0.957226
+          },
+          {
+            "name": "ProcessTime",
+            "value": 1.961257
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4472004
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6815744
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6455.505581
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 85
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 84
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.117008
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.066263
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.017546
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.874561
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.297197
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.221819
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.268095
+          },
+          {
+            "name": "ProcessTime",
+            "value": 2.389312
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4600084
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 4980736
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 2632,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 1,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 2,
+      "latency": [
+        31.75763999999981,
+        33.243617000000086,
+        31.365695999999843,
+        33.124643000000106,
+        31.34342800000013,
+        31.39125999999942,
+        39.32831499999975,
+        38.96337200000016,
+        52.73385899999994,
+        30.67215699999997,
+        34.121288999999706,
+        34.39901800000007,
+        36.38831299999947,
+        30.020935999999892,
+        30.281379000000015,
+        29.217309999999998,
+        28.265051000000312,
+        29.464845000000423,
+        37.45284199999878,
+        30.070318000000043
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6455.511971
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 85
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 84
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.117008
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.066263
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.018022
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 0.874561
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.297753
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.221899
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.268711
+          },
+          {
+            "name": "ProcessTime",
+            "value": 2.390213
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4603560
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5242880
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6456.247765
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 121
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 120
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.125068
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.072927
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.025213
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.098755
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.602818
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.280855
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.562776
+          },
+          {
+            "name": "ProcessTime",
+            "value": 2.83684
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4880132
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5505024
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 2632,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 2,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 3,
+      "latency": [
+        30.852728999998362,
+        37.5395899999985,
+        39.37160699999913,
+        37.89679400000023,
+        48.830362999999124,
+        28.82026500000029,
+        34.10981999999967,
+        34.629173000001174,
+        38.24767400000019,
+        40.501979000000574,
+        32.30647599999975,
+        29.382746999999654,
+        36.51274800000101,
+        43.84256600000117,
+        36.68417599999884,
+        35.24107700000059,
+        36.06434900000022,
+        37.696303999999145,
+        36.3239880000001,
+        30.30765000000065
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6456.252498
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 121
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 120
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.125068
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.072927
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.025672
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.098755
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.603313
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.280891
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.563292
+          },
+          {
+            "name": "ProcessTime",
+            "value": 2.837457
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4883608
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5767168
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6457.058483
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 156
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 155
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.133274
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.0803
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.033894
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.323064
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.926567
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.356035
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.875625
+          },
+          {
+            "name": "ProcessTime",
+            "value": 3.24653
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4898832
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5767168
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 2632,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 2,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 4,
+      "latency": [
+        30.557675000000017,
+        33.19555599999876,
+        33.51126899999872,
+        33.88924599999882,
+        35.434863000000405,
+        36.8111659999995,
+        43.74491200000011,
+        35.56423200000063,
+        34.202901000000566,
+        35.37271899999905,
+        35.19839899999897,
+        36.92263699999967,
+        37.766345,
+        37.58753699999943,
+        35.77630499999941,
+        31.64364900000146,
+        31.057749999999942,
+        30.053028000000268,
+        30.42180399999961,
+        30.95063200000004
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6457.064895
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 156
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 155
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.133274
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.0803
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.034396
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.323064
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 1.92715
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.356116
+          },
+          {
+            "name": "ThreadTime",
+            "value": 1.876266
+          },
+          {
+            "name": "ProcessTime",
+            "value": 3.247512
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4902308
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6029312
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6457.835414
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 191
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 190
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.14145
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.08765
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.042306
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.524476
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.219388
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.423506
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.162709
+          },
+          {
+            "name": "ProcessTime",
+            "value": 3.635796
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4919832
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5767168
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 2632,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 1,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 5,
+      "latency": [
+        32.00615800000014,
+        33.37855800000034,
+        35.69609799999853,
+        40.41546799999924,
+        35.52446400000008,
+        31.39762200000041,
+        29.66851400000087,
+        30.28183100000024,
+        33.58451100000093,
+        34.0364210000007,
+        30.392923000001247,
+        30.694005999999717,
+        30.39456599999903,
+        30.601604999999836,
+        35.2489659999992,
+        31.613341999998738,
+        30.383589999999458,
+        36.46820800000023,
+        41.169229999999516,
+        29.577080999999453
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6457.840237
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 191
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 190
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.14145
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.08765
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.042773
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.524476
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.2199
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.423551
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.163261
+          },
+          {
+            "name": "ProcessTime",
+            "value": 3.636464
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4923308
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 6029312
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6458.578843
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 226
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 225
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.148735
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.093923
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.05117
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.734284
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.511336
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.483224
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.440326
+          },
+          {
+            "name": "ProcessTime",
+            "value": 4.009587
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4890188
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5505024
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 1202,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 2,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 6,
+      "latency": [
+        31.090892000000167,
+        35.12078199999996,
+        32.39684800000032,
+        31.423828999999387,
+        31.434065999999802,
+        35.20856999999887,
+        37.728117000000566,
+        46.61998700000004,
+        30.30557900000167,
+        29.920783999999912,
+        32.906622000000425,
+        31.98520599999938,
+        30.56869700000061,
+        30.41106899999977,
+        30.06546300000082,
+        31.5423920000012,
+        39.26027599999907,
+        33.11677899999995,
+        37.188491000000795,
+        37.43929699999899
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6458.584169
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 130
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 144
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 226
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 225
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.148735
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.093923
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.051625
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.734284
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.511829
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.483262
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.440852
+          },
+          {
+            "name": "ProcessTime",
+            "value": 4.010552
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4893664
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5767168
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 144,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6459.33532
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 127
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 142
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 261
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 260
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.157931
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.100317
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.059595
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.944544
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.815732
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.553345
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.737124
+          },
+          {
+            "name": "ProcessTime",
+            "value": 4.417564
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4414620
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 4980736
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 142,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 3,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "kind": "20-navigation-cycle",
+      "round": 7,
+      "latency": [
+        43.54715599999872,
+        31.797191999999995,
+        33.458912000000055,
+        34.583136999999624,
+        21.778645000000324,
+        33.57467499999984,
+        38.027570000000196,
+        35.73719099999835,
+        39.14157399999931,
+        38.25648200000069,
+        37.433279000000766,
+        59.39958399999887,
+        30.723533000000316,
+        32.50464100000136,
+        33.01333599999998,
+        32.977005000000645,
+        37.06798700000036,
+        38.65139299999828,
+        34.071562000000995,
+        32.13066799999979
+      ],
+      "before": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6459.343678
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 127
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 142
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 261
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 260
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.157931
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.100317
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.060136
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 1.944544
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 2.816329
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.553401
+          },
+          {
+            "name": "ThreadTime",
+            "value": 2.737776
+          },
+          {
+            "name": "ProcessTime",
+            "value": 4.418423
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4418096
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 5242880
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 142,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "after": {
+        "metrics": [
+          {
+            "name": "Timestamp",
+            "value": 6460.106072
+          },
+          {
+            "name": "AudioHandlers",
+            "value": 0
+          },
+          {
+            "name": "AudioWorkletProcessors",
+            "value": 0
+          },
+          {
+            "name": "Documents",
+            "value": 2
+          },
+          {
+            "name": "Frames",
+            "value": 3
+          },
+          {
+            "name": "JSEventListeners",
+            "value": 216
+          },
+          {
+            "name": "LayoutObjects",
+            "value": 127
+          },
+          {
+            "name": "MediaKeySessions",
+            "value": 0
+          },
+          {
+            "name": "MediaKeys",
+            "value": 0
+          },
+          {
+            "name": "Nodes",
+            "value": 142
+          },
+          {
+            "name": "Resources",
+            "value": 2
+          },
+          {
+            "name": "ContextLifecycleStateObservers",
+            "value": 7
+          },
+          {
+            "name": "V8PerContextDatas",
+            "value": 2
+          },
+          {
+            "name": "WorkerGlobalScopes",
+            "value": 2
+          },
+          {
+            "name": "UACSSResources",
+            "value": 0
+          },
+          {
+            "name": "RTCPeerConnections",
+            "value": 0
+          },
+          {
+            "name": "ResourceFetchers",
+            "value": 4
+          },
+          {
+            "name": "AdSubframes",
+            "value": 0
+          },
+          {
+            "name": "DetachedScriptStates",
+            "value": 0
+          },
+          {
+            "name": "ArrayBufferContents",
+            "value": 6
+          },
+          {
+            "name": "LayoutCount",
+            "value": 295
+          },
+          {
+            "name": "RecalcStyleCount",
+            "value": 294
+          },
+          {
+            "name": "LayoutDuration",
+            "value": 0.166238
+          },
+          {
+            "name": "RecalcStyleDuration",
+            "value": 0.106498
+          },
+          {
+            "name": "DevToolsCommandDuration",
+            "value": 0.068302
+          },
+          {
+            "name": "ScriptDuration",
+            "value": 2.159876
+          },
+          {
+            "name": "V8CompileDuration",
+            "value": 0
+          },
+          {
+            "name": "TaskDuration",
+            "value": 3.121171
+          },
+          {
+            "name": "TaskOtherDuration",
+            "value": 0.620257
+          },
+          {
+            "name": "ThreadTime",
+            "value": 3.036711
+          },
+          {
+            "name": "ProcessTime",
+            "value": 4.807449
+          },
+          {
+            "name": "JSHeapUsedSize",
+            "value": 4414068
+          },
+          {
+            "name": "JSHeapTotalSize",
+            "value": 4980736
+          },
+          {
+            "name": "FirstMeaningfulPaint",
+            "value": 0
+          },
+          {
+            "name": "DomContentLoaded",
+            "value": 6449.849482
+          },
+          {
+            "name": "NavigationStart",
+            "value": 6449.649536
+          }
+        ],
+        "dom": {
+          "documents": 2,
+          "nodes": 142,
+          "jsEventListeners": 216
+        },
+        "visibility": "visible"
+      },
+      "diagnostics": {
+        "directories": {
+          "cachedBranches": 128,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 1,
+          "editorWatches": 0,
+          "pendingChanges": 1,
+          "polling": true,
+          "visible": true
+        },
+        "jobs": {
+          "records": 10,
+          "running": 0,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {
+            "cancelled": 1,
+            "completed": 9
+          }
+        },
+        "endpoints": [
+          {
+            "id": "windows-c",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-d",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-e",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "windows-f",
+            "connected": false,
+            "enabled": true
+          },
+          {
+            "id": "wsl-ubuntu",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-train",
+            "connected": true,
+            "enabled": true
+          },
+          {
+            "id": "load-infer",
+            "connected": true,
+            "enabled": true
+          }
+        ]
+      }
+    }
+  ],
+  "transfers": [
+    {
+      "kind": "parallel-64MiB",
+      "frames": {
+        "count": 120,
+        "meanMs": 17.06583333333333,
+        "p95Ms": 17,
+        "maxMs": 33.399999999999636
+      },
+      "ms": 17981.257894000002,
+      "maxRunning": 2,
+      "browseMs": [
+        6.440870000000359,
+        6.404649000000063,
+        6.551933999999164,
+        5.764954000000216,
+        7.929775000000518,
+        5.161540000000969,
+        4.781538999999611,
+        4.532156000001123,
+        6.625403000001825,
+        19.833275000000867,
+        12.874335999997129,
+        15.815601999998762,
+        5.764904999999999,
+        6.705921999997372,
+        10.652421000002505,
+        8.690357999999833,
+        14.308356999998068,
+        6.854957999999897,
+        4.998984999998356,
+        5.5623110000015,
+        9.648542000002635
+      ],
+      "states": [
+        {
+          "state": "completed",
+          "bytes": 67108864
+        },
+        {
+          "state": "completed",
+          "bytes": 67108864
+        }
+      ],
+      "sha256": "eb51066508331ecf75b22a884dac806c6b75f8b039c57e86d464980409387cdf"
+    },
+    {
+      "kind": "small-files",
+      "ms": 11232.471193999998,
+      "files": 200,
+      "bytes": 1400,
+      "state": "completed"
+    }
+  ],
+  "resources": [
+    {
+      "phase": "before-transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 212783104,
+          "heapTotal": 55029760,
+          "heapUsed": 38403124,
+          "external": 9164825,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3703000,
+            "system": 2156000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 542.68,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 908,
+            "failures": 0,
+            "sentBytes": 113263,
+            "receivedBytes": 1691728,
+            "serializeMs": 6.118399999731082,
+            "parseMs": 15.062199999686527,
+            "rpcElapsedMs": 4256.15940000074,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 29.999,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 6,
+            "failures": 0,
+            "sentBytes": 362,
+            "receivedBytes": 17432,
+            "serializeMs": 0.021900000050663948,
+            "parseMs": 0.3051999999443069,
+            "rpcElapsedMs": 2397.042499999923,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 27.307,
+          "cpuSystemMs": 0.998,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 5,
+            "failures": 0,
+            "sentBytes": 289,
+            "receivedBytes": 6461,
+            "serializeMs": 0.018400000117253512,
+            "parseMs": 0.10169999999925494,
+            "rpcElapsedMs": 1696.255300000077,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 212525056,
+          "heapTotal": 55291904,
+          "heapUsed": 36094652,
+          "external": 7507359,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3718000,
+            "system": 2156000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 545.755,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 910,
+            "failures": 0,
+            "sentBytes": 113393,
+            "receivedBytes": 1734468,
+            "serializeMs": 6.125399999656111,
+            "parseMs": 15.230299999638191,
+            "rpcElapsedMs": 4260.104700000703,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 30.265,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 7,
+            "failures": 0,
+            "sentBytes": 402,
+            "receivedBytes": 17603,
+            "serializeMs": 0.02290000003995374,
+            "parseMs": 0.3173999999416992,
+            "rpcElapsedMs": 2424.8807999999262,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 23928832,
+            "peakRss": 23928832,
+            "cpuUserMs": 26.493,
+            "cpuSystemMs": 7.864,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 2,
+              "failures": 0,
+              "sentBytes": 114,
+              "receivedBytes": 430,
+              "serializeMs": 0.010599999979604036,
+              "parseMs": 0.015599999984260648,
+              "rpcElapsedMs": 1431.6912999999477,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 27.511999999999997,
+          "cpuSystemMs": 0.998,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 6,
+            "failures": 0,
+            "sentBytes": 329,
+            "receivedBytes": 6632,
+            "serializeMs": 0.019100000150501728,
+            "parseMs": 0.10550000000512227,
+            "rpcElapsedMs": 1724.183100000082,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 16351232,
+            "peakRss": 16351232,
+            "cpuUserMs": 22.622,
+            "cpuSystemMs": 3.761,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 2,
+              "failures": 0,
+              "sentBytes": 114,
+              "receivedBytes": 432,
+              "serializeMs": 0.007000000041443855,
+              "parseMs": 0.022999999986495823,
+              "rpcElapsedMs": 1300.7652000000235,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 209633280,
+          "heapTotal": 56733696,
+          "heapUsed": 37189192,
+          "external": 7922776,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3718000,
+            "system": 2187000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 548.732,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 912,
+            "failures": 0,
+            "sentBytes": 113523,
+            "receivedBytes": 1777209,
+            "serializeMs": 6.133999999598927,
+            "parseMs": 15.479399999653651,
+            "rpcElapsedMs": 4264.040600000685,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 19804160,
+            "peakRss": 19599360,
+            "cpuUserMs": 64.6,
+            "cpuSystemMs": 26.599999999999998,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 5,
+              "failures": 0,
+              "sentBytes": 376,
+              "receivedBytes": 822,
+              "serializeMs": 0.025599999935366213,
+              "parseMs": 0.0348000000230968,
+              "rpcElapsedMs": 447.3666000000085,
+              "peakPending": 3,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 30.54,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 8,
+            "failures": 0,
+            "sentBytes": 442,
+            "receivedBytes": 17773,
+            "serializeMs": 0.062400000053457916,
+            "parseMs": 0.32769999996526167,
+            "rpcElapsedMs": 2448.7822999999044,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 23928832,
+            "peakRss": 23928832,
+            "cpuUserMs": 26.764999999999997,
+            "cpuSystemMs": 7.9449999999999985,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 3,
+              "failures": 0,
+              "sentBytes": 154,
+              "receivedBytes": 614,
+              "serializeMs": 0.015099999960511923,
+              "parseMs": 0.026399999973364174,
+              "rpcElapsedMs": 1455.3485999999102,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 27.798,
+          "cpuSystemMs": 0.998,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 7,
+            "failures": 0,
+            "sentBytes": 369,
+            "receivedBytes": 6791,
+            "serializeMs": 0.021200000133831054,
+            "parseMs": 0.11839999997755513,
+            "rpcElapsedMs": 1744.6778000000631,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 16351232,
+            "peakRss": 16351232,
+            "cpuUserMs": 23.002,
+            "cpuSystemMs": 3.824,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 3,
+              "failures": 0,
+              "sentBytes": 154,
+              "receivedBytes": 591,
+              "serializeMs": 0.011000000056810677,
+              "parseMs": 0.03279999998630956,
+              "rpcElapsedMs": 1322.6126000000513,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 209707008,
+          "heapTotal": 56733696,
+          "heapUsed": 37469436,
+          "external": 7968308,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3718000,
+            "system": 2187000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 551.6759999999999,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 914,
+            "failures": 0,
+            "sentBytes": 113653,
+            "receivedBytes": 1819959,
+            "serializeMs": 6.141399999601163,
+            "parseMs": 15.623999999595071,
+            "rpcElapsedMs": 4267.812200000663,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 19808256,
+            "peakRss": 19599360,
+            "cpuUserMs": 65.684,
+            "cpuSystemMs": 27.045999999999996,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 6,
+              "failures": 0,
+              "sentBytes": 416,
+              "receivedBytes": 992,
+              "serializeMs": 0.02749999990919605,
+              "parseMs": 0.06300000002374873,
+              "rpcElapsedMs": 449.0286999999662,
+              "peakPending": 3,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 30.718,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 9,
+            "failures": 0,
+            "sentBytes": 482,
+            "receivedBytes": 17944,
+            "serializeMs": 0.06510000006528571,
+            "parseMs": 0.3357999999425374,
+            "rpcElapsedMs": 2484.5145999999368,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 23928832,
+            "peakRss": 23928832,
+            "cpuUserMs": 26.764999999999997,
+            "cpuSystemMs": 8.265,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 7,
+              "failures": 1,
+              "sentBytes": 544,
+              "receivedBytes": 981,
+              "serializeMs": 0.03859999997075647,
+              "parseMs": 0.054699999920558184,
+              "rpcElapsedMs": 1649.5385999999708,
+              "peakPending": 2,
+              "pending": 1
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 28.124999999999996,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 8,
+            "failures": 0,
+            "sentBytes": 409,
+            "receivedBytes": 6975,
+            "serializeMs": 0.023400000121910125,
+            "parseMs": 0.13219999999273568,
+            "rpcElapsedMs": 1778.2077000000281,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 16351232,
+            "peakRss": 16351232,
+            "cpuUserMs": 23.150000000000002,
+            "cpuSystemMs": 4.62,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 7,
+              "failures": 1,
+              "sentBytes": 544,
+              "receivedBytes": 977,
+              "serializeMs": 0.03300000005401671,
+              "parseMs": 0.08879999996861443,
+              "rpcElapsedMs": 1536.9846000000834,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 209817600,
+          "heapTotal": 56733696,
+          "heapUsed": 37859336,
+          "external": 8013960,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3718000,
+            "system": 2203000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 553.635,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 916,
+            "failures": 0,
+            "sentBytes": 113783,
+            "receivedBytes": 1862700,
+            "serializeMs": 6.148999999612897,
+            "parseMs": 15.915799999601404,
+            "rpcElapsedMs": 4270.906000000695,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 19820544,
+            "peakRss": 19599360,
+            "cpuUserMs": 66.774,
+            "cpuSystemMs": 27.494999999999997,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 9,
+              "failures": 0,
+              "sentBytes": 620,
+              "receivedBytes": 1698,
+              "serializeMs": 0.0474999999278225,
+              "parseMs": 0.1006000000052154,
+              "rpcElapsedMs": 459.54409999994095,
+              "peakPending": 3,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 30.822,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 10,
+            "failures": 0,
+            "sentBytes": 523,
+            "receivedBytes": 18116,
+            "serializeMs": 0.06930000003194436,
+            "parseMs": 0.34669999993639067,
+            "rpcElapsedMs": 2614.6680999999517,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 23928832,
+            "peakRss": 23928832,
+            "cpuUserMs": 26.764999999999997,
+            "cpuSystemMs": 8.746,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 9,
+              "failures": 1,
+              "sentBytes": 735,
+              "receivedBytes": 1640,
+              "serializeMs": 0.04989999992540106,
+              "parseMs": 0.07429999992018566,
+              "rpcElapsedMs": 2771.4914999998873,
+              "peakPending": 2,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 28.398,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 9,
+            "failures": 0,
+            "sentBytes": 449,
+            "receivedBytes": 7147,
+            "serializeMs": 0.02590000012423843,
+            "parseMs": 0.14309999998658895,
+            "rpcElapsedMs": 1886.6189000000013,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 16351232,
+            "peakRss": 16351232,
+            "cpuUserMs": 23.766,
+            "cpuSystemMs": 4.742999999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 10,
+              "failures": 1,
+              "sentBytes": 1399013,
+              "receivedBytes": 1618,
+              "serializeMs": 3.5930000000516884,
+              "parseMs": 0.14409999997587875,
+              "rpcElapsedMs": 1832.6679000000586,
+              "peakPending": 2,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 242425856,
+          "heapTotal": 81334272,
+          "heapUsed": 61776804,
+          "external": 18463947,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 3906000,
+            "system": 2234000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 556.7879999999999,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 918,
+            "failures": 0,
+            "sentBytes": 113913,
+            "receivedBytes": 1905451,
+            "serializeMs": 6.156599999566424,
+            "parseMs": 16.144799999651696,
+            "rpcElapsedMs": 4275.222600000715,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20447232,
+            "peakRss": 32174080,
+            "cpuUserMs": 141.963,
+            "cpuSystemMs": 103.595,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 18,
+              "failures": 0,
+              "sentBytes": 1585,
+              "receivedBytes": 11186867,
+              "serializeMs": 0.07589999999618158,
+              "parseMs": 11.987899999890942,
+              "rpcElapsedMs": 906.7885999999708,
+              "peakPending": 4,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 30.962999999999997,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 11,
+            "failures": 0,
+            "sentBytes": 564,
+            "receivedBytes": 18300,
+            "serializeMs": 0.07190000003902242,
+            "parseMs": 0.35469999990891665,
+            "rpcElapsedMs": 2852.7433999999776,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 31784960,
+            "peakRss": 31784960,
+            "cpuUserMs": 30.400999999999996,
+            "cpuSystemMs": 16.182,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 14,
+              "failures": 1,
+              "sentBytes": 5593906,
+              "receivedBytes": 1894,
+              "serializeMs": 5.244900000048801,
+              "parseMs": 0.11509999993722886,
+              "rpcElapsedMs": 13550.765799999936,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 28.647,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 10,
+            "failures": 0,
+            "sentBytes": 490,
+            "receivedBytes": 7320,
+            "serializeMs": 0.028300000121816993,
+            "parseMs": 0.15749999997206032,
+            "rpcElapsedMs": 2123.906399999978,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 30142464,
+            "peakRss": 30298112,
+            "cpuUserMs": 34.102000000000004,
+            "cpuSystemMs": 8.276,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 14,
+              "failures": 1,
+              "sentBytes": 5593906,
+              "receivedBytes": 1871,
+              "serializeMs": 9.244000000180677,
+              "parseMs": 0.1900000000023283,
+              "rpcElapsedMs": 15967.104800000146,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 285966336,
+          "heapTotal": 111079424,
+          "heapUsed": 78452656,
+          "external": 17099744,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4046000,
+            "system": 2328000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 564.855,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 922,
+            "failures": 0,
+            "sentBytes": 114173,
+            "receivedBytes": 1990919,
+            "serializeMs": 6.18069999954696,
+            "parseMs": 16.584899999658774,
+            "rpcElapsedMs": 4285.822600000692,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20455424,
+            "peakRss": 33660928,
+            "cpuUserMs": 264.69599999999997,
+            "cpuSystemMs": 264.69599999999997,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 35,
+              "failures": 0,
+              "sentBytes": 3504,
+              "receivedBytes": 33557066,
+              "serializeMs": 0.14619999995920807,
+              "parseMs": 37.77539999986766,
+              "rpcElapsedMs": 1792.0400999999838,
+              "peakPending": 4,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 31.239,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 12,
+            "failures": 0,
+            "sentBytes": 605,
+            "receivedBytes": 18472,
+            "serializeMs": 0.07780000002821907,
+            "parseMs": 0.3669999999110587,
+            "rpcElapsedMs": 2893.967000000004,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 27799552,
+            "peakRss": 33099776,
+            "cpuUserMs": 49.839999999999996,
+            "cpuSystemMs": 25.438,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 27,
+              "failures": 1,
+              "sentBytes": 22373361,
+              "receivedBytes": 2418,
+              "serializeMs": 28.38420000014594,
+              "parseMs": 0.24379999982193112,
+              "rpcElapsedMs": 19483.44729999994,
+              "peakPending": 5,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 28.903,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 11,
+            "failures": 0,
+            "sentBytes": 531,
+            "receivedBytes": 7493,
+            "serializeMs": 0.030700000119395554,
+            "parseMs": 0.16899999999441206,
+            "rpcElapsedMs": 2162.7726999999722,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 44.11599999999999,
+            "cpuSystemMs": 12.184,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 19,
+              "failures": 1,
+              "sentBytes": 11187083,
+              "receivedBytes": 2151,
+              "serializeMs": 13.495900000212714,
+              "parseMs": 0.22710000007646158,
+              "rpcElapsedMs": 25968.390200000198,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 317300736,
+          "heapTotal": 143822848,
+          "heapUsed": 114090868,
+          "external": 19941074,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4187000,
+            "system": 2687000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 567.412,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 925,
+            "failures": 0,
+            "sentBytes": 114345,
+            "receivedBytes": 2033727,
+            "serializeMs": 6.190899999565772,
+            "parseMs": 16.723999999688203,
+            "rpcElapsedMs": 4289.632500000685,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 2,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20459520,
+            "peakRss": 33697792,
+            "cpuUserMs": 591.531,
+            "cpuSystemMs": 562.776,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 72,
+              "failures": 0,
+              "sentBytes": 7791,
+              "receivedBytes": 83889763,
+              "serializeMs": 0.2851000000955537,
+              "parseMs": 71.82409999973606,
+              "rpcElapsedMs": 3742.0556000000797,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 31.495999999999995,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 13,
+            "failures": 0,
+            "sentBytes": 646,
+            "receivedBytes": 18656,
+            "serializeMs": 0.08100000000558794,
+            "parseMs": 0.3752999998978339,
+            "rpcElapsedMs": 3024.657099999953,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1402048,
+            "rss": 28569600,
+            "peakRss": 33202176,
+            "cpuUserMs": 106.31099999999999,
+            "cpuSystemMs": 39.39,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 60,
+              "failures": 1,
+              "sentBytes": 67118522,
+              "receivedBytes": 3454,
+              "serializeMs": 84.52780000003986,
+              "parseMs": 0.5929999999352731,
+              "rpcElapsedMs": 24028.39229999989,
+              "peakPending": 5,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 29.169999999999998,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 12,
+            "failures": 0,
+            "sentBytes": 572,
+            "receivedBytes": 7678,
+            "serializeMs": 0.032700000097975135,
+            "parseMs": 0.18439999996917322,
+            "rpcElapsedMs": 2290.289699999965,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 53.76,
+            "cpuSystemMs": 14.813,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 25,
+              "failures": 1,
+              "sentBytes": 16780303,
+              "receivedBytes": 2580,
+              "serializeMs": 17.842100000125356,
+              "parseMs": 0.2741000000969507,
+              "rpcElapsedMs": 32215.39570000011,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 348307456,
+          "heapTotal": 180244480,
+          "heapUsed": 155733672,
+          "external": 22736376,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4281000,
+            "system": 2812000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 570.032,
+          "cpuSystemMs": 574.603,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 928,
+            "failures": 0,
+            "sentBytes": 114517,
+            "receivedBytes": 2076630,
+            "serializeMs": 6.198899999538298,
+            "parseMs": 16.85409999969761,
+            "rpcElapsedMs": 4293.394000000649,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20459520,
+            "peakRss": 33742848,
+            "cpuUserMs": 791.05,
+            "cpuSystemMs": 717.654,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 96,
+              "failures": 0,
+              "sentBytes": 10415,
+              "receivedBytes": 111852969,
+              "serializeMs": 0.371200000110548,
+              "parseMs": 88.85649999964517,
+              "rpcElapsedMs": 4633.609900000156,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 31.971,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 15,
+            "failures": 0,
+            "sentBytes": 728,
+            "receivedBytes": 19012,
+            "serializeMs": 0.0851000000257045,
+            "parseMs": 0.41979999985778704,
+            "rpcElapsedMs": 3087.5955999999424,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 29.662999999999997,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 14,
+            "failures": 0,
+            "sentBytes": 654,
+            "receivedBytes": 8036,
+            "serializeMs": 0.03520000010030344,
+            "parseMs": 0.21639999997569248,
+            "rpcElapsedMs": 2347.518199999933,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 65.136,
+            "cpuSystemMs": 17.224,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 30,
+              "failures": 1,
+              "sentBytes": 22373484,
+              "receivedBytes": 2849,
+              "serializeMs": 22.67780000012135,
+              "parseMs": 0.3242000000900589,
+              "rpcElapsedMs": 35472.58010000008,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 250814464,
+          "heapTotal": 75681792,
+          "heapUsed": 53502668,
+          "external": 15594430,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4562000,
+            "system": 2890000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 572.616,
+          "cpuSystemMs": 577.125,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 931,
+            "failures": 0,
+            "sentBytes": 114735,
+            "receivedBytes": 2161950,
+            "serializeMs": 6.2102999995559,
+            "parseMs": 17.10319999971307,
+            "rpcElapsedMs": 4300.460900000683,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20459520,
+            "peakRss": 33742848,
+            "cpuUserMs": 865.9169999999999,
+            "cpuSystemMs": 764.2829999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 101,
+              "failures": 0,
+              "sentBytes": 10930,
+              "receivedBytes": 117445656,
+              "serializeMs": 0.38970000023255125,
+              "parseMs": 98.99989999970421,
+              "rpcElapsedMs": 5021.135200000193,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 32.222,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 16,
+            "failures": 0,
+            "sentBytes": 769,
+            "receivedBytes": 19184,
+            "serializeMs": 0.09180000005289912,
+            "parseMs": 0.42269999987911433,
+            "rpcElapsedMs": 3112.34799999994,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 29.918,
+          "cpuSystemMs": 1.0050000000000001,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 15,
+            "failures": 0,
+            "sentBytes": 695,
+            "receivedBytes": 8209,
+            "serializeMs": 0.03630000009434298,
+            "parseMs": 0.227199999964796,
+            "rpcElapsedMs": 2371.8593999999575,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 73.66099999999999,
+            "cpuSystemMs": 20.753,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 35,
+              "failures": 1,
+              "sentBytes": 27966665,
+              "receivedBytes": 3129,
+              "serializeMs": 33.092600000149105,
+              "parseMs": 0.39190000004600734,
+              "rpcElapsedMs": 37254.910900000075,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 269103104,
+          "heapTotal": 98095104,
+          "heapUsed": 83141524,
+          "external": 21302494,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4578000,
+            "system": 2921000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 577.441,
+          "cpuSystemMs": 577.441,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 933,
+            "failures": 0,
+            "sentBytes": 114865,
+            "receivedBytes": 2204691,
+            "serializeMs": 6.225999999544911,
+            "parseMs": 17.66849999967144,
+            "rpcElapsedMs": 4314.410000000652,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20459520,
+            "peakRss": 33742848,
+            "cpuUserMs": 915.727,
+            "cpuSystemMs": 830.259,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 106,
+              "failures": 0,
+              "sentBytes": 11448,
+              "receivedBytes": 123038326,
+              "serializeMs": 0.4140000001061708,
+              "parseMs": 107.23459999979241,
+              "rpcElapsedMs": 5356.50270000007,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 32.397,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 17,
+            "failures": 0,
+            "sentBytes": 810,
+            "receivedBytes": 19356,
+            "serializeMs": 0.09330000006593764,
+            "parseMs": 0.4322999998694286,
+            "rpcElapsedMs": 3151.0913999999757,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 30.218,
+          "cpuSystemMs": 1.007,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 16,
+            "failures": 0,
+            "sentBytes": 736,
+            "receivedBytes": 8369,
+            "serializeMs": 0.040600000065751374,
+            "parseMs": 0.2393999999621883,
+            "rpcElapsedMs": 2406.1666999999434,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 81.913,
+            "cpuSystemMs": 23.098,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 40,
+              "failures": 1,
+              "sentBytes": 33559846,
+              "receivedBytes": 3398,
+              "serializeMs": 45.30030000017723,
+              "parseMs": 0.4490000000805594,
+              "rpcElapsedMs": 38609.223200000066,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 270540800,
+          "heapTotal": 98095104,
+          "heapUsed": 79488440,
+          "external": 18433711,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4609000,
+            "system": 2968000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 582.313,
+          "cpuSystemMs": 577.799,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 935,
+            "failures": 0,
+            "sentBytes": 114995,
+            "receivedBytes": 2247432,
+            "serializeMs": 6.244599999555248,
+            "parseMs": 17.922899999705805,
+            "rpcElapsedMs": 4321.405500000613,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 961.7339999999999,
+            "cpuSystemMs": 876.156,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 111,
+              "failures": 0,
+              "sentBytes": 11966,
+              "receivedBytes": 128631006,
+              "serializeMs": 0.4356000000843778,
+              "parseMs": 113.41609999979846,
+              "rpcElapsedMs": 5643.998300000036,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 32.644,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 18,
+            "failures": 0,
+            "sentBytes": 851,
+            "receivedBytes": 19528,
+            "serializeMs": 0.09880000003613532,
+            "parseMs": 0.45109999988926575,
+            "rpcElapsedMs": 3192.6025999999256,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 30.491999999999997,
+          "cpuSystemMs": 1.007,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 17,
+            "failures": 0,
+            "sentBytes": 777,
+            "receivedBytes": 8541,
+            "serializeMs": 0.046200000040698797,
+            "parseMs": 0.25049999996554106,
+            "rpcElapsedMs": 2445.094999999914,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 91.285,
+            "cpuSystemMs": 25.485999999999997,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 45,
+              "failures": 1,
+              "sentBytes": 39153027,
+              "receivedBytes": 3679,
+              "serializeMs": 54.65390000020852,
+              "parseMs": 0.5009000001009554,
+              "rpcElapsedMs": 40170.868400000094,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 278102016,
+          "heapTotal": 100102144,
+          "heapUsed": 74534464,
+          "external": 15715860,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4640000,
+            "system": 3015000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 585.84,
+          "cpuSystemMs": 581.333,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 937,
+            "failures": 0,
+            "sentBytes": 115125,
+            "receivedBytes": 2290172,
+            "serializeMs": 6.2616999995525475,
+            "parseMs": 18.07389999971838,
+            "rpcElapsedMs": 4330.113200000583,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 1017.066,
+            "cpuSystemMs": 935.3739999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 116,
+              "failures": 0,
+              "sentBytes": 12484,
+              "receivedBytes": 134223687,
+              "serializeMs": 0.45390000008046627,
+              "parseMs": 123.61739999975543,
+              "rpcElapsedMs": 5985.137700000079,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 32.762,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 19,
+            "failures": 0,
+            "sentBytes": 892,
+            "receivedBytes": 19700,
+            "serializeMs": 0.10260000004200265,
+            "parseMs": 0.4668999998830259,
+            "rpcElapsedMs": 3229.071799999918,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 30.74,
+          "cpuSystemMs": 1.007,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 18,
+            "failures": 0,
+            "sentBytes": 818,
+            "receivedBytes": 8700,
+            "serializeMs": 0.051700000069104135,
+            "parseMs": 0.26139999995939434,
+            "rpcElapsedMs": 2471.3465999999316,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 100.13799999999999,
+            "cpuSystemMs": 28.717,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 50,
+              "failures": 1,
+              "sentBytes": 44746208,
+              "receivedBytes": 3960,
+              "serializeMs": 65.90730000013718,
+              "parseMs": 0.5541000001248904,
+              "rpcElapsedMs": 41437.28330000007,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 289247232,
+          "heapTotal": 122515456,
+          "heapUsed": 103980352,
+          "external": 21443805,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4703000,
+            "system": 3015000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 587.268,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 940,
+            "failures": 0,
+            "sentBytes": 115297,
+            "receivedBytes": 2332979,
+            "serializeMs": 6.273299999579649,
+            "parseMs": 18.221299999676376,
+            "rpcElapsedMs": 4334.163900000604,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 1061.46,
+            "cpuSystemMs": 971.645,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 121,
+              "failures": 0,
+              "sentBytes": 13002,
+              "receivedBytes": 139816357,
+              "serializeMs": 0.470000000030268,
+              "parseMs": 127.40589999972144,
+              "rpcElapsedMs": 6235.995400000014,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.013,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 20,
+            "failures": 0,
+            "sentBytes": 933,
+            "receivedBytes": 19872,
+            "serializeMs": 0.10500000003958121,
+            "parseMs": 0.4704999998793937,
+            "rpcElapsedMs": 3276.0258999999496,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 31.002,
+          "cpuSystemMs": 1.007,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 19,
+            "failures": 0,
+            "sentBytes": 859,
+            "receivedBytes": 8860,
+            "serializeMs": 0.05460000009043142,
+            "parseMs": 0.2739999999757856,
+            "rpcElapsedMs": 2517.6309999999357,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 110.30199999999999,
+            "cpuSystemMs": 32.177,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 55,
+              "failures": 1,
+              "sentBytes": 50339389,
+              "receivedBytes": 4241,
+              "serializeMs": 70.77900000015507,
+              "parseMs": 0.62710000021616,
+              "rpcElapsedMs": 42620.476500000106,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 288124928,
+          "heapTotal": 121114624,
+          "heapUsed": 98813460,
+          "external": 18561079,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4703000,
+            "system": 3046000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 589.794,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 942,
+            "failures": 0,
+            "sentBytes": 115427,
+            "receivedBytes": 2375719,
+            "serializeMs": 6.278399999530848,
+            "parseMs": 18.55609999968783,
+            "rpcElapsedMs": 4337.608600000597,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 1097.262,
+            "cpuSystemMs": 1015.681,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 126,
+              "failures": 0,
+              "sentBytes": 13520,
+              "receivedBytes": 145409029,
+              "serializeMs": 0.4885000000940636,
+              "parseMs": 132.48349999968195,
+              "rpcElapsedMs": 6488.298300000082,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.152,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 21,
+            "failures": 0,
+            "sentBytes": 974,
+            "receivedBytes": 20044,
+            "serializeMs": 0.10720000002766028,
+            "parseMs": 0.47759999986737967,
+            "rpcElapsedMs": 3304.4701999999816,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 31.287999999999997,
+          "cpuSystemMs": 1.009,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 20,
+            "failures": 0,
+            "sentBytes": 900,
+            "receivedBytes": 9032,
+            "serializeMs": 0.056600000069011,
+            "parseMs": 0.2919999999576248,
+            "rpcElapsedMs": 2545.496599999955,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 120.512,
+            "cpuSystemMs": 33.829,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 60,
+              "failures": 1,
+              "sentBytes": 55932570,
+              "receivedBytes": 4511,
+              "serializeMs": 79.63040000019828,
+              "parseMs": 0.687600000295788,
+              "rpcElapsedMs": 43671.36440000014,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 297975808,
+          "heapTotal": 119713792,
+          "heapUsed": 95695640,
+          "external": 15699033,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4734000,
+            "system": 3062000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 593.4549999999999,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 944,
+            "failures": 0,
+            "sentBytes": 115557,
+            "receivedBytes": 2418469,
+            "serializeMs": 6.284499999529544,
+            "parseMs": 18.956399999667155,
+            "rpcElapsedMs": 4342.546100000597,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 1135.6409999999998,
+            "cpuSystemMs": 1041.685,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 131,
+              "failures": 0,
+              "sentBytes": 14038,
+              "receivedBytes": 151001711,
+              "serializeMs": 0.505500000086613,
+              "parseMs": 135.9037999996799,
+              "rpcElapsedMs": 6676.042400000151,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.342999999999996,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 22,
+            "failures": 0,
+            "sentBytes": 1015,
+            "receivedBytes": 20228,
+            "serializeMs": 0.1085000000311993,
+            "parseMs": 0.4891999998362735,
+            "rpcElapsedMs": 3326.7934999999707,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 31.523999999999997,
+          "cpuSystemMs": 1.017,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 21,
+            "failures": 0,
+            "sentBytes": 941,
+            "receivedBytes": 9204,
+            "serializeMs": 0.05870000005234033,
+            "parseMs": 0.29449999995995313,
+            "rpcElapsedMs": 2567.422099999967,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 128.70999999999998,
+            "cpuSystemMs": 38.30199999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 65,
+              "failures": 1,
+              "sentBytes": 61525751,
+              "receivedBytes": 4803,
+              "serializeMs": 84.10400000028312,
+              "parseMs": 0.7359000003198162,
+              "rpcElapsedMs": 44626.24360000016,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 300781568,
+          "heapTotal": 119713792,
+          "heapUsed": 92441880,
+          "external": 14284425,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4781000,
+            "system": 3093000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 597.2429999999999,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 946,
+            "failures": 0,
+            "sentBytes": 115687,
+            "receivedBytes": 2461218,
+            "serializeMs": 6.30649999952675,
+            "parseMs": 19.179099999651044,
+            "rpcElapsedMs": 4348.375800000541,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33742848,
+            "cpuUserMs": 1171.5729999999999,
+            "cpuSystemMs": 1089.93,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 136,
+              "failures": 0,
+              "sentBytes": 14556,
+              "receivedBytes": 156594392,
+              "serializeMs": 0.5192000001552515,
+              "parseMs": 141.77169999975013,
+              "rpcElapsedMs": 6917.719500000181,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.437000000000005,
+          "cpuSystemMs": 6.693999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 23,
+            "failures": 0,
+            "sentBytes": 1056,
+            "receivedBytes": 20412,
+            "serializeMs": 0.11160000000381842,
+            "parseMs": 0.5005999997956678,
+            "rpcElapsedMs": 3363.2855999999447,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 31.74,
+          "cpuSystemMs": 1.024,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 22,
+            "failures": 0,
+            "sentBytes": 982,
+            "receivedBytes": 9363,
+            "serializeMs": 0.0636000000522472,
+            "parseMs": 0.3055999999633059,
+            "rpcElapsedMs": 2602.1364000000176,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 138.893,
+            "cpuSystemMs": 41.06999999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 70,
+              "failures": 1,
+              "sentBytes": 67118932,
+              "receivedBytes": 5084,
+              "serializeMs": 91.15870000026189,
+              "parseMs": 0.7891000003437512,
+              "rpcElapsedMs": 45564.058200000145,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 307335168,
+          "heapTotal": 142127104,
+          "heapUsed": 121737232,
+          "external": 19996703,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4812000,
+            "system": 3140000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 602.741,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 948,
+            "failures": 0,
+            "sentBytes": 115817,
+            "receivedBytes": 2503957,
+            "serializeMs": 6.317999999607309,
+            "parseMs": 19.38729999964471,
+            "rpcElapsedMs": 4357.330600000606,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33759232,
+            "cpuUserMs": 1228.5900000000001,
+            "cpuSystemMs": 1138.793,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 141,
+              "failures": 0,
+              "sentBytes": 15074,
+              "receivedBytes": 162187074,
+              "serializeMs": 0.5500000001047738,
+              "parseMs": 146.18059999973048,
+              "rpcElapsedMs": 7248.986400000111,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.437000000000005,
+          "cpuSystemMs": 6.834,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 24,
+            "failures": 0,
+            "sentBytes": 1097,
+            "receivedBytes": 20584,
+            "serializeMs": 0.11639999999897555,
+            "parseMs": 0.52779999980703,
+            "rpcElapsedMs": 3414.4955999999656,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 31.995999999999995,
+          "cpuSystemMs": 1.032,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 23,
+            "failures": 0,
+            "sentBytes": 1023,
+            "receivedBytes": 9535,
+            "serializeMs": 0.06860000005690381,
+            "parseMs": 0.32730000000447035,
+            "rpcElapsedMs": 2650.9867000000086,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 149.455,
+            "cpuSystemMs": 42.266999999999996,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 75,
+              "failures": 1,
+              "sentBytes": 72712113,
+              "receivedBytes": 5366,
+              "serializeMs": 100.34830000024522,
+              "parseMs": 0.8322000002954155,
+              "rpcElapsedMs": 46793.28390000021,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 312188928,
+          "heapTotal": 135122944,
+          "heapUsed": 110403676,
+          "external": 16354302,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4843000,
+            "system": 3171000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 605.869,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 950,
+            "failures": 0,
+            "sentBytes": 115947,
+            "receivedBytes": 2546697,
+            "serializeMs": 6.327799999607123,
+            "parseMs": 19.509699999579425,
+            "rpcElapsedMs": 4361.746700000637,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33759232,
+            "cpuUserMs": 1281.9460000000001,
+            "cpuSystemMs": 1192.413,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 146,
+              "failures": 0,
+              "sentBytes": 15592,
+              "receivedBytes": 167779756,
+              "serializeMs": 0.5674000001163222,
+              "parseMs": 153.23329999973066,
+              "rpcElapsedMs": 7568.725200000044,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.437000000000005,
+          "cpuSystemMs": 6.949999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 25,
+            "failures": 0,
+            "sentBytes": 1138,
+            "receivedBytes": 20768,
+            "serializeMs": 0.11940000002505258,
+            "parseMs": 0.5437999998102896,
+            "rpcElapsedMs": 3439.080499999982,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 32.289,
+          "cpuSystemMs": 1.042,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 24,
+            "failures": 0,
+            "sentBytes": 1064,
+            "receivedBytes": 9695,
+            "serializeMs": 0.07180000009248033,
+            "parseMs": 0.33370000001741573,
+            "rpcElapsedMs": 2675.311300000001,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 158.774,
+            "cpuSystemMs": 44.64,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 80,
+              "failures": 1,
+              "sentBytes": 78305294,
+              "receivedBytes": 5635,
+              "serializeMs": 109.5549000002211,
+              "parseMs": 0.8922000002930872,
+              "rpcElapsedMs": 47995.06280000013,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 323358720,
+          "heapTotal": 140726272,
+          "heapUsed": 113420588,
+          "external": 14280337,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4875000,
+            "system": 3203000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 607.895,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 952,
+            "failures": 0,
+            "sentBytes": 116077,
+            "receivedBytes": 2589436,
+            "serializeMs": 6.334199999620068,
+            "parseMs": 19.638799999541334,
+            "rpcElapsedMs": 4364.540400000676,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33759232,
+            "cpuUserMs": 1311.847,
+            "cpuSystemMs": 1217.8519999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 151,
+              "failures": 0,
+              "sentBytes": 16110,
+              "receivedBytes": 173372438,
+              "serializeMs": 0.5848000001278706,
+              "parseMs": 156.7473999997601,
+              "rpcElapsedMs": 7743.356300000101,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.437000000000005,
+          "cpuSystemMs": 7.146,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 26,
+            "failures": 0,
+            "sentBytes": 1179,
+            "receivedBytes": 20940,
+            "serializeMs": 0.12230000004637986,
+            "parseMs": 0.5554999997839332,
+            "rpcElapsedMs": 3497.2428000000073,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 32.533,
+          "cpuSystemMs": 1.05,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 25,
+            "failures": 0,
+            "sentBytes": 1105,
+            "receivedBytes": 9854,
+            "serializeMs": 0.07480000011855736,
+            "parseMs": 0.35320000001229346,
+            "rpcElapsedMs": 2731.9773000000278,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 168.47199999999998,
+            "cpuSystemMs": 46.291,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 85,
+              "failures": 1,
+              "sentBytes": 83898475,
+              "receivedBytes": 5916,
+              "serializeMs": 113.71490000019548,
+              "parseMs": 0.9442000002600253,
+              "rpcElapsedMs": 49528.89320000011,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 332627968,
+          "heapTotal": 163139584,
+          "heapUsed": 143218072,
+          "external": 19935016,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4875000,
+            "system": 3250000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 610.6179999999999,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 954,
+            "failures": 0,
+            "sentBytes": 116207,
+            "receivedBytes": 2632186,
+            "serializeMs": 6.340399999623514,
+            "parseMs": 19.772899999566107,
+            "rpcElapsedMs": 4368.1003000006685,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 20463616,
+            "peakRss": 33759232,
+            "cpuUserMs": 1336.9370000000001,
+            "cpuSystemMs": 1243.189,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 156,
+              "failures": 0,
+              "sentBytes": 16628,
+              "receivedBytes": 178965120,
+              "serializeMs": 0.6204000001307577,
+              "parseMs": 158.90119999973103,
+              "rpcElapsedMs": 7880.513000000094,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.459999999999994,
+          "cpuSystemMs": 7.233,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 27,
+            "failures": 0,
+            "sentBytes": 1220,
+            "receivedBytes": 21112,
+            "serializeMs": 0.12540000007720664,
+            "parseMs": 0.56039999978384,
+            "rpcElapsedMs": 3526.4212000000407,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 32.751999999999995,
+          "cpuSystemMs": 1.057,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 26,
+            "failures": 0,
+            "sentBytes": 1146,
+            "receivedBytes": 10026,
+            "serializeMs": 0.07700000010663643,
+            "parseMs": 0.3670999999740161,
+            "rpcElapsedMs": 2760.5383000000147,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 178.15,
+            "cpuSystemMs": 48.215,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 90,
+              "failures": 1,
+              "sentBytes": 89491656,
+              "receivedBytes": 6185,
+              "serializeMs": 117.77730000013253,
+              "parseMs": 1.0045000003301539,
+              "rpcElapsedMs": 50875.035700000066,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 327077888,
+          "heapTotal": 163139584,
+          "heapUsed": 143540368,
+          "external": 19981038,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 4875000,
+            "system": 3265000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 614.1189999999999,
+          "cpuSystemMs": 582.75,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 956,
+            "failures": 0,
+            "sentBytes": 116337,
+            "receivedBytes": 2674936,
+            "serializeMs": 6.351299999675575,
+            "parseMs": 19.993099999605874,
+            "rpcElapsedMs": 4373.717400000701,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 82021,
+            "rss": 22433792,
+            "peakRss": 33759232,
+            "cpuUserMs": 1395.442,
+            "cpuSystemMs": 1269.3229999999999,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 159,
+              "failures": 0,
+              "sentBytes": 16854,
+              "receivedBytes": 178965651,
+              "serializeMs": 0.6430000000400469,
+              "parseMs": 158.95199999969918,
+              "rpcElapsedMs": 7969.467200000072,
+              "peakPending": 6,
+              "pending": 0
+            }
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.459999999999994,
+          "cpuSystemMs": 7.428,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 28,
+            "failures": 0,
+            "sentBytes": 1261,
+            "receivedBytes": 21284,
+            "serializeMs": 0.12960000010207295,
+            "parseMs": 0.5779999997466803,
+            "rpcElapsedMs": 3559.80540000007,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 80,
+            "failures": 1,
+            "sentBytes": 89491704,
+            "receivedBytes": 4182,
+            "serializeMs": 106.19799999997485,
+            "parseMs": 0.798599999921862,
+            "rpcElapsedMs": 26463.149199999694,
+            "peakPending": 5
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 32.997,
+          "cpuSystemMs": 1.065,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 27,
+            "failures": 0,
+            "sentBytes": 1187,
+            "receivedBytes": 10186,
+            "serializeMs": 0.0819000001065433,
+            "parseMs": 0.39350000000558794,
+            "rpcElapsedMs": 2789.95630000002,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 1,
+          "transfer": {
+            "pid": 1115032,
+            "rss": 33968128,
+            "peakRss": 36622336,
+            "cpuUserMs": 206.648,
+            "cpuSystemMs": 52.138999999999996,
+            "cursors": 0,
+            "processes": 0,
+            "watches": 0,
+            "children": [],
+            "transport": {
+              "calls": 94,
+              "failures": 1,
+              "sentBytes": 89492278,
+              "receivedBytes": 6496,
+              "serializeMs": 117.81160000013188,
+              "parseMs": 1.0520000004325993,
+              "rpcElapsedMs": 51399.389399999985,
+              "peakPending": 5,
+              "pending": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "phase": "after-transfer",
+      "values": [
+        {
+          "endpoint": "windows-c",
+          "scope": "shared-extension-host",
+          "pid": 18188,
+          "rss": 232828928,
+          "heapTotal": 70545408,
+          "heapUsed": 63544680,
+          "external": 15599672,
+          "arrayBuffers": 0,
+          "cpu": {
+            "user": 6218000,
+            "system": 5343000
+          },
+          "cursors": 0,
+          "processes": 0,
+          "children": []
+        },
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 78383,
+          "rss": 21774336,
+          "peakRss": 21299200,
+          "cpuUserMs": 623.353,
+          "cpuSystemMs": 583.28,
+          "cursors": 5,
+          "processes": 0,
+          "watches": 6,
+          "children": [],
+          "transport": {
+            "calls": 963,
+            "failures": 0,
+            "sentBytes": 116723,
+            "receivedBytes": 2760617,
+            "serializeMs": 6.386699999843586,
+            "parseMs": 20.421699999707016,
+            "rpcElapsedMs": 4389.9751000007755,
+            "peakPending": 11,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 11,
+            "failures": 0,
+            "sentBytes": 1174,
+            "receivedBytes": 11185597,
+            "serializeMs": 0.06269999995129183,
+            "parseMs": 14.309499999973923,
+            "rpcElapsedMs": 776.3778999999631,
+            "peakPending": 4
+          }
+        },
+        {
+          "endpoint": "load-train",
+          "pid": 1402001,
+          "rss": 23986176,
+          "peakRss": 23986176,
+          "cpuUserMs": 33.459999999999994,
+          "cpuSystemMs": 7.951999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 30,
+            "failures": 0,
+            "sentBytes": 1343,
+            "receivedBytes": 21652,
+            "serializeMs": 0.14230000012321398,
+            "parseMs": 0.6219999997410923,
+            "rpcElapsedMs": 3616.685400000075,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 15,
+            "failures": 1,
+            "sentBytes": 11187007,
+            "receivedBytes": 1709,
+            "serializeMs": 15.179999999993015,
+            "parseMs": 0.19389999989653006,
+            "rpcElapsedMs": 4645.195599999919,
+            "peakPending": 4
+          }
+        },
+        {
+          "endpoint": "load-infer",
+          "pid": 1113902,
+          "rss": 16384000,
+          "peakRss": 16384000,
+          "cpuUserMs": 33.547,
+          "cpuSystemMs": 1.065,
+          "cursors": 0,
+          "processes": 0,
+          "watches": 0,
+          "children": [],
+          "transport": {
+            "calls": 29,
+            "failures": 0,
+            "sentBytes": 1269,
+            "receivedBytes": 10506,
+            "serializeMs": 0.1108000001986511,
+            "parseMs": 0.44100000004982576,
+            "rpcElapsedMs": 2836.3812000000617,
+            "peakPending": 2,
+            "pending": 0
+          },
+          "transferUsers": 0,
+          "lastTransferTransport": {
+            "calls": 94,
+            "failures": 1,
+            "sentBytes": 89492278,
+            "receivedBytes": 6520,
+            "serializeMs": 117.81160000013188,
+            "parseMs": 1.0627000004751608,
+            "rpcElapsedMs": 51472.83150000003,
+            "peakPending": 5
+          }
+        }
+      ]
+    },
+    {
+      "phase": "disconnect",
+      "endpoint": "load-train",
+      "pid": 1402001
+    },
+    {
+      "phase": "disconnect",
+      "endpoint": "load-infer",
+      "pid": 1113902
+    }
+  ],
+  "loaded": {
+    "metrics": [
+      {
+        "name": "Timestamp",
+        "value": 6453.926488
+      },
+      {
+        "name": "AudioHandlers",
+        "value": 0
+      },
+      {
+        "name": "AudioWorkletProcessors",
+        "value": 0
+      },
+      {
+        "name": "Documents",
+        "value": 2
+      },
+      {
+        "name": "Frames",
+        "value": 3
+      },
+      {
+        "name": "JSEventListeners",
+        "value": 3108
+      },
+      {
+        "name": "LayoutObjects",
+        "value": 13947
+      },
+      {
+        "name": "MediaKeySessions",
+        "value": 0
+      },
+      {
+        "name": "MediaKeys",
+        "value": 0
+      },
+      {
+        "name": "Nodes",
+        "value": 12510
+      },
+      {
+        "name": "Resources",
+        "value": 2
+      },
+      {
+        "name": "ContextLifecycleStateObservers",
+        "value": 7
+      },
+      {
+        "name": "V8PerContextDatas",
+        "value": 2
+      },
+      {
+        "name": "WorkerGlobalScopes",
+        "value": 2
+      },
+      {
+        "name": "UACSSResources",
+        "value": 0
+      },
+      {
+        "name": "RTCPeerConnections",
+        "value": 0
+      },
+      {
+        "name": "ResourceFetchers",
+        "value": 4
+      },
+      {
+        "name": "AdSubframes",
+        "value": 0
+      },
+      {
+        "name": "DetachedScriptStates",
+        "value": 0
+      },
+      {
+        "name": "ArrayBufferContents",
+        "value": 6
+      },
+      {
+        "name": "LayoutCount",
+        "value": 15
+      },
+      {
+        "name": "RecalcStyleCount",
+        "value": 14
+      },
+      {
+        "name": "LayoutDuration",
+        "value": 0.098113
+      },
+      {
+        "name": "RecalcStyleDuration",
+        "value": 0.052145
+      },
+      {
+        "name": "DevToolsCommandDuration",
+        "value": 0.000409
+      },
+      {
+        "name": "ScriptDuration",
+        "value": 0.396397
+      },
+      {
+        "name": "V8CompileDuration",
+        "value": 0
+      },
+      {
+        "name": "TaskDuration",
+        "value": 0.610255
+      },
+      {
+        "name": "TaskOtherDuration",
+        "value": 0.063191
+      },
+      {
+        "name": "ThreadTime",
+        "value": 0.59205
+      },
+      {
+        "name": "ProcessTime",
+        "value": 1.439962
+      },
+      {
+        "name": "JSHeapUsedSize",
+        "value": 23160796
+      },
+      {
+        "name": "JSHeapTotalSize",
+        "value": 48254976
+      },
+      {
+        "name": "FirstMeaningfulPaint",
+        "value": 0
+      },
+      {
+        "name": "DomContentLoaded",
+        "value": 6449.849482
+      },
+      {
+        "name": "NavigationStart",
+        "value": 6449.649536
+      }
+    ],
+    "dom": {
+      "documents": 2,
+      "nodes": 12510,
+      "jsEventListeners": 3108
+    },
+    "visibility": "visible"
+  },
+  "manualOverride": true,
+  "cancel": {
+    "state": "cancelled",
+    "sourcePresent": true
+  },
+  "collapsed": {
+    "directories": {
+      "cachedBranches": 128,
+      "cachedEntries": 1167,
+      "uiCursors": 0,
+      "pendingUiReads": 0,
+      "watches": 0,
+      "editorWatches": 0,
+      "pendingChanges": 0,
+      "polling": false,
+      "visible": true
+    },
+    "jobs": {
+      "records": 14,
+      "running": 0,
+      "heldLocks": 0,
+      "progressTimers": 0,
+      "states": {
+        "cancelled": 2,
+        "completed": 12
+      }
+    },
+    "endpoints": [
+      {
+        "id": "windows-c",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-d",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-e",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-f",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "wsl-ubuntu",
+        "connected": true,
+        "enabled": true
+      },
+      {
+        "id": "load-train",
+        "connected": true,
+        "enabled": true
+      },
+      {
+        "id": "load-infer",
+        "connected": true,
+        "enabled": true
+      }
+    ]
+  },
+  "hidden": {
+    "directories": {
+      "cachedBranches": 128,
+      "cachedEntries": 1167,
+      "uiCursors": 0,
+      "pendingUiReads": 0,
+      "watches": 0,
+      "editorWatches": 0,
+      "pendingChanges": 0,
+      "polling": false,
+      "visible": false
+    },
+    "jobs": {
+      "records": 14,
+      "running": 0,
+      "heldLocks": 0,
+      "progressTimers": 0,
+      "states": {
+        "cancelled": 2,
+        "completed": 12
+      }
+    },
+    "endpoints": [
+      {
+        "id": "windows-c",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-d",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-e",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-f",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "wsl-ubuntu",
+        "connected": true,
+        "enabled": true
+      },
+      {
+        "id": "load-train",
+        "connected": true,
+        "enabled": true
+      },
+      {
+        "id": "load-infer",
+        "connected": true,
+        "enabled": true
+      }
+    ]
+  },
+  "closed": {
+    "directories": {
+      "cachedBranches": 128,
+      "cachedEntries": 1167,
+      "uiCursors": 0,
+      "pendingUiReads": 0,
+      "watches": 0,
+      "editorWatches": 0,
+      "pendingChanges": 0,
+      "polling": false,
+      "visible": false
+    },
+    "jobs": {
+      "records": 31,
+      "running": 0,
+      "heldLocks": 0,
+      "progressTimers": 0,
+      "states": {
+        "cancelled": 3,
+        "completed": 28
+      }
+    },
+    "endpoints": [
+      {
+        "id": "windows-c",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-d",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-e",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "windows-f",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "wsl-ubuntu",
+        "connected": true,
+        "enabled": true
+      },
+      {
+        "id": "load-train",
+        "connected": false,
+        "enabled": false
+      },
+      {
+        "id": "load-infer",
+        "connected": false,
+        "enabled": false
+      }
+    ]
+  },
+  "closeMethod": "actual Map tab close button (Ctrl+F4 binding)"
+}

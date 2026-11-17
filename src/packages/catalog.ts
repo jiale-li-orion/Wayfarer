@@ -1,4 +1,3 @@
-import type { Endpoint } from "../shared/types";
 export type PackageInput = {
   endpoint: string;
   cwd: string;
@@ -352,50 +351,4 @@ export function recipe(i: PackageInput): Recipe {
       "cache-info",
     ].includes(a),
   };
-}
-export async function discover(e: Endpoint, cwd?: string) {
-  const names = [
-    "uv",
-    "python3",
-    "python",
-    "npm",
-    "pnpm",
-    "bun",
-    "java",
-    "gradle",
-    "mvn",
-    "sdkmanager",
-    "flutter",
-    "rustup",
-    "cargo",
-    "winget",
-  ];
-  const found = await Promise.all(
-    names.map(async (name) => {
-      try {
-        return { name, path: await e.call("which", { name }) };
-      } catch {
-        return { name, path: null };
-      }
-    }),
-  );
-  const available = found.filter((x) => x.path);
-  if (cwd) {
-    const separator = e.config.kind === "windows" ? "\\\\" : "/";
-    for (const name of [
-      "gradlew",
-      "gradlew.bat",
-      "mvnw",
-      "mvnw.cmd",
-      ".venv/bin/python",
-      ".venv/Scripts/python.exe",
-    ]) {
-      const p = cwd.replace(/[\\\\/]$/, "") + separator + name;
-      try {
-        const s = await e.call("stat", { path: p });
-        if (s.kind === "file") available.push({ name, path: p });
-      } catch {}
-    }
-  }
-  return available;
 }

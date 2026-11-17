@@ -1,0 +1,190 @@
+{
+  "environment": {
+    "platform": "linux",
+    "node": "v22.23.2"
+  },
+  "samples": [
+    {
+      "direction": "upload",
+      "wallMs": 3203.949788,
+      "cpuMs": 596.836,
+      "rssStart": 51965952,
+      "peakRss": 125788160,
+      "browseMs": [
+        16.409134999999992,
+        17.715872999999988,
+        166.47008700000004,
+        188.957533,
+        103.85517099999993,
+        135.05725400000006,
+        149.73943900000017,
+        164.2842619999999,
+        228.17248900000004,
+        110.16466900000023,
+        82.31651199999988,
+        75.39273200000025,
+        130.56795799999963,
+        95.48324599999978,
+        227.42120000000023,
+        106.01028899999983,
+        102.11072999999988,
+        115.71026500000016,
+        16.307369000000108
+      ],
+      "before": {
+        "pid": 1383457,
+        "rss": 24080384,
+        "peakRss": 24080384,
+        "cpuUserMs": 22.942,
+        "cpuSystemMs": 11.481,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 2,
+          "failures": 0,
+          "sentBytes": 120,
+          "receivedBytes": 183,
+          "serializeMs": 0.04271200000003006,
+          "parseMs": 0.046202999999991334,
+          "rpcElapsedMs": 342.89857800000004,
+          "peakPending": 1,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1383457,
+        "rss": 30814208,
+        "peakRss": 33329152,
+        "cpuUserMs": 166.65,
+        "cpuSystemMs": 64.22200000000001,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 94,
+          "failures": 1,
+          "sentBytes": 89493660,
+          "receivedBytes": 13346,
+          "serializeMs": 229.30807999999988,
+          "parseMs": 1.3654440000010482,
+          "rpcElapsedMs": 10870.083930000003,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    },
+    {
+      "direction": "download",
+      "wallMs": 7678.773287,
+      "cpuMs": 840.2,
+      "rssStart": 108429312,
+      "peakRss": 128704512,
+      "browseMs": [
+        14.601834999999937,
+        980.9871520000002,
+        392.0561689999995,
+        595.3580330000004,
+        765.3267159999996,
+        405.3561490000002,
+        409.6451480000005,
+        341.7157070000003,
+        360.2179050000004,
+        352.495128999999,
+        342.4710529999993,
+        312.9099559999995,
+        330.71980799999983,
+        266.6623760000002,
+        283.3961670000008,
+        330.6157669999993,
+        255.97356599999875,
+        15.495651999999609
+      ],
+      "before": {
+        "pid": 1383457,
+        "rss": 30814208,
+        "peakRss": 33329152,
+        "cpuUserMs": 166.726,
+        "cpuSystemMs": 64.25200000000001,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 95,
+          "failures": 1,
+          "sentBytes": 89493701,
+          "receivedBytes": 13519,
+          "serializeMs": 229.31515299999964,
+          "parseMs": 1.3820800000013378,
+          "rpcElapsedMs": 10886.422294000004,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1383457,
+        "rss": 30449664,
+        "peakRss": 42450944,
+        "cpuUserMs": 358.97999999999996,
+        "cpuSystemMs": 165.41899999999998,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 183,
+          "failures": 1,
+          "sentBytes": 89504074,
+          "receivedBytes": 89501431,
+          "serializeMs": 229.54457699999884,
+          "parseMs": 63.04736900000728,
+          "rpcElapsedMs": 37972.099124,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    }
+  ],
+  "sha256": "a32282d78083208d646756b24b2b1976f6c979a54df4cd0265a88f35263edc9a",
+  "events": [
+    {
+      "at": "2026-11-17T06:39:28.305Z",
+      "stage": "job.start",
+      "job": "ba9e471d-b051-4f2e-8b8a-733b24eeb35f",
+      "kind": "transfer",
+      "queueMs": 2
+    },
+    {
+      "at": "2026-11-17T06:39:31.465Z",
+      "stage": "job.end",
+      "job": "ba9e471d-b051-4f2e-8b8a-733b24eeb35f",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 3160.352319,
+      "bytes": 67108864,
+      "MiBps": 20.25086112404517
+    },
+    {
+      "at": "2026-11-17T06:39:31.524Z",
+      "stage": "job.start",
+      "job": "f06914ad-02a9-4ea5-9097-7b147cd267ca",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:39:39.128Z",
+      "stage": "job.end",
+      "job": "f06914ad-02a9-4ea5-9097-7b147cd267ca",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 7604.814525000001,
+      "bytes": 67108864,
+      "MiBps": 8.415714675532632
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "source": "/data/users/lijiale/worktrees/workspace-map-baseline",
+  "node": "v22.23.2",
+  "historyTasks": 3000,
+  "cold": {
+    "initMs": 151.52995399999998,
+    "heapDelta": 2764456,
+    "rss": 99684352,
+    "cpuMs": 211.332,
+    "residentTasks": 3000,
+    "pageRows": 3000,
+    "pageMs": 1.9437520000000177,
+    "summaryBytes": 378781,
+    "directoryP95Ms": 0.3436100000000124
+  },
+  "warm": {
+    "initMs": 148.03502000000003,
+    "heapDelta": 188184,
+    "rss": 110145536,
+    "cpuMs": 224.42,
+    "residentTasks": 3000,
+    "pageRows": 3000,
+    "pageMs": 1.6849419999999782,
+    "summaryBytes": 378781,
+    "directoryP95Ms": 0.1450800000000072
+  }
+}

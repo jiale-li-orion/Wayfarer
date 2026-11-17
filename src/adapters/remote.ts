@@ -13,6 +13,42 @@ export class RemoteEndpoint implements Endpoint {
     { resolve: (v: any) => void; reject: (e: Error) => void }
   >();
   private stderr = "";
+  private bulk?: RemoteEndpoint;
+  private bulkUsers = 0;
+  private lastTransferTransport?: Record<string, number>;
+  openTransfer() {
+    if (this.closed) throw Error("Endpoint connection closed");
+    const bulk = (this.bulk ??= new RemoteEndpoint(
+      this.config,
+      this.helperPath,
+      this.log,
+    ));
+    this.bulkUsers++;
+    let released = false;
+    return {
+      endpoint: bulk,
+      release: () => {
+        if (released) return;
+        released = true;
+        if (this.bulk !== bulk) return;
+        if (--this.bulkUsers === 0) {
+          this.lastTransferTransport = { ...bulk.metrics };
+          this.bulk = undefined;
+          bulk.dispose();
+        }
+      },
+    };
+  }
+  private metrics = {
+    calls: 0,
+    failures: 0,
+    sentBytes: 0,
+    receivedBytes: 0,
+    serializeMs: 0,
+    parseMs: 0,
+    rpcElapsedMs: 0,
+    peakPending: 0,
+  };
   constructor(
     public config: EndpointConfig,
     private helperPath: string,
@@ -79,7 +115,10 @@ export class RemoteEndpoint implements Endpoint {
       const lines = createInterface({ input: child.stdout });
       lines.on("line", (line) => {
         try {
+          const start = performance.now();
           const v = JSON.parse(line);
+          this.metrics.parseMs += performance.now() - start;
+          this.metrics.receivedBytes += Buffer.byteLength(line) + 1;
           const p = this.pending.get(v.id);
           if (!p) return;
           this.pending.delete(v.id);
@@ -121,22 +160,70 @@ export class RemoteEndpoint implements Endpoint {
     method: string,
     args: Record<string, any> = {},
   ): Promise<T> {
+    const result = await this.request<T>(method, args);
+    if (method !== "resources") return result;
+    const bulk = this.bulk;
+    return {
+      ...result,
+      transferUsers: this.bulkUsers,
+      lastTransferTransport: this.lastTransferTransport,
+      transfer: bulk?.connected
+        ? await bulk
+            .request("resources")
+            .catch((error) => ({ error: String(error) }))
+        : undefined,
+    } as T;
+  }
+  private async request<T = any>(
+    method: string,
+    args: Record<string, any> = {},
+  ): Promise<T> {
     await this.open();
     if (this.closed || !this.child) throw Error("Endpoint connection closed");
     const child = this.child!;
     const id = ++this.seq;
     return new Promise<T>((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
-      child.stdin.write(JSON.stringify({ id, method, args }) + "\n", (e) => {
+      const start = performance.now();
+      const frame = JSON.stringify({ id, method, args }) + "\n";
+      this.metrics.serializeMs += performance.now() - start;
+      this.metrics.sentBytes += Buffer.byteLength(frame);
+      this.metrics.calls++;
+      this.pending.set(id, {
+        resolve: (value) => {
+          this.metrics.rpcElapsedMs += performance.now() - start;
+          resolve(
+            method === "resources"
+              ? {
+                  ...value,
+                  transport: { ...this.metrics, pending: this.pending.size },
+                }
+              : value,
+          );
+        },
+        reject: (error) => {
+          this.metrics.failures++;
+          this.metrics.rpcElapsedMs += performance.now() - start;
+          reject(error);
+        },
+      });
+      this.metrics.peakPending = Math.max(
+        this.metrics.peakPending,
+        this.pending.size,
+      );
+      child.stdin.write(frame, (e) => {
         if (e) {
+          const pending = this.pending.get(id);
           this.pending.delete(id);
-          reject(e);
+          pending?.reject(e);
         }
       });
     });
   }
   dispose() {
     this.closed = true;
+    this.bulk?.dispose();
+    this.bulk = undefined;
+    this.bulkUsers = 0;
     const c = this.child;
     this.child = undefined;
     c?.stdin.end();

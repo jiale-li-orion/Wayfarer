@@ -1,0 +1,46 @@
+{
+  "ms": 36830.876738,
+  "cpuMs": 2886.022,
+  "files": 200,
+  "bytes": 1400,
+  "memory": {
+    "rss": 62132224,
+    "heapTotal": 7970816,
+    "heapUsed": 6532032,
+    "external": 6184653,
+    "arrayBuffers": 4250587
+  },
+  "resources": {
+    "pid": 1395896,
+    "rss": 24043520,
+    "peakRss": 24043520,
+    "cpuUserMs": 24.365,
+    "cpuSystemMs": 10.737,
+    "cursors": 0,
+    "processes": 0,
+    "watches": 0,
+    "children": [],
+    "transport": {
+      "calls": 2,
+      "failures": 0,
+      "sentBytes": 120,
+      "receivedBytes": 183,
+      "serializeMs": 0.06775800000022514,
+      "parseMs": 0.07136800000330368,
+      "rpcElapsedMs": 1238.6452949999994,
+      "peakPending": 1,
+      "pending": 0
+    },
+    "transferUsers": 0,
+    "lastTransferTransport": {
+      "calls": 1205,
+      "failures": 2,
+      "sentBytes": 240364,
+      "receivedBytes": 135687,
+      "serializeMs": 22.876475999899867,
+      "parseMs": 29.77104999993753,
+      "rpcElapsedMs": 35003.226665999944,
+      "peakPending": 1
+    }
+  }
+}

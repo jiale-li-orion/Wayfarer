@@ -1,0 +1,191 @@
+{
+  "environment": {
+    "platform": "linux",
+    "node": "v22.23.2"
+  },
+  "samples": [
+    {
+      "direction": "upload",
+      "wallMs": 9049.896603,
+      "cpuMs": 553.613,
+      "rssStart": 52080640,
+      "peakRss": 113475584,
+      "browseMs": [
+        18.596307000000024,
+        19.16426899999999,
+        1088.419183,
+        621.93901,
+        639.2703100000003,
+        614.9683439999999,
+        458.2110209999996,
+        509.0355900000004,
+        449.11677599999985,
+        388.07033500000034,
+        405.8308240000006,
+        394.2269989999995,
+        475.95372099999986,
+        686.5131570000003,
+        322.0680570000013,
+        285.9122499999994,
+        375.07217499999933,
+        298.81728699999985,
+        18.436109000000215
+      ],
+      "before": {
+        "pid": 1379295,
+        "rss": 23928832,
+        "peakRss": 23928832,
+        "cpuUserMs": 23.224999999999998,
+        "cpuSystemMs": 11.616,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 2,
+          "failures": 0,
+          "sentBytes": 120,
+          "receivedBytes": 195,
+          "serializeMs": 0.01919700000001967,
+          "parseMs": 0.039762999999993554,
+          "rpcElapsedMs": 355.568275,
+          "peakPending": 1,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1379295,
+        "rss": 27078656,
+        "peakRss": 33259520,
+        "cpuUserMs": 173.94,
+        "cpuSystemMs": 61.76599999999999,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 94,
+          "failures": 1,
+          "sentBytes": 89493660,
+          "receivedBytes": 13350,
+          "serializeMs": 214.54027399999705,
+          "parseMs": 1.1885820000079548,
+          "rpcElapsedMs": 30785.61436700002,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    },
+    {
+      "direction": "download",
+      "wallMs": 12918.801993,
+      "cpuMs": 1162.614,
+      "rssStart": 101011456,
+      "peakRss": 117788672,
+      "browseMs": [
+        20.071085999999923,
+        22.351141000001007,
+        2564.6275330000008,
+        1790.616462,
+        853.1313130000017,
+        678.2696019999985,
+        650.2944820000012,
+        554.1571219999969,
+        517.6858679999968,
+        551.2568589999973,
+        658.0569370000012,
+        1416.874695999999,
+        360.75298300000213,
+        305.92810100000133,
+        251.38336799999888,
+        249.16386400000192,
+        246.2009889999972,
+        224.5818560000007,
+        23.790874999998778
+      ],
+      "before": {
+        "pid": 1379295,
+        "rss": 27078656,
+        "peakRss": 33259520,
+        "cpuUserMs": 174.04999999999998,
+        "cpuSystemMs": 61.76599999999999,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 95,
+          "failures": 1,
+          "sentBytes": 89493701,
+          "receivedBytes": 13534,
+          "serializeMs": 214.5447179999972,
+          "parseMs": 1.2034670000084589,
+          "rpcElapsedMs": 30807.058266000022,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "after": {
+        "pid": 1379295,
+        "rss": 28794880,
+        "peakRss": 40796160,
+        "cpuUserMs": 375.47700000000003,
+        "cpuSystemMs": 166.852,
+        "cursors": 0,
+        "processes": 0,
+        "watches": 0,
+        "children": [],
+        "transport": {
+          "calls": 184,
+          "failures": 1,
+          "sentBytes": 89504167,
+          "receivedBytes": 89501775,
+          "serializeMs": 214.77994299998846,
+          "parseMs": 130.764617000008,
+          "rpcElapsedMs": 76317.10509200003,
+          "peakPending": 5,
+          "pending": 0
+        }
+      },
+      "bytes": 67108864
+    }
+  ],
+  "sha256": "a32282d78083208d646756b24b2b1976f6c979a54df4cd0265a88f35263edc9a",
+  "events": [
+    {
+      "at": "2026-11-17T06:28:07.984Z",
+      "stage": "job.start",
+      "job": "d4b5a2ed-5504-464c-9e65-d06d50fe17b1",
+      "kind": "transfer",
+      "queueMs": 2
+    },
+    {
+      "at": "2026-11-17T06:28:17.008Z",
+      "stage": "job.end",
+      "job": "d4b5a2ed-5504-464c-9e65-d06d50fe17b1",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 9023.171226999999,
+      "bytes": 67108864,
+      "MiBps": 7.092845280217485
+    },
+    {
+      "at": "2026-11-17T06:28:17.055Z",
+      "stage": "job.start",
+      "job": "2b35bcdb-a9bb-491d-b20f-48f58a13f416",
+      "kind": "transfer",
+      "queueMs": 1
+    },
+    {
+      "at": "2026-11-17T06:28:29.885Z",
+      "stage": "job.end",
+      "job": "2b35bcdb-a9bb-491d-b20f-48f58a13f416",
+      "kind": "transfer",
+      "state": "completed",
+      "ms": 12830.002931,
+      "bytes": 67108864,
+      "MiBps": 4.988305124792222
+    }
+  ]
+}

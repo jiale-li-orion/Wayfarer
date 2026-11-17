@@ -1,0 +1,71 @@
+{
+  "dsh": {
+    "profile": "actual headless profile with temporary MCP overlay",
+    "calls": [
+      {
+        "tool": "mcp__workspace_map__map_sessions",
+        "status": "completed"
+      },
+      {
+        "tool": "mcp__workspace_map__map_bind",
+        "status": "completed"
+      },
+      {
+        "tool": "mcp__workspace_map__map_list",
+        "status": "completed"
+      },
+      {
+        "tool": "mcp__workspace_map__map_navigate",
+        "status": "completed",
+        "result": {
+          "follow": false
+        }
+      },
+      {
+        "tool": "mcp__workspace_map__map_transfer",
+        "status": "completed"
+      },
+      {
+        "tool": "mcp__workspace_map__map_job",
+        "status": "completed",
+        "result": {
+          "id": "e640f4c8-02e0-4b9f-a821-30a1a611a498",
+          "state": "completed",
+          "bytes": 26,
+          "files": 1
+        }
+      },
+      {
+        "tool": "mcp__workspace_map__map_read",
+        "status": "completed",
+        "result": {
+          "data": "d29ya3NwYWNlIG1hcCBkc2ggZml4dHVyZQo=",
+          "encoding": "base64"
+        }
+      }
+    ]
+  },
+  "codex": {
+    "sandbox": "read-only test session",
+    "calls": [
+      {
+        "tool": "map_list",
+        "status": "completed",
+        "error": null
+      },
+      {
+        "tool": "map_navigate",
+        "status": "completed",
+        "error": null
+      },
+      {
+        "tool": "map_transfer",
+        "status": "failed",
+        "error": {
+          "message": "MCP tool call requires approval, but approval policy is never"
+        }
+      }
+    ]
+  },
+  "persistentAuthorizationChanged": false
+}
