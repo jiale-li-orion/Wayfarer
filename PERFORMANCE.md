@@ -62,3 +62,38 @@ Windows 安装版脚本在 WSL 执行，显式设置 `WM_SESSION`、`WM_CDP_PORT
 窗口命令先定位并激活指定验收窗口，确认命令输入框后再输入；关闭地图使用该页签的 Close 按钮，兼容本机 Ctrl+F4 绑定。真实数据移动使用显式临时 fixture。
 
 产品日志位于 Workspace Map OutputChannel。`host.resources` 标记共享宿主，`ui.resources` 给出 heap、节点与缓存数量；`map_diagnostics` 查询监听、缓存、游标和任务计数。`map_resources.transport` 为控制通道累计通信计数，`transfer` 为活动数据助手资源，`lastTransferTransport` 为刚结束数据通道的计数。RPC 累计时间包含并行等待，任务墙钟时间见 `job.start`／`job.end`。传输错误回复计数也包含目标存在性探测，任务最终状态由任务记录承担。
+
+## 0.2.0 日常管理复测 · 2026-11-17
+
+同一训练机、Node 22.23.2、3,000 条旧版任务 journal；`scripts/profile-management.ts` 分别加载 f337610 与日常管理分支。下面为单轮 cold／warm 原始记录，warm 指首次归档迁移后的再次启动。
+
+| 项目 | 0.1.1 | 0.2.0 |
+|---|---:|---:|
+| 首次加载＋旧记录迁移 | 151.5ms | 273.8ms |
+| warm 启动 | 148.0ms | 3.4ms |
+| warm 启动 CPU 时间 | 224.4ms | 16.9ms |
+| 历史任务常驻记录 | 3,000 | 0 |
+| 首次加载后的 GC 堆增量 | 2.64MiB | 0.17MiB |
+| 历史摘要首屏 | 378,781B／3,000 条 | 3,894B／30 条 |
+| warm 历史页读取 | 1.7ms（全部摘要） | 7.0ms（磁盘页） |
+| 刷新目录 p95（30 次） | 0.15ms | 0.20ms |
+
+首次迁移增加文件移动开销；后续启动只清点归档文件名。历史翻页使用磁盘读取换取有界常驻内存。20 个同时详情请求合并为一次检查，随后 200 次缓存查询新增端点调用为 0。查询快照限制 64 项／8MiB。
+
+Windows VS Code 1.146.0 的两个独立验收窗口连接 Windows／WSL／训练机／推理机。两窗口均固定在 WSL 家目录、一个监听分支，连续静置 60 秒，采样前后核对根目录和监听数。
+
+| 资源 | 0.1.1 | 0.2.0 |
+|---|---:|---:|
+| Webview CPU（单核时间占比） | 0.035% | 0.037% |
+| 独立验收宿主 CPU | 0.052% | 0.025% |
+| Webview JS heap | 4.67MiB | 5.39MiB |
+| 宿主 Working Set 原始值 | 141.1MiB | 63.0MiB |
+
+宿主包含内置扩展，Working Set 受 Windows 页面回收影响；该列保留观测值。WSL／SSH 助手及包子进程的原始资源计数随记录保存。0.1.1 的三段 600 秒长时间基线继续见上文，本轮新增功能使用 60 秒对照和面板回收验收。
+
+- 详情面板开关 30 次并 GC：JS heap 3.65→3.78MiB，监听数 254→254；关闭面板后监听数 234。查询 pending 为 0，后台包进程为 0。
+- 16MiB Windows→训练机复制并回读核对共 4.80 秒，SHA-256 一致；复制期间并行刷新目录 p95 为 9.35ms。此耗时包含回读校验，完整复制调度耗时由任务 created／updated 与 job.end 日志记录。
+- 四端工具版本任务分别完成；Android SDK 清单、Flutter 版本、winget 软件清单通过共享包适配器查询。修改类包操作沿用 0.1.1 的隔离环境覆盖范围。
+- 实际 Codex 与 dsh 会话完成 endpoints→inspect→jobsPage→navigate；固定验收会话，跟随关闭，用户现有授权配置保留。
+
+数据入口：[baseline.json](docs/performance-data/20261117-management/baseline.json)、[candidate.json](docs/performance-data/20261117-management/candidate.json)、[windows-management.json](docs/performance-data/20261117-management/windows-management.json)。原始窗口日志保存在本机交付 artifacts，公开记录仅保留工具身份与资源数据。

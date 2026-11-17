@@ -3,33 +3,34 @@
   "node": "v22.23.2",
   "historyTasks": 3000,
   "cold": {
-    "initMs": 218.09286000000003,
-    "heapDelta": 172736,
-    "rss": 93200384,
-    "cpuMs": 276.316,
+    "initMs": 273.776256,
+    "heapDelta": 173888,
+    "rss": 99311616,
+    "cpuMs": 337.743,
     "residentTasks": 0,
     "pageRows": 30,
-    "pageMs": 15.803706999999974,
+    "pageMs": 12.292842999999948,
     "summaryBytes": 3894,
-    "directoryP95Ms": 0.3341700000000287
+    "directoryP95Ms": 0.33173100000010436
   },
   "warm": {
-    "initMs": 3.040233999999998,
-    "heapDelta": -4992,
-    "rss": 97116160,
-    "cpuMs": 16.295,
+    "initMs": 3.410824000000048,
+    "heapDelta": 10192,
+    "rss": 103161856,
+    "cpuMs": 16.916,
     "residentTasks": 0,
     "pageRows": 30,
-    "pageMs": 9.071239999999989,
+    "pageMs": 7.037118000000078,
     "summaryBytes": 3894,
-    "directoryP95Ms": 0.19547000000000025
+    "directoryP95Ms": 0.2017799999999852
   },
   "inspection": {
-    "ms": 2.033771999999999,
+    "ms": 2.144871999999964,
     "initialCalls": 43,
     "repeatCalls": 0,
     "stats": {
       "snapshots": 1,
+      "snapshotBytes": 973,
       "pending": 0,
       "projects": 0
     }
