@@ -174,7 +174,6 @@ export class Inspector {
     );
   }
   register(ref: Ref, remove = false) {
-    this.endpoints.get(ref.endpoint);
     if (remove) this.registered.delete(refKey(ref));
     else this.registered.set(refKey(ref), ref);
     this.persist();
@@ -324,6 +323,7 @@ export class Inspector {
         for (const tool of found) {
           ctx.check();
           ctx.progress({ progress: tool.name });
+          const started = performance.now();
           const args =
             versions[tool.name] ??
             (tool.name.includes("python") ? ["--version"] : undefined);
@@ -357,6 +357,15 @@ export class Inspector {
               result = { ...result, error: String(error) };
             }
           }
+          result.ms = performance.now() - started;
+          this.profile.record("inspect.tool", {
+            endpoint,
+            cwd,
+            name: tool.name,
+            ms: result.ms,
+            exitCode: result.exitCode,
+            error: result.error,
+          });
           tools.push(result);
           ctx.progress({ files: tools.length });
         }

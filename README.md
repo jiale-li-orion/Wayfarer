@@ -60,3 +60,8 @@ Marketplace 发布单独处理。
 **占用** 中点击当前目录或缓存旁的 **统计**；后台显示文件数、已统计字节与取消入口。统计结果带查询时间，部分无权限路径计入结果提示。已登记项目、查询快照、书签及任务记录随地图会话保存。后台任务面板分页浏览完成和取消的任务，运行中及可恢复任务单列；详情与日志按需打开。
 
 MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用同一实现。库存查询返回任务 ID，用 `map_job` 查看输出，用 `map_jobControl` 取消。`map_packageDiscover` 支持 `refresh:true` 手动更新管理器路径。
+
+
+### 发布与维护
+
+源码仓库为 [Wayfarer](https://github.com/jiale-li-orion/Wayfarer)，插件继续显示 Workspace Map。构建、安装、升级、回退与 MCP 配置说明见 [docs/RELEASE.md](docs/RELEASE.md)，实际机器覆盖见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。标签工作流交付 VSIX、SHA-256、提交身份和版本说明；PR 产物供审阅验收。

@@ -102,3 +102,12 @@ flowchart LR
 - 快照同时限制数量与序列化体积，持久写入合并排队请求。文件修改使所属端点的快照失效；再次查询按需重建。目录浏览、任务调度与缓存清理各有独立入口。
 - `Jobs.page` 返回全部运行／可恢复摘要及最多 200 条历史摘要；UI 每页 30 条，只保留当前页。历史游标使用创建时间与 ID；每次查询仅保留本页候选文件名。历史正文、输入、结果、日志在详情请求时读取。内存保留最近 100 个结束任务以兼容现有同步 `get` 调用；完整归档存于 `jobs/history`。旧版 flat journal 首次启动迁移，旧输入／结果／日志原位保留。暂停与失败继续沿原恢复流程。
 - 新增 MCP 工具 `map_inspect`、`map_projects`、`map_registerProject`、`map_inventory`、`map_jobsPage`；原 `map_jobs` 保留数组形态，返回可恢复任务及有界近期摘要。批量历史使用新分页入口。
+
+
+## 发布与多窗口版本
+
+`.github/workflows/check.yml` 对 PR 做 Linux 全套与 Windows portable 检查；`release.yml` 在 `v*` 标签上检查版本、构建 VSIX 并发布摘要和元数据。`scripts/release-assets.mjs` 从实际 VSIX 计算 SHA-256，和源码提交一起写入 release.json。安装、配置、升级、回退与实机范围见 `docs/RELEASE.md`、`docs/ACCEPTANCE.md`。
+
+MCP 客户端助手按 mcp.py＋tools.json 的内容哈希写入 `~/.local/share/workspace-map/client/<revision>`。新旧 VS Code 窗口使用各自固定助手目录，接入命令仅更新本扩展项；已配置的旧客户端继续使用其原目录与授权。后台任务共享 Core，窗口会话通过 session ID 绑定。profiling 包含工具版本命令的 endpoint、cwd、名称、耗时及退出状态。
+
+工具发现位于 `src/packages/discovery.ts`，依赖端点与原生路径；UI 共用的 `catalog.ts` 只包含命令配方与字段声明。项目登记与移除属于地图元数据，移除操作独立于端点连接状态。
