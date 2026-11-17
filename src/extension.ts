@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
+import { createSidebar } from "./sidebar";
 import { Core } from "./core/core";
 import { EXIT_GRACE_MS } from "./core/lifecycle";
 import { Profiler } from "./core/log";
@@ -90,7 +91,17 @@ export async function activate(context: vscode.ExtensionContext) {
       isCaseSensitive: false,
     }),
   );
+  context.subscriptions.push(createSidebar(core));
   let panel: vscode.WebviewPanel | undefined;
+  let ready = false;
+  let pendingAction: string | undefined;
+  const flushAction = () => {
+    if (ready && panel?.visible && pendingAction) {
+      const action = pendingAction;
+      pendingAction = undefined;
+      void panel.webview.postMessage({ type: "uiAction", action });
+    }
+  };
   const open = (revived?: vscode.WebviewPanel) => {
     if (panel) {
       panel.reveal();
@@ -213,17 +224,25 @@ export async function activate(context: vscode.ExtensionContext) {
             result = await core.dispatch(m.method, m.args);
         }
         await webview.postMessage({ id: m.id, result });
+        if (m.method === "bootstrap") {
+          ready = true;
+          flushAction();
+        }
       } catch (e) {
         await webview.postMessage({ id: m.id, error: String(e) });
       }
     });
     panel.onDidChangeViewState((e) => {
       core.directories.setVisible(e.webviewPanel.visible);
-      if (!e.webviewPanel.visible) jobsSubscribed = false;
+      if (!e.webviewPanel.visible) {
+        jobsSubscribed = false;
+        ready = false;
+      }
     });
     panel.onDidDispose(() => {
       core.off("event", send);
       panel = undefined;
+      ready = false;
       core.directories.setVisible(false);
       core.directories.watch([]);
     });
@@ -443,18 +462,56 @@ export async function activate(context: vscode.ExtensionContext) {
       await vscode.window.showTextDocument(doc, { preview: true });
     }
   };
-  const register = (id: string, run: () => any) =>
+  const register = (id: string, run: (...args: any[]) => any) =>
     context.subscriptions.push(
-      vscode.commands.registerCommand(id, async () => {
+      vscode.commands.registerCommand(id, async (...args: any[]) => {
         try {
-          await run();
+          await run(...args);
         } catch (e) {
           output.error(String(e));
           void vscode.window.showErrorMessage(String(e));
         }
       }),
     );
-  register("workspaceMap.open", open);
+  register("workspaceMap.open", () => open());
+  register("workspaceMap.sidebar", () =>
+    vscode.commands.executeCommand("workspaceMap.locations.focus"),
+  );
+  register("workspaceMap.openLocation", async (ref: Ref) => {
+    await core.dispatch("navigate", { ref });
+    open();
+  });
+  for (const [name, direction] of [
+    ["back", -1],
+    ["forward", 1],
+  ] as const)
+    register("workspaceMap." + name, async () => {
+      await core.dispatch("history", { direction });
+      open();
+    });
+  register("workspaceMap.home", async () => {
+    await core.dispatch("navigate");
+    open();
+  });
+  register("workspaceMap.parent", async () => {
+    const ref = core.view.root;
+    if (ref)
+      await core.dispatch("navigate", {
+        ref: {
+          endpoint: ref.endpoint,
+          path: pathApi(core.endpoints.get(ref.endpoint).config).dirname(
+            ref.path,
+          ),
+        },
+      });
+    open();
+  });
+  for (const name of ["search", "tasks", "fit"])
+    register("workspaceMap." + name, () => {
+      pendingAction = name;
+      open();
+      flushAction();
+    });
   register("workspaceMap.addEndpoint", () => commands("add"));
   register("workspaceMap.connectCodex", () => commands("codex"));
   register("workspaceMap.connectDsh", () => commands("dsh"));

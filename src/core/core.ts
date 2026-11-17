@@ -406,7 +406,10 @@ export class Core extends EventEmitter {
       case "setView": {
         if (a.expanded) this.view.expanded = a.expanded;
         if (a.viewport) this.view.viewport = a.viewport;
-        if (a.bookmarks) this.view.bookmarks = a.bookmarks;
+        if (a.bookmarks) {
+          this.view.bookmarks = a.bookmarks;
+          this.emit("event", { type: "bookmarks" });
+        }
         if (typeof a.follow === "boolean") this.view.follow = a.follow;
         if (a.manual || a.follow === false) this.navigationRevision++;
         if (a.manual) this.view.follow = false;

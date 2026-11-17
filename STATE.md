@@ -1,6 +1,10 @@
-# Workspace Map · 0.3.0
+# Workspace Map · 0.3.1
 
 训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像与 VSIX：`/home/orion/agent-system-learning/workspace-map`。开发在训练机独立 worktree，本机安装验收。仓库为 `jiale-li-orion/Wayfarer`，插件显示名称 Workspace Map。
+
+## 当前入口更新
+
+0.3.1 补齐原生活动栏／侧边栏和快捷键，复用 0.3.0 地图、任务与 Agent 核心。原生活动栏、机器／书签／操作导航与快捷键已完成独立窗口验收；类型检查、48 项检查与打包通过。Windows 推理机桥接本轮出现退出码 4294967295，保留为验收缺口。详见 docs/ACCEPTANCE.md。
 
 ## 当前交付
 

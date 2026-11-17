@@ -135,3 +135,9 @@ CPU 按单核累计时间计算，Webview 使用 CDP TaskDuration，宿主使用
 另将 **64MiB Windows→训练机复制在 4MiB 检查点后重载窗口**：原任务自动接续，包含重载共 33.00 秒，SHA-256 一致，原任务收据保持同一 ID；期间 469 次目录查询 p95 约 5.97ms。结束后传输租约、借出缓冲、运行任务及路径锁均归零。独立 Codex／dsh 实际会话均查询到该原任务为 completed；临时配置退出后清除，原授权保留。
 
 数据：[50 轮生命周期](docs/performance-data/20261117-resume/lifecycle.json)、[Windows 采样与传输对照](docs/performance-data/20261117-resume/windows.json)。Windows 完整原始日志留在本机 artifacts/acceptance-030；公开记录保留场景、版本及资源数值。测试只操作独立 fixture，完成后删除。
+
+## 0.3.1 入口增量
+
+侧边栏使用原生 TreeView，仅从 Core 配置与书签建立导航项；启动与展开操作各读取内存快照。侧边栏沿端点／书签变化刷新，隐藏期间只保留 dirty 标记。后台任务进度与镜头更新继续使用原通道，侧边栏新增待机定时器为 0，新增目录监听为 0。
+
+独立 Windows 窗口完成 20 轮侧边栏／地图切换，前后目录游标、任务 runner、传输租约与锁计数保持稳定；原始诊断在本机 artifacts/acceptance-031/ui.json。0.3.0 的 CPU／内存和传输基线继续保留，本轮验证范围是新增入口和资源归属。
