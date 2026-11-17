@@ -97,3 +97,41 @@ Windows VS Code 1.146.0 的两个独立验收窗口连接 Windows／WSL／训练
 - 实际 Codex 与 dsh 会话完成 endpoints→inspect→jobsPage→navigate；固定验收会话，跟随关闭，用户现有授权配置保留。
 
 数据入口：[baseline.json](docs/performance-data/20261117-management/baseline.json)、[candidate.json](docs/performance-data/20261117-management/candidate.json)、[windows-management.json](docs/performance-data/20261117-management/windows-management.json)。原始窗口日志保存在本机交付 artifacts，公开记录仅保留工具身份与资源数据。
+
+## 0.3.0 Agent resume · 2026-11-17
+
+Windows 独立验收窗口完成 10 次真实重载及 50 次重新绑定；持久 mapId 始终相同，运行 id 每次更新。另用两个同名 Core／relay 地图交替绑定 50 次、替换实例 10 次，核对旧订阅与游标回收。提交确认丢失、helper 实际退出、主动断开、取消清理、包命令中断等由定向检查承接。
+
+`node --expose-gc --import tsx scripts/profile-resume.mjs <output.json>` 使用 Linux 临时 fixture，记录如下：
+
+| 轮次 | MCP RSS | MCP 线程／FD | 宿主 GC 堆 |
+|---|---:|---:|---:|
+| 10 | 18.14MiB | 2／7 | 8.34MiB |
+| 20 | 18.14MiB | 2／7 | 8.33MiB |
+| 30 | 18.14MiB | 2／7 | 8.33MiB |
+| 40 | 18.14MiB | 2／7 | 8.36MiB |
+| 50 | 18.14MiB | 2／7 | 8.37MiB |
+
+每轮只有目标地图保留一个客户端。关闭后两图的客户端、订阅、pending、relay、游标、监听、runner 与路径锁均为零。MCP 连接期间使用阻塞读取，目录通知只负责等待阶段的唤醒。
+
+四端连接、画布全局视图静置 **600.06 秒／41 个样本**。第 60 秒至结束的 Webview TaskDuration CPU 占比约 0.035%，共享宿主约 0.081%；这段每 15 秒主动查询四端资源和诊断。Webview heap 为 4.54→4.62MiB，宿主 RSS 原始值为 131.77→37.41MiB。WSL／训练机／推理机 helper 的 RSS 分别约 19.04／22.97／17.69MiB，CPU 占比约 0.0069%／0.0024%／0.0038%。整个阶段运行任务、路径锁、借出缓冲和恢复等待器均为零，包子进程为零。
+
+再固定到 WSL 家目录、一个监听分支，按 0.2.0 的方式只读取首尾资源，静置 60 秒。UI 根目录与监听数前后相同：
+
+| 项目 | 0.2.0 | 0.3.0 |
+|---|---:|---:|
+| Webview TaskDuration CPU | 0.037% | 0.046% |
+| 共享宿主 CPU | 0.025% | 0.025% |
+| Webview JS heap | 5.39MiB | 4.81MiB |
+| 宿主 RSS 原始值 | 63.0MiB | 38.9MiB |
+| 16MiB 复制＋回读核对，当前对照 | 14.95s | 13.32s |
+| 复制阶段墙钟 | 10.50s | 6.57s |
+| 复制及回读期间目录响应 p95 | 15.19ms | 10.91ms |
+
+CPU 按单核累计时间计算，Webview 使用 CDP TaskDuration，宿主使用原生端点的 process.cpuUsage。共享宿主含 VS Code 内置扩展，RSS 受 Windows 页面回收影响；堆与 RSS 保留场景观测值，回收稳定性由循环计数及 GC 堆判断。
+
+传输对照在同一验收窗口分别加载官方 0.2.0 和本轮 0.3.0，使用相同 16MiB 内容、Windows 源、训练机目标及 WSL 目录查询；每次创建独立 fixture。0.2.0 同日历史样本为 4.80 秒，当前重测为 14.95 秒，因此本轮使用当前对照。单轮数值承接这次实际环境，后续调优继续按相同场景重测。
+
+另将 **64MiB Windows→训练机复制在 4MiB 检查点后重载窗口**：原任务自动接续，包含重载共 33.00 秒，SHA-256 一致，原任务收据保持同一 ID；期间 469 次目录查询 p95 约 5.97ms。结束后传输租约、借出缓冲、运行任务及路径锁均归零。独立 Codex／dsh 实际会话均查询到该原任务为 completed；临时配置退出后清除，原授权保留。
+
+数据：[50 轮生命周期](docs/performance-data/20261117-resume/lifecycle.json)、[Windows 采样与传输对照](docs/performance-data/20261117-resume/windows.json)。Windows 完整原始日志留在本机 artifacts/acceptance-030；公开记录保留场景、版本及资源数值。测试只操作独立 fixture，完成后删除。

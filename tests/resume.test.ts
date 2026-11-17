@@ -742,3 +742,69 @@ test("legacy per-request MCP sockets retain pagination across requests", async (
     await f.dispose();
   }
 });
+test("interrupted package command retains its actual result across restart and receipt retry", async () => {
+  const f = await fixture();
+  let core = await f.open();
+  try {
+    const python = path.join(f.root, "fixture-python");
+    await fs.writeFile(
+      python,
+      '#!/usr/bin/env python3\nimport time\nprint("fixture manager ready",flush=True)\ntime.sleep(60)\n',
+      { mode: 0o700 },
+    );
+    const args = {
+      endpoint: "source",
+      cwd: f.source,
+      manager: "pip",
+      action: "list",
+      python,
+      operationId: "package-interrupted",
+    };
+    const job = await core.dispatch("package", args);
+    await until(() => core.jobs.get(job.id).checkpoint.process, Boolean);
+    core.jobs.control(job.id, "cancel");
+    assert.equal((await done(core, job.id)).state, "cancelled");
+    const original = await core.jobs.details(job.id);
+    assert.equal(original.result.interrupted, true);
+    assert.notEqual(original.result.exitCode, null);
+    assert.equal(
+      (await core.endpoints.get("source").call("resources")).processes,
+      0,
+    );
+    await core.dispose();
+    core = await f.open();
+    const duplicate = await core.dispatch("package", args);
+    assert.equal(duplicate.id, job.id);
+    assert.equal(duplicate.state, "cancelled");
+    assert.deepEqual((await core.jobs.details(job.id)).result, original.result);
+    assert.equal(core.jobs.stats().running, 0);
+  } finally {
+    await core.dispose();
+    await f.dispose();
+  }
+});
+test("successful final commit remains completed when shutdown arrives at its acknowledgement", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "wm-committed-"));
+  const jobs = new Jobs(root, new Profiler(() => {}));
+  let commit!: () => void;
+  jobs.register("package", async () => {
+    await new Promise<void>((resolve) => (commit = resolve));
+    return { exitCode: 0, committed: true };
+  });
+  try {
+    await jobs.init();
+    const task = jobs.submit("package", {});
+    await until(() => commit, Boolean);
+    const closing = jobs.dispose();
+    commit();
+    await closing;
+    assert.equal(jobs.get(task.id).state, "completed");
+    assert.deepEqual((await jobs.details(task.id)).result, {
+      exitCode: 0,
+      committed: true,
+    });
+  } finally {
+    await jobs.dispose();
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});

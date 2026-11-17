@@ -586,7 +586,6 @@ export class Jobs extends EventEmitter {
     };
     try {
       j.result = await this.runners.get(j.kind)!(ctx);
-      ctx.check();
       j.state = "completed";
       j.pauseReason = undefined;
       j.checkpoint = { locks: j.checkpoint.locks };

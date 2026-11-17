@@ -147,3 +147,20 @@ sequenceDiagram
 - Transfers 在 finally 归还任务租约及借出的缓冲，Jobs 随后释放路径锁并落盘。取消沿登记的 uncommitted 私有路径清理，保留已提交目标及源处理事实；失败项写入 cleanupPending，归档后仍可通过 `map_jobCleanup` 或任务面板明确重试。
 - `lifecycle.ts` 集中 1.5 秒宽限；Core、Jobs、Endpoint、Bridge 的关闭均可重复等待。宽限结束中止归属进程与悬挂 RPC，再等待 finally 和记录写入；Native 包进程的升级 kill 定时器在进程结束时回收。视图写入串行，关闭时交接最终快照。
 - `map_diagnostics` 增加 Agent 客户端／订阅／pending、客户端游标、runner、日志写入、恢复等待器、传输租约／缓冲及退出阶段；`map_connection` 返回客户端绑定、恢复状态和最新交接快照。编辑器与面板继续各自管理订阅，后台任务使用地图生命周期。
+
+```mermaid
+stateDiagram-v2
+    [*] --> queued: 持久化提交收据
+    queued --> running: 上段已结束且获得路径锁
+    running --> paused: 主动暂停／断开、窗口退出或网络断开
+    paused --> queued: 用户继续，或对应的自动恢复条件满足
+    running --> completed: 提交结果与归档
+    running --> failed: 权限、源变化、空间等任务失败
+    failed --> queued: 用户明确继续
+    queued --> cancelled: 取消并清理登记暂存
+    paused --> cancelled: 取消并清理登记暂存
+    running --> cancelled: 执行段退出后清理
+    cancelled --> cancelled: 明确重试 cleanupPending
+```
+
+0.2.0 助手的独立请求 socket 继续沿旧分页方式工作；新助手通过 clientAttach 声明连接归属，采用完整的恢复与退出流程。升级接入命令生成稳定 mapId 绑定。目录关闭调用和退休端点均有归属集合，地图退出在助手收束后等待这些清理完成。Python helper 的 stdin EOF 结束其控制权；清理所属包进程、游标与监听后退出，即使某个 worker 仍阻塞于系统调用。

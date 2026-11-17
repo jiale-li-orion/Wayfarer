@@ -1,0 +1,4706 @@
+{
+  "at": "2026-11-17",
+  "runtimeCommit": "4674eb59e4b839e29cceed21f9bb3b51ae6942e3",
+  "idle": {
+    "seconds": 600.064020042,
+    "sampleCount": 41,
+    "visible": true,
+    "watches": [
+      0
+    ],
+    "webviewTaskCpuPercent": 0.03539173733852629,
+    "hostCpuPercent": 0.08111127307785633,
+    "webviewHeapMiB": [
+      4.544944763183594,
+      4.620903015136719
+    ],
+    "hostRssMiB": [
+      131.76953125,
+      37.40625
+    ],
+    "helpers": [
+      {
+        "endpoint": "wsl-ubuntu",
+        "rssMiB": 19.04296875,
+        "cpuPercent": 0.00689556932494763,
+        "processes": 0
+      },
+      {
+        "endpoint": "train",
+        "rssMiB": 22.97265625,
+        "cpuPercent": 0.0023740788147445634,
+        "processes": 0
+      },
+      {
+        "endpoint": "infer",
+        "rssMiB": 17.6875,
+        "cpuPercent": 0.003833526173481058,
+        "processes": 0
+      }
+    ]
+  },
+  "idleSamples": [
+    {
+      "elapsedMs": 0.008336999999983163,
+      "webview": {
+        "TaskDuration": 0.000544,
+        "ProcessTime": 7.94688,
+        "JSHeapUsedSize": 4765720,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 138170368,
+        "heapUsed": 39391088,
+        "external": 7355782,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 562000,
+          "system": 578000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 95.684,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 28.957,
+          "cpuSystemMs": 7.8,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 25.797,
+          "cpuSystemMs": 4.173,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 15007.085809999999,
+      "webview": {
+        "TaskDuration": 0.005709,
+        "ProcessTime": 7.955656,
+        "JSHeapUsedSize": 4774892,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 136957952,
+        "heapUsed": 39471172,
+        "external": 7358726,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 562000,
+          "system": 593000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 96.54299999999999,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 29.394,
+          "cpuSystemMs": 7.917999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 26.354,
+          "cpuSystemMs": 4.173,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 30013.583727,
+      "webview": {
+        "TaskDuration": 0.010789,
+        "ProcessTime": 7.963875,
+        "JSHeapUsedSize": 4777136,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 136966144,
+        "heapUsed": 39549344,
+        "external": 7361623,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 578000,
+          "system": 593000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 97.107,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 29.831999999999997,
+          "cpuSystemMs": 8.036,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 26.916,
+          "cpuSystemMs": 4.173,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 45015.179669000005,
+      "webview": {
+        "TaskDuration": 0.016205,
+        "ProcessTime": 7.973006,
+        "JSHeapUsedSize": 4779568,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 137043968,
+        "heapUsed": 39623892,
+        "external": 7364524,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 578000,
+          "system": 593000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 98.338,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 30.25,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 27.491,
+          "cpuSystemMs": 4.173,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 60013.595532,
+      "webview": {
+        "TaskDuration": 0.021485,
+        "ProcessTime": 7.981382,
+        "JSHeapUsedSize": 4781236,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 137195520,
+        "heapUsed": 39694952,
+        "external": 7367459,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 593000,
+          "system": 609000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 99.20599999999999,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 30.753,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 27.663999999999998,
+          "cpuSystemMs": 4.62,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 75013.651289,
+      "webview": {
+        "TaskDuration": 0.026827,
+        "ProcessTime": 7.990009,
+        "JSHeapUsedSize": 4782904,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 135946240,
+        "heapUsed": 38757980,
+        "external": 7159697,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 593000,
+          "system": 640000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 99.841,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 31.301999999999996,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 28.171,
+          "cpuSystemMs": 4.705,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 90015.047407,
+      "webview": {
+        "TaskDuration": 0.031815,
+        "ProcessTime": 7.998166,
+        "JSHeapUsedSize": 4784572,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 135946240,
+        "heapUsed": 38826464,
+        "external": 7162546,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 609000,
+          "system": 640000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 100.508,
+          "cpuSystemMs": 88.01199999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 31.782999999999998,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 28.723,
+          "cpuSystemMs": 4.749,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 105014.895175,
+      "webview": {
+        "TaskDuration": 0.037381,
+        "ProcessTime": 8.006868,
+        "JSHeapUsedSize": 4786240,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 135954432,
+        "heapUsed": 38902856,
+        "external": 7165399,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 625000,
+          "system": 640000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 101.272,
+          "cpuSystemMs": 88.063,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 32.184999999999995,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 29.313,
+          "cpuSystemMs": 4.749,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 120004.096785,
+      "webview": {
+        "TaskDuration": 0.043515,
+        "ProcessTime": 8.01642,
+        "JSHeapUsedSize": 4787908,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 135958528,
+        "heapUsed": 38973232,
+        "external": 7168230,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 625000,
+          "system": 640000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 101.835,
+          "cpuSystemMs": 88.553,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 32.68899999999999,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 29.313,
+          "cpuSystemMs": 5.306,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 135007.983117,
+      "webview": {
+        "TaskDuration": 0.048912,
+        "ProcessTime": 8.025392,
+        "JSHeapUsedSize": 4789576,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 125939712,
+        "heapUsed": 39048424,
+        "external": 7171043,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 625000,
+          "system": 671000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 102.27399999999999,
+          "cpuSystemMs": 88.934,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 33.234,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 29.755,
+          "cpuSystemMs": 5.425,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 150013.608219,
+      "webview": {
+        "TaskDuration": 0.054734,
+        "ProcessTime": 8.035458,
+        "JSHeapUsedSize": 4793744,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 125943808,
+        "heapUsed": 39137400,
+        "external": 7174224,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 625000,
+          "system": 671000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 102.947,
+          "cpuSystemMs": 89.519,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 33.79,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 30.230999999999998,
+          "cpuSystemMs": 5.464,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 165005.603608,
+      "webview": {
+        "TaskDuration": 0.060173,
+        "ProcessTime": 8.045013,
+        "JSHeapUsedSize": 4795412,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 125947904,
+        "heapUsed": 39201732,
+        "external": 7176839,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 640000,
+          "system": 671000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 103.89999999999999,
+          "cpuSystemMs": 89.519,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 34.312,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 30.82,
+          "cpuSystemMs": 5.464,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 180014.163592,
+      "webview": {
+        "TaskDuration": 0.066227,
+        "ProcessTime": 8.054515,
+        "JSHeapUsedSize": 4797080,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 126095360,
+        "heapUsed": 39275684,
+        "external": 7179704,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 640000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 104.961,
+          "cpuSystemMs": 89.696,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 34.641,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 31.413999999999998,
+          "cpuSystemMs": 5.464,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 195011.402331,
+      "webview": {
+        "TaskDuration": 0.07143,
+        "ProcessTime": 8.062597,
+        "JSHeapUsedSize": 4798748,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 126103552,
+        "heapUsed": 39358944,
+        "external": 7182609,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 640000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 104.961,
+          "cpuSystemMs": 90.77099999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 34.869,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 32.00899999999999,
+          "cpuSystemMs": 5.464,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 210014.244913,
+      "webview": {
+        "TaskDuration": 0.077125,
+        "ProcessTime": 8.071121,
+        "JSHeapUsedSize": 4800416,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 126107648,
+        "heapUsed": 39433496,
+        "external": 7185623,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 640000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 104.961,
+          "cpuSystemMs": 91.57,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 35.08,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 32.410000000000004,
+          "cpuSystemMs": 5.608999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 225000.135387,
+      "webview": {
+        "TaskDuration": 0.082792,
+        "ProcessTime": 8.08009,
+        "JSHeapUsedSize": 4802084,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 125325312,
+        "heapUsed": 38788028,
+        "external": 7158250,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 640000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 105.22899999999998,
+          "cpuSystemMs": 92.076,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 35.382999999999996,
+          "cpuSystemMs": 8.148,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 32.459,
+          "cpuSystemMs": 6.156,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 240007.076381,
+      "webview": {
+        "TaskDuration": 0.087155,
+        "ProcessTime": 8.087323,
+        "JSHeapUsedSize": 4803752,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 125386752,
+        "heapUsed": 38870212,
+        "external": 7161323,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 656000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 106.102,
+          "cpuSystemMs": 92.83899999999998,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 35.687999999999995,
+          "cpuSystemMs": 8.364,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 33.132000000000005,
+          "cpuSystemMs": 6.284,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 255014.773604,
+      "webview": {
+        "TaskDuration": 0.092457,
+        "ProcessTime": 8.095695,
+        "JSHeapUsedSize": 4805420,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71860224,
+        "heapUsed": 38951376,
+        "external": 7164681,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 656000,
+          "system": 687000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 106.81299999999999,
+          "cpuSystemMs": 93.04799999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 35.918,
+          "cpuSystemMs": 8.364,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 33.756,
+          "cpuSystemMs": 6.284,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 270007.161603,
+      "webview": {
+        "TaskDuration": 0.097888,
+        "ProcessTime": 8.103945,
+        "JSHeapUsedSize": 4808672,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71979008,
+        "heapUsed": 39040652,
+        "external": 7168247,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 656000,
+          "system": 703000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 107.524,
+          "cpuSystemMs": 93.04799999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.077999999999996,
+          "cpuSystemMs": 8.542,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 33.897,
+          "cpuSystemMs": 6.718,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 285013.578905,
+      "webview": {
+        "TaskDuration": 0.10216,
+        "ProcessTime": 8.110851,
+        "JSHeapUsedSize": 4810340,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70815744,
+        "heapUsed": 39125536,
+        "external": 7236896,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 687000,
+          "system": 703000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 107.669,
+          "cpuSystemMs": 93.717,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.077999999999996,
+          "cpuSystemMs": 8.850999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 34.193,
+          "cpuSystemMs": 7.019,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 300013.520861,
+      "webview": {
+        "TaskDuration": 0.106254,
+        "ProcessTime": 8.118015,
+        "JSHeapUsedSize": 4812008,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70807552,
+        "heapUsed": 39197768,
+        "external": 7239862,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 687000,
+          "system": 718000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 107.669,
+          "cpuSystemMs": 94.467,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.077999999999996,
+          "cpuSystemMs": 9.112,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 34.653,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 315014.911044,
+      "webview": {
+        "TaskDuration": 0.111467,
+        "ProcessTime": 8.126138,
+        "JSHeapUsedSize": 4813676,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70868992,
+        "heapUsed": 39277428,
+        "external": 7242841,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 687000,
+          "system": 734000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 107.937,
+          "cpuSystemMs": 94.984,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.104,
+          "cpuSystemMs": 9.286,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 35.285,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 330010.926066,
+      "webview": {
+        "TaskDuration": 0.116014,
+        "ProcessTime": 8.133395,
+        "JSHeapUsedSize": 4815344,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71544832,
+        "heapUsed": 39374412,
+        "external": 7245932,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 718000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 108.478,
+          "cpuSystemMs": 95.46,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.278999999999996,
+          "cpuSystemMs": 9.331,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 35.878,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 345013.671129,
+      "webview": {
+        "TaskDuration": 0.121273,
+        "ProcessTime": 8.141712,
+        "JSHeapUsedSize": 4817012,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71213056,
+        "heapUsed": 39456812,
+        "external": 7248859,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 718000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 113.633,
+          "cpuSystemMs": 96.151,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.534,
+          "cpuSystemMs": 9.396999999999998,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 36.498999999999995,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 360014.70832,
+      "webview": {
+        "TaskDuration": 0.125802,
+        "ProcessTime": 8.149027,
+        "JSHeapUsedSize": 4818680,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71208960,
+        "heapUsed": 39528708,
+        "external": 7251827,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 734000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 114.14699999999999,
+          "cpuSystemMs": 96.58599999999998,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 36.81699999999999,
+          "cpuSystemMs": 9.469999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 37.068,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 375002.437712,
+      "webview": {
+        "TaskDuration": 0.130835,
+        "ProcessTime": 8.158024,
+        "JSHeapUsedSize": 4820348,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 71340032,
+        "heapUsed": 38836052,
+        "external": 7223224,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 734000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 114.54199999999999,
+          "cpuSystemMs": 96.91999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.096,
+          "cpuSystemMs": 9.540999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 37.669999999999995,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 390014.273615,
+      "webview": {
+        "TaskDuration": 0.136386,
+        "ProcessTime": 8.166754,
+        "JSHeapUsedSize": 4822016,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70606848,
+        "heapUsed": 38908360,
+        "external": 7226135,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 750000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 115.082,
+          "cpuSystemMs": 97.377,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.308,
+          "cpuSystemMs": 9.596,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 38.20399999999999,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 405014.046288,
+      "webview": {
+        "TaskDuration": 0.141876,
+        "ProcessTime": 8.176272,
+        "JSHeapUsedSize": 4823684,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70737920,
+        "heapUsed": 38981756,
+        "external": 7229114,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 750000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 115.494,
+          "cpuSystemMs": 97.725,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.487,
+          "cpuSystemMs": 9.682999999999998,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 38.75899999999999,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 420014.178628,
+      "webview": {
+        "TaskDuration": 0.14708,
+        "ProcessTime": 8.184072,
+        "JSHeapUsedSize": 4825352,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 70762496,
+        "heapUsed": 39056220,
+        "external": 7232132,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 750000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 115.93299999999999,
+          "cpuSystemMs": 98.097,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.487,
+          "cpuSystemMs": 9.943999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 39.334,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 435013.541237,
+      "webview": {
+        "TaskDuration": 0.151724,
+        "ProcessTime": 8.191313,
+        "JSHeapUsedSize": 4827020,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 38973440,
+        "heapUsed": 39127848,
+        "external": 7235049,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 765000,
+          "system": 750000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 116.33399999999999,
+          "cpuSystemMs": 98.43599999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.487,
+          "cpuSystemMs": 10.182,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 39.875,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 450013.851635,
+      "webview": {
+        "TaskDuration": 0.157349,
+        "ProcessTime": 8.200053,
+        "JSHeapUsedSize": 4828688,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39075840,
+        "heapUsed": 39203852,
+        "external": 7238127,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 781000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 117.045,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.487,
+          "cpuSystemMs": 10.439,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 40.431,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 465011.34399,
+      "webview": {
+        "TaskDuration": 0.163212,
+        "ProcessTime": 8.209025,
+        "JSHeapUsedSize": 4830356,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39124992,
+        "heapUsed": 39276164,
+        "external": 7241007,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 796000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 117.75999999999999,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.759,
+          "cpuSystemMs": 10.494,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 40.969,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 480012.472936,
+      "webview": {
+        "TaskDuration": 0.168103,
+        "ProcessTime": 8.216952,
+        "JSHeapUsedSize": 4832024,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39215104,
+        "heapUsed": 39351800,
+        "external": 7243935,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 796000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 119.17399999999999,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.830999999999996,
+          "cpuSystemMs": 10.678,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 41.519,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 495005.061833,
+      "webview": {
+        "TaskDuration": 0.173876,
+        "ProcessTime": 8.226212,
+        "JSHeapUsedSize": 4833692,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39292928,
+        "heapUsed": 39421828,
+        "external": 7246827,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 812000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 119.99499999999999,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.830999999999996,
+          "cpuSystemMs": 11.129999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 42.056999999999995,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 510013.663478,
+      "webview": {
+        "TaskDuration": 0.179513,
+        "ProcessTime": 8.23526,
+        "JSHeapUsedSize": 4835360,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39391232,
+        "heapUsed": 39493800,
+        "external": 7249817,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 828000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 120.725,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 37.830999999999996,
+          "cpuSystemMs": 11.501,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 42.608,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 525012.692172,
+      "webview": {
+        "TaskDuration": 0.186211,
+        "ProcessTime": 8.245651,
+        "JSHeapUsedSize": 4837028,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39477248,
+        "heapUsed": 39565576,
+        "external": 7252798,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 828000,
+          "system": 765000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 121.413,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 38.04,
+          "cpuSystemMs": 11.632,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 43.143,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 540013.534389,
+      "webview": {
+        "TaskDuration": 0.191717,
+        "ProcessTime": 8.254781,
+        "JSHeapUsedSize": 4838696,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 38842368,
+        "heapUsed": 38870680,
+        "external": 7223187,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 843000,
+          "system": 781000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 122.25399999999999,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 38.311,
+          "cpuSystemMs": 11.715,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 43.695,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 555010.27448,
+      "webview": {
+        "TaskDuration": 0.196896,
+        "ProcessTime": 8.263247,
+        "JSHeapUsedSize": 4840364,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 38989824,
+        "heapUsed": 38942500,
+        "external": 7226141,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 859000,
+          "system": 781000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 123.08999999999999,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 38.605000000000004,
+          "cpuSystemMs": 11.805,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 44.239999999999995,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 570007.743278,
+      "webview": {
+        "TaskDuration": 0.203126,
+        "ProcessTime": 8.272077,
+        "JSHeapUsedSize": 4842032,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39145472,
+        "heapUsed": 39013980,
+        "external": 7229839,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 859000,
+          "system": 781000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 124.002,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 38.885999999999996,
+          "cpuSystemMs": 11.890999999999998,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 44.782999999999994,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 1,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 585012.097937,
+      "webview": {
+        "TaskDuration": 0.207999,
+        "ProcessTime": 8.279859,
+        "JSHeapUsedSize": 4843700,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39116800,
+        "heapUsed": 39082952,
+        "external": 7232176,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 859000,
+          "system": 781000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 125.306,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 39.283,
+          "cpuSystemMs": 12.012,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 45.324999999999996,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 3,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 3,
+          "recoveryWaiters": 0
+        }
+      }
+    },
+    {
+      "elapsedMs": 600012.517235,
+      "webview": {
+        "TaskDuration": 0.2126,
+        "ProcessTime": 8.287114,
+        "JSHeapUsedSize": 4845368,
+        "JSEventListeners": 616,
+        "Nodes": 205
+      },
+      "host": {
+        "pid": 27520,
+        "rss": 39223296,
+        "heapUsed": 39152500,
+        "external": 7235088,
+        "arrayBuffers": 0,
+        "cpu": {
+          "user": 859000,
+          "system": 781000
+        }
+      },
+      "helpers": [
+        {
+          "endpoint": "wsl-ubuntu",
+          "pid": 290911,
+          "rss": 19968000,
+          "cpuUserMs": 125.924,
+          "cpuSystemMs": 98.52999999999999,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "train",
+          "pid": 1615066,
+          "rss": 24088576,
+          "cpuUserMs": 39.609,
+          "cpuSystemMs": 12.112,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        },
+        {
+          "endpoint": "infer",
+          "pid": 3621133,
+          "rss": 18546688,
+          "cpuUserMs": 45.87199999999999,
+          "cpuSystemMs": 7.1129999999999995,
+          "cursors": 0,
+          "processes": 0,
+          "transferUsers": 0
+        }
+      ],
+      "diagnostics": {
+        "directories": {
+          "clients": 2,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 24,
+          "cachedEntries": 655,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        "jobs": {
+          "records": 0,
+          "historyOnDisk": 22,
+          "retainedTerminal": 0,
+          "running": 0,
+          "runners": 0,
+          "submissions": 0,
+          "logWrites": 0,
+          "closing": false,
+          "heldLocks": 0,
+          "progressTimers": 0,
+          "states": {}
+        },
+        "transfers": {
+          "leases": 0,
+          "buffers": 0,
+          "bufferBytes": 0
+        },
+        "lifecycle": {
+          "stage": "running",
+          "clients": 2,
+          "recoveryWaiters": 0
+        }
+      }
+    }
+  ],
+  "home60s": {
+    "seconds": 60.132435567,
+    "webviewCpuPercent": 0.04649237925653303,
+    "hostCpuPercent": 0.024944940045355204,
+    "webviewHeapMiB": 4.814357757568359,
+    "hostRssMiB": 38.88671875,
+    "watches": [
+      1,
+      1
+    ],
+    "rootStable": true
+  },
+  "liveResume": {
+    "reloads": 10,
+    "binds": 50,
+    "mapIdStable": true,
+    "clients": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "pending": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "endpoints": [
+      {
+        "id": "windows-c",
+        "entries": 179,
+        "cursor": false
+      },
+      {
+        "id": "wsl-ubuntu",
+        "entries": 79,
+        "cursor": false
+      },
+      {
+        "id": "train",
+        "entries": 24,
+        "cursor": false
+      },
+      {
+        "id": "infer",
+        "entries": 13,
+        "cursor": false
+      }
+    ]
+  },
+  "transferReload": {
+    "bytes": 67108864,
+    "bytesBeforeReload": 4194304,
+    "secondsIncludingReload": 32.99591552099999,
+    "sha256": "e3f94a7cf5e4223ed571fd220888bd5037140aa8298eecc51eee8adac4cbd58f",
+    "directoryLatencyMs": [
+      7.40711900000133,
+      5.9386599999998,
+      6.744673999999577,
+      4.802779999999984,
+      5.188922999999704,
+      4.84700200000043,
+      4.204593000000386,
+      4.350764000000709,
+      4.940915999999561,
+      4.218569000000571,
+      3.3755070000006526,
+      4.174814999998489,
+      3.773095000000467,
+      4.3466520000001765,
+      5.088762999999744,
+      3.158422000000428,
+      3.7507499999992433,
+      3.0716879999999946,
+      3.166682999999466,
+      3.1585220000015397,
+      3.2125840000007884,
+      3.7070029999995313,
+      6.181302000000869,
+      4.598571000000447,
+      4.174752000000808,
+      3.1245770000004995,
+      3.410436000000118,
+      5.110957000000781,
+      4.1195929999994405,
+      4.842064000000391,
+      3.657334000001356,
+      3.289384000001519,
+      4.556198000000222,
+      3.357238000000507,
+      5.912795999998707,
+      3.0977440000006027,
+      3.578121000000465,
+      3.13381500000105,
+      2.7807560000001104,
+      3.9376219999994646,
+      3.326290999999401,
+      5.4359220000005735,
+      3.8503620000010415,
+      3.295922999999675,
+      3.2986049999999523,
+      3.4647599999989325,
+      6.314875000000029,
+      3.5369900000005146,
+      3.408713999999236,
+      3.3521680000012566,
+      3.218894999999975,
+      3.2799230000000534,
+      3.1313679999984743,
+      3.1046210000004066,
+      4.327519000000393,
+      4.442033999999694,
+      3.478945000000749,
+      3.0659230000001116,
+      3.2794709999998304,
+      3.21889100000044,
+      3.89077399999951,
+      2.978370000000723,
+      3.5444729999999254,
+      3.2811490000003687,
+      3.3369590000002063,
+      3.5702410000012605,
+      3.505972999999358,
+      5.6186260000013135,
+      5.733636999999362,
+      2.869445000000269,
+      2.9479059999994206,
+      5.012402000000293,
+      3.782028999999966,
+      4.359721999999238,
+      5.168113999998241,
+      3.849630000000616,
+      4.773698999999397,
+      3.0871229999993375,
+      6.458113000000594,
+      2.9595030000000406,
+      4.375098000000435,
+      3.819519999999102,
+      4.23244700000032,
+      3.53870199999983,
+      2.8891480000002048,
+      3.6340330000002723,
+      3.2771370000009483,
+      3.209501999999702,
+      3.323696999999811,
+      3.3016829999996844,
+      3.9276190000000497,
+      4.0224249999992026,
+      3.779603999999381,
+      3.3946080000005168,
+      3.4629060000006575,
+      3.3295319999997446,
+      3.237535000000207,
+      4.478074000000561,
+      3.6943709999995917,
+      3.543626000000586,
+      4.886216999999306,
+      4.362801999999647,
+      4.6735719999996945,
+      5.370012999999744,
+      4.2506369999991875,
+      3.8171350000011444,
+      4.121702999998888,
+      3.9246729999995296,
+      4.385475000000952,
+      3.4702349999988655,
+      12.503407000000152,
+      4.176197999999204,
+      8.764745000000403,
+      3.374148000000787,
+      3.0274719999997615,
+      3.159859999999753,
+      3.9226099999996222,
+      3.2843320000010863,
+      3.2629460000007384,
+      3.337015999999494,
+      3.9196780000002036,
+      2.9260969999995723,
+      3.5308550000008836,
+      3.47707199999968,
+      3.156768999999258,
+      4.031629000000976,
+      4.078515999999581,
+      3.132306999999855,
+      3.1039119999986724,
+      4.384982000001401,
+      3.2784350000001723,
+      3.3337570000003325,
+      3.8085919999994076,
+      3.875528000000486,
+      4.245319999999992,
+      3.516381999999794,
+      3.515610000000379,
+      4.360803999999916,
+      4.359878999999637,
+      3.7082330000012007,
+      4.169720000001689,
+      10.856927000000724,
+      8.378145999999106,
+      3.5502830000004906,
+      3.995081000000937,
+      4.734073999999964,
+      3.9279649999989488,
+      4.654749999997875,
+      3.972254000000248,
+      3.338498000000982,
+      7.884127000001172,
+      3.0007450000011886,
+      3.1153210000011313,
+      2.946259000000282,
+      3.268836999999621,
+      3.2685530000017025,
+      3.1986130000004778,
+      3.3062910000007832,
+      2.8573189999988244,
+      2.858491999999387,
+      3.930158000002848,
+      3.4158720000014,
+      3.0424389999971027,
+      4.247564999997849,
+      3.2487030000011146,
+      3.3287020000025223,
+      4.96689399999741,
+      4.037477999998373,
+      7.128861999997753,
+      3.5789130000011937,
+      3.2808199999999488,
+      2.9149260000012873,
+      3.0545189999975264,
+      2.9155329999994137,
+      3.5729339999998047,
+      3.6633900000015274,
+      3.837154000000737,
+      3.252459999999701,
+      4.067579999998998,
+      3.3026690000006056,
+      3.1704070000014326,
+      4.050263000000996,
+      3.304788000001281,
+      3.82796099999905,
+      4.102881000002526,
+      3.463032999999996,
+      3.854780000001483,
+      5.229920000001584,
+      3.3699169999999867,
+      3.9474479999989853,
+      4.174527000002854,
+      4.258183000001736,
+      3.9198599999981525,
+      4.237194000001182,
+      5.650538999998389,
+      4.291382999999769,
+      5.0433109999976296,
+      6.8886099999981525,
+      3.3570199999994657,
+      3.815797000002931,
+      3.237538000001223,
+      3.3449280000022554,
+      4.217735999998695,
+      3.1162439999970957,
+      2.9159249999975145,
+      3.2507349999978032,
+      3.6589869999988878,
+      3.0662349999984144,
+      3.036786000000575,
+      3.2699780000002647,
+      3.958169999998063,
+      3.352321000002121,
+      3.555870000000141,
+      3.755235000000539,
+      3.301525999999285,
+      4.372866999998223,
+      4.61855099999957,
+      3.2667489999985264,
+      3.198887000002287,
+      3.9380479999999807,
+      5.164076999997633,
+      4.999472999999853,
+      5.304000000000087,
+      5.2479460000031395,
+      5.324490999999398,
+      3.4898209999992105,
+      3.49340900000243,
+      2.9655279999969935,
+      3.328787000002194,
+      3.3264579999995476,
+      3.660849000003509,
+      3.1335350000008475,
+      4.816912999998749,
+      3.6605019999988144,
+      3.285188999998354,
+      2.819790000001376,
+      2.8453200000003562,
+      3.376814999999624,
+      4.427735000001121,
+      4.312114000000292,
+      3.784836999999243,
+      3.562153999999282,
+      3.4605520000004617,
+      5.081446000000142,
+      6.156988999999157,
+      3.1710320000020147,
+      3.507920000000013,
+      3.0180030000010447,
+      4.107370000001538,
+      3.1410290000021632,
+      5.683060999999725,
+      4.608825999999681,
+      4.102998000002117,
+      3.4782709999999497,
+      3.381282000002102,
+      3.5635739999997895,
+      3.2777709999973013,
+      3.044088999999076,
+      3.4618659999978263,
+      3.3463040000024193,
+      3.3200700000015786,
+      3.335801999997784,
+      2.905869000001985,
+      2.924635000003036,
+      4.343825000003562,
+      3.1288690000001225,
+      3.4614809999984573,
+      3.2803430000021763,
+      3.3778960000017832,
+      3.1173210000015388,
+      3.637166000000434,
+      3.8288700000011886,
+      3.334020000002056,
+      3.2976849999977276,
+      4.265555000001768,
+      3.273581000001286,
+      5.4216359999991255,
+      4.102347000000009,
+      4.386261999999988,
+      4.2691890000023704,
+      3.2181039999995846,
+      3.57716900000014,
+      3.2744000000020606,
+      3.6677469999995083,
+      3.077987000000576,
+      3.3524020000004384,
+      3.4503660000009404,
+      3.1519359999983863,
+      4.0753829999994196,
+      3.5452489999988757,
+      3.220636000001832,
+      4.060025999999198,
+      3.4561659999999392,
+      3.5354200000001583,
+      3.012897000000521,
+      3.3089659999968717,
+      3.1101459999990766,
+      2.9614309999997204,
+      4.811673000000155,
+      4.9735860000000685,
+      3.7590840000011667,
+      5.1390109999993,
+      4.3939509999981965,
+      3.8645810000016354,
+      3.3063659999970696,
+      3.361338999999134,
+      4.000796000000264,
+      8.71561699999802,
+      3.853635999999824,
+      3.5898139999990235,
+      3.6020879999996396,
+      2.9375599999984843,
+      3.223301000001811,
+      3.310617999999522,
+      2.885005000000092,
+      2.9120159999984025,
+      2.774406000000454,
+      2.823679999997694,
+      2.9869679999974323,
+      3.326148000000103,
+      3.275720999998157,
+      2.9954039999975066,
+      3.0187169999990147,
+      2.9121849999974074,
+      3.14922800000204,
+      3.4646109999994223,
+      4.480090000000928,
+      4.8926790000004985,
+      3.1731410000029427,
+      4.534059999998135,
+      4.948979000000691,
+      7.705481000000873,
+      3.458549999999377,
+      3.644626999997854,
+      4.280053999998927,
+      3.6354240000000573,
+      2.9977880000005825,
+      2.8708580000020447,
+      3.394099000001006,
+      7.4062769999982265,
+      3.428670000001148,
+      5.8099160000019765,
+      5.403432999999495,
+      4.643332000003284,
+      3.334230000000389,
+      4.470796999998129,
+      4.19343200000003,
+      3.5084160000005795,
+      5.262049999997544,
+      5.722294999999576,
+      3.5198319999981322,
+      3.5064569999995,
+      3.420810999999958,
+      3.451065999997809,
+      3.1653370000021823,
+      3.9046939999971073,
+      3.616218999999546,
+      4.906055999999808,
+      4.943989999999758,
+      3.304371000001993,
+      3.4667030000018713,
+      5.195079000000987,
+      6.349497999999585,
+      3.6359340000017255,
+      3.9677750000009837,
+      3.634507000002486,
+      3.3237609999996494,
+      3.8278410000020813,
+      3.182110999998258,
+      3.2451920000021346,
+      3.366753999998764,
+      3.3111879999996745,
+      3.144871000000421,
+      3.5300900000002002,
+      2.857538000000204,
+      3.6210989999999583,
+      3.2297550000002957,
+      2.9649370000006456,
+      3.2330700000020443,
+      3.7790839999979653,
+      2.8143380000001343,
+      3.4836919999979727,
+      3.1191279999984545,
+      3.237505000000965,
+      3.4738349999970524,
+      3.0763819999992847,
+      3.032725000000937,
+      2.966721000000689,
+      6.542116000000533,
+      8.290004999998928,
+      3.7791889999971318,
+      3.5018220000019937,
+      3.6684620000014547,
+      3.5129909999996016,
+      6.265741999999591,
+      4.624039999998786,
+      3.5190179999990505,
+      3.2593029999989085,
+      3.432067999998253,
+      2.998689000000013,
+      3.8366150000001653,
+      2.9665769999992335,
+      3.2938470000008238,
+      3.959305000000313,
+      3.0732070000012754,
+      3.273412999998982,
+      3.003683999999339,
+      3.11188200000106,
+      2.9020849999978964,
+      3.413469000002806,
+      8.095494000001054,
+      3.660342999999557,
+      3.076891999997315,
+      3.2854669999978796,
+      2.902140000001964,
+      3.026621000000887,
+      2.7109109999983048,
+      3.4621640000004845,
+      3.6899740000008023,
+      3.284088000000338,
+      4.092790000002424,
+      4.135072000000946,
+      3.7744259999999485,
+      3.6544020000001183,
+      4.2809310000011465,
+      3.145876999999018,
+      3.3480240000026242,
+      3.9345590000011725,
+      8.825409000000946,
+      3.600467000000208,
+      5.7774849999987055,
+      5.488884999998845,
+      4.196230000001378,
+      3.9588780000012775,
+      3.658845999998448,
+      3.485991000001377,
+      3.9777419999991253,
+      3.917820999999094,
+      3.453983999999764,
+      4.154226000002382,
+      3.899695000000065,
+      3.435556999997061,
+      3.0405030000038096,
+      3.1833649999971385,
+      3.2581700000009732,
+      3.7535309999948367,
+      4.976982000000135,
+      3.542611000004399,
+      3.298516999995627,
+      3.975115999994159,
+      3.3203510000021197,
+      3.928633000003174,
+      5.971255000004021,
+      7.468043000000762,
+      3.7173099999999977,
+      4.521581000000879,
+      3.926682000004803,
+      4.225104999997711,
+      3.993106000001717,
+      4.7816749999983585,
+      5.99715400000423,
+      5.731691000000865,
+      5.17849600000045,
+      3.161005000001751,
+      5.23431900000287,
+      3.311474999994971,
+      3.5330809999941266,
+      4.171362000000954,
+      3.823426000002655
+    ],
+    "released": {
+      "leases": 0,
+      "buffers": 0,
+      "bufferBytes": 0
+    }
+  },
+  "throughput030": {
+    "bytes": 16777216,
+    "copyMs": 6567.773733999999,
+    "totalMs": 13318.557997,
+    "copyMiBps": 2.436137517523073,
+    "directoryLatencyMs": [
+      4.408493000000021,
+      3.1031680000000392,
+      4.069875000000025,
+      3.500617000000034,
+      4.362280000000055,
+      4.197871999999961,
+      3.2629309999999805,
+      4.111697000000049,
+      4.808185999999978,
+      7.795383999999785,
+      4.545219999999972,
+      4.566383999999971,
+      3.4849040000001423,
+      6.289416999999958,
+      5.146893000000091,
+      3.2286000000001422,
+      3.8361489999999776,
+      3.2104269999999815,
+      2.921404000000166,
+      3.13273799999979,
+      3.049164000000019,
+      5.379952999999659,
+      6.332065000000057,
+      3.116226000000097,
+      3.1775510000002214,
+      3.2259589999998752,
+      3.39286200000015,
+      7.322625000000244,
+      3.9780759999998736,
+      3.3785720000000765,
+      2.795422000000144,
+      2.885087999999996,
+      2.8208190000000286,
+      4.052483999999822,
+      3.317566999999599,
+      3.2452439999997296,
+      5.357904999999846,
+      5.757792999999765,
+      2.822880000000623,
+      4.446824000000561,
+      3.271458000000166,
+      3.2016929999999775,
+      3.197033999999803,
+      3.7903260000002774,
+      4.070072000000437,
+      3.118702000000667,
+      4.193710999999894,
+      2.9454429999996137,
+      3.0805090000003474,
+      8.111495000000104,
+      4.066235000000233,
+      3.5692879999996876,
+      5.001952999999958,
+      4.978986000000077,
+      2.8069150000001173,
+      3.009937999999238,
+      4.397573999999622,
+      2.887511999999333,
+      3.661287999999331,
+      3.1444259999998394,
+      3.10735300000033,
+      2.253563999999642,
+      5.1664950000003955,
+      2.747440000000097,
+      3.789460999999392,
+      2.80625499999951,
+      3.5117639999998573,
+      3.444104999999581,
+      4.240809000000809,
+      3.6076309999998557,
+      3.1728039999998146,
+      6.259261000000151,
+      5.866785999999593,
+      3.6746180000000095,
+      10.90549800000008,
+      5.658598999999413,
+      3.068594000000303,
+      3.35634200000095,
+      3.2884480000011536,
+      3.2815890000001673,
+      14.117168999999194,
+      5.266209999999774,
+      3.9500429999989137,
+      2.8845359999995708,
+      4.122099000000162,
+      4.101043999999092,
+      3.5119180000001506,
+      7.573662000000695,
+      3.152685000000929,
+      2.9942919999994047,
+      18.416305999999167,
+      3.359144000000015,
+      4.9182959999998275,
+      2.79761900000085,
+      17.29886400000032,
+      3.2302010000003065,
+      2.9729590000006283,
+      8.66697799999929,
+      3.4821759999995265,
+      2.6535620000013296,
+      3.070804999999382,
+      3.1836600000006,
+      5.283672000001388,
+      5.607864999999947,
+      5.158554000001459,
+      3.5150760000015,
+      2.9401249999991705,
+      3.5661240000008547,
+      2.942752000000837,
+      3.311203999999634,
+      13.00550099999964,
+      3.687198999999964,
+      4.984570000000531,
+      3.3954740000008314,
+      2.9448670000001584,
+      3.778980999999476,
+      3.861874000000171,
+      3.545760999999402,
+      4.1778919999997015,
+      7.689178000000538,
+      3.012226999999257,
+      3.155428000000029,
+      3.0798780000004626,
+      19.615571000000273,
+      3.003670999998576,
+      4.210963999999876,
+      3.037184000000707,
+      16.088666999999987
+    ],
+    "sha256": "a17635748f3d5dd9af40f3fb0b3563070a591fcd0c428b820856d4b459faaac3"
+  },
+  "agents": {
+    "codex": [
+      "connection",
+      "endpoints",
+      "jobsPage",
+      "operation"
+    ],
+    "dsh": [
+      "connection",
+      "endpoints",
+      "jobsPage",
+      "operation"
+    ],
+    "policies": "temporary overrides; original authorization retained"
+  },
+  "throughput020Current": {
+    "bytes": 16777216,
+    "copyMs": 10496.793548000001,
+    "totalMs": 14950.717507000001,
+    "copyMiBps": 1.5242750013930253,
+    "directoryLatencyMs": [
+      7.980735000000095,
+      3.881257999999889,
+      3.4790870000001632,
+      4.036034999999856,
+      3.330727999999908,
+      4.635913000000073,
+      3.9151540000000296,
+      3.4515559999999823,
+      4.192527999999811,
+      2.868908999999803,
+      2.6369190000000344,
+      2.902915000000121,
+      3.212782000000061,
+      3.5979599999996026,
+      3.766454000000067,
+      3.7035439999999653,
+      4.393442999999934,
+      3.284526000000369,
+      4.026526999999987,
+      3.940095999999812,
+      3.0042759999996633,
+      3.712481999999909,
+      4.056193999999778,
+      3.1331930000001194,
+      3.101567000000159,
+      3.026567000000341,
+      3.4765630000001693,
+      2.915610999999899,
+      4.005713000000014,
+      3.3330230000001393,
+      4.39998900000046,
+      5.9378710000000865,
+      3.7283250000000407,
+      3.894873999999618,
+      4.649296999999933,
+      3.3859309999998004,
+      3.0211209999997664,
+      3.746894999999313,
+      3.200181000000157,
+      4.3814290000000256,
+      5.646853000000192,
+      4.113492000000406,
+      3.5450369999998657,
+      4.547523000000183,
+      3.6193469999998342,
+      3.997335000000021,
+      3.849551000000247,
+      4.621543999999631,
+      4.459993999999824,
+      4.34380500000043,
+      4.23826199999985,
+      2.925105000000258,
+      3.798856999999771,
+      3.9856399999998757,
+      3.5899689999996554,
+      3.9544660000001386,
+      2.4688679999999295,
+      3.385488000000805,
+      2.3338840000005803,
+      2.824464000000262,
+      4.60138199999983,
+      3.6854849999999715,
+      3.876444000000447,
+      3.6807669999998325,
+      3.6924279999993814,
+      4.264524999999594,
+      2.943924999999581,
+      2.8625780000002123,
+      3.2940690000004906,
+      2.638651999999638,
+      2.796178000000509,
+      2.4934059999995952,
+      3.33216800000082,
+      3.289128000000346,
+      3.2977559999999357,
+      3.5982490000005782,
+      2.8561120000013034,
+      3.7024620000011055,
+      3.0662670000001526,
+      2.6450039999999717,
+      3.0968970000012632,
+      4.94642500000009,
+      4.346894000000248,
+      3.4004100000001927,
+      3.8332030000001396,
+      3.053902999999991,
+      2.6785519999993994,
+      3.037266000001182,
+      4.086206999998467,
+      3.243332999998529,
+      3.1599910000004456,
+      4.039859000000433,
+      3.0520739999992657,
+      4.236431999999695,
+      4.029849000000468,
+      4.145801999999094,
+      5.5547459999997955,
+      3.7813810000006924,
+      4.511594999999943,
+      3.577197000000524,
+      3.9187570000012784,
+      3.704236999999921,
+      3.5900130000009085,
+      2.9156800000000658,
+      66.34952800000065,
+      2.87043999999878,
+      5.694508000000496,
+      3.061347000000751,
+      3.1155650000000605,
+      3.454732000000149,
+      2.7667440000004717,
+      4.259803000000829,
+      4.179958999999144,
+      2.947325000001001,
+      3.754399999999805,
+      3.797685999999885,
+      2.7250439999988885,
+      10.817402000000584,
+      2.739665999999488,
+      15.452985000001718,
+      3.10526100000061,
+      29.425022999999783,
+      2.7631189999992785,
+      4.34173600000031,
+      4.335133999999016,
+      2.782599999998638,
+      12.339911999999458,
+      3.8803719999996247,
+      3.8583179999986896,
+      17.592380999998568,
+      3.3136389999999665,
+      7.2577799999999115,
+      3.6970219999984693,
+      17.64682999999968,
+      4.187303999999131,
+      15.186353999999483,
+      2.7741790000000037,
+      3.084867999999915,
+      3.3095830000002024,
+      25.87319100000059,
+      3.1369830000003276,
+      20.546102999998766
+    ],
+    "sha256": "a17635748f3d5dd9af40f3fb0b3563070a591fcd0c428b820856d4b459faaac3"
+  },
+  "throughput020Commit": "429f1fa40141480d78d51a90115230016f69fe48"
+}
