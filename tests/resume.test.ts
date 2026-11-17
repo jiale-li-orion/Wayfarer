@@ -298,7 +298,10 @@ test("network interruption recovers once; source mutation remains a local failed
       await fs.readFile(path.join(f.target, "中文 file.bin")),
       bytes,
     );
-    assert.equal(core.jobs.stats().runners, 0);
+    await until(
+      () => core.jobs.stats().runners,
+      (n) => n === 0,
+    );
     assert.equal(core.jobs.stats().heldLocks, 0);
   } finally {
     await core.dispose();

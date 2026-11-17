@@ -536,6 +536,7 @@ export class Jobs extends EventEmitter {
       const execution = this.run(j).finally(() => {
         if (this.executions.get(j.id) === execution)
           this.executions.delete(j.id);
+        this.pump();
       });
       this.executions.set(j.id, execution);
     }
@@ -626,7 +627,6 @@ export class Jobs extends EventEmitter {
         j.input = undefined;
         j.logs = [];
       }
-      this.executions.delete(j.id);
       this.emit("change", j);
       this.profile.record("job.end", {
         job: j.id,
