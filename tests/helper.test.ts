@@ -55,12 +55,14 @@ test("Python helper protocol handles paging, binary chunks, resources, command c
       argv: ["python3", "-c", "import sys;print(len(sys.stdin.read()))"],
       cwd: dir,
     });
-    let readResult: any;
+    let readResult: any,
+      readerOutput = "";
     do {
       await new Promise((r) => setTimeout(r, 10));
       readResult = await call("execPoll", { id: reader.id });
+      readerOutput += readResult.output;
     } while (readResult.code === null);
-    assert.match(readResult.output, /0/);
+    assert.match(readerOutput, /0/);
     const proc = await call("execStart", {
       argv: [
         "python3",
@@ -69,9 +71,13 @@ test("Python helper protocol handles paging, binary chunks, resources, command c
       ],
       cwd: dir,
     });
-    await new Promise((r) => setTimeout(r, 50));
-    const first = await call("execPoll", { id: proc.id });
-    assert.match(first.output, /ready/);
+    let output = "";
+    const deadline = Date.now() + 5000;
+    while (!output.includes("ready") && Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 10));
+      output += (await call("execPoll", { id: proc.id })).output;
+    }
+    assert.match(output, /ready/);
     await call("execCancel", { id: proc.id });
   } finally {
     c.stdin.end();
