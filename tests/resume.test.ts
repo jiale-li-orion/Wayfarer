@@ -220,7 +220,7 @@ test("cleanup failure keeps ownership in terminal archive and explicit retry rec
     await f.dispose();
   }
 });
-test("legacy paused records remain manual; v3 process interruption resumes transfers only", async () => {
+test("legacy paused records remain manual; lifecycle marker resumes interrupted transfers only", async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "wm-legacy-"));
   const jobs = new Jobs(root, new Profiler(() => {}));
   let runs = 0;
@@ -255,10 +255,28 @@ test("legacy paused records remain manual; v3 process interruption resumes trans
         pauseReason: "shutdown",
       }),
     );
+    await fs.writeFile(
+      path.join(root, "modern.json"),
+      JSON.stringify({
+        ...template,
+        id: "modern",
+        state: "running",
+        journalVersion: 2,
+        lifecycleVersion: 1,
+      }),
+    );
+    await fs.writeFile(path.join(root, "modern.input.json"), "{}");
+    await fs.writeFile(
+      path.join(root, "modern.checkpoint.jsonl"),
+      JSON.stringify({ key: "locks", value: [] }) + "\n",
+    );
     await jobs.init();
     jobs.resumeInterrupted();
-    await sleep(20);
-    assert.equal(runs, 0);
+    await until(
+      () => jobs.get("modern").state,
+      (state) => state === "completed",
+    );
+    assert.equal(runs, 1);
     assert.equal(jobs.get("old").state, "paused");
     assert.equal(jobs.get("package").state, "paused");
     jobs.control("old", "resume");
@@ -266,7 +284,7 @@ test("legacy paused records remain manual; v3 process interruption resumes trans
       () => jobs.get("old").state,
       (s) => s === "completed",
     );
-    assert.equal(runs, 1);
+    assert.equal(runs, 2);
   } finally {
     await jobs.dispose();
     await fs.rm(root, { recursive: true, force: true });
@@ -799,6 +817,18 @@ test("successful final commit remains completed when shutdown arrives at its ack
     commit();
     await closing;
     assert.equal(jobs.get(task.id).state, "completed");
+    const metadata = JSON.parse(
+      await fs.readFile(
+        path.join(
+          root,
+          "history",
+          String(task.created).padStart(16, "0") + "-" + task.id + ".json",
+        ),
+        "utf8",
+      ),
+    );
+    assert.equal(metadata.journalVersion, 2);
+    assert.equal(metadata.lifecycleVersion, 1);
     assert.deepEqual((await jobs.details(task.id)).result, {
       exitCode: 0,
       committed: true,

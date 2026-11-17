@@ -223,7 +223,10 @@ export class Jobs extends EventEmitter {
         this.track(j, !(version >= 2));
         if (["queued", "running"].includes(j.state)) {
           j.state = "paused";
-          if (j.kind === "transfer" && version >= 3)
+          if (
+            j.kind === "transfer" &&
+            (version >= 3 || (j as any).lifecycleVersion === 1)
+          )
             j.pauseReason ??= "process-interrupted";
           j.progress = "执行中断，检查点已保留";
         }
@@ -666,7 +669,8 @@ export class Jobs extends EventEmitter {
     const data = JSON.stringify({
       ...metadata,
       ...(!completed ? { result, logs } : {}),
-      journalVersion: 3,
+      journalVersion: 2,
+      lifecycleVersion: 1,
     });
     const dirty = this.dirty.get(j.id) ?? new Set<string>();
     const changes = [...dirty]
