@@ -834,3 +834,38 @@ test("bounded small-file batches preserve distinct bytes across pause and resume
     await f.close();
   }
 });
+
+test("dsh discovery selects current patch files and excludes dependency directories", async () => {
+  const f = await fixture();
+  const endpoint = f.core.endpoints.get("a"),
+    original = endpoint.call.bind(endpoint);
+  try {
+    const profiles = path.join(f.dir, ".dsh/profiles");
+    for (const name of ["current", "legacy", "node_modules"])
+      await fs.mkdir(path.join(profiles, name), { recursive: true });
+    await fs.writeFile(
+      path.join(profiles, "current/package.json"),
+      JSON.stringify({ dsh: { profile: { bundles: ["example"] } } }),
+    );
+    await fs.writeFile(path.join(profiles, "legacy/cordis.yml"), "[]\n");
+    endpoint.call = (async (method: string, args?: Record<string, any>) =>
+      method === "info"
+        ? { home: f.dir }
+        : method === "which"
+          ? "/fixture/dsh"
+          : original(method, args)) as typeof endpoint.call;
+    const { dshProfiles } = await import("../src/mcp/integrations");
+    const result = await dshProfiles(f.core, "a");
+    assert.deepEqual(result.profiles.map((p) => p.name).sort(), [
+      "current",
+      "legacy",
+    ]);
+    assert.equal(
+      result.profiles.find((p) => p.name === "current")?.path,
+      path.join(profiles, "current/cordis.patch.yml"),
+    );
+  } finally {
+    endpoint.call = original;
+    await f.close();
+  }
+});

@@ -70,10 +70,24 @@ export async function dshProfiles(core: Core, endpoint: string) {
         if (Array.isArray(manifest.dsh?.profile?.bundles))
           file = "cordis.patch.yml";
       } catch {}
-      return { name: v.name, path: path.posix.join(v.path, file) };
+      const profilePath = path.posix.join(v.path, file);
+      if (file === "cordis.yml") {
+        try {
+          const stat = await e.call("stat", { path: profilePath });
+          if (!["file", "symlink"].includes(stat.kind)) return null;
+        } catch {
+          return null;
+        }
+      }
+      return { name: v.name, path: profilePath };
     }),
   );
-  return { launcher, profiles };
+  return {
+    launcher,
+    profiles: profiles.filter(
+      (p): p is { name: string; path: string } => p !== null,
+    ),
+  };
 }
 export async function connectDsh(
   core: Core,
