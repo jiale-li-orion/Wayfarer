@@ -256,6 +256,7 @@ function App() {
   const viewRef = useRef(view);
   const selectionRef = useRef(selected);
   const loadPending = useRef(new Set<string>());
+  const refreshPending = useRef(new Set<string>());
   const worker = useRef<Worker | null>(null);
   const layoutId = useRef(0);
   const requestedFocus = useRef(true);
@@ -275,9 +276,12 @@ function App() {
     [],
   );
   const load = useCallback(
-    async (ref: Ref, refresh = false, cursor?: string) => {
+    async (ref: Ref, refresh = false, cursor?: string): Promise<void> => {
       const key = refKey(ref);
-      if (loadPending.current.has(key)) return;
+      if (loadPending.current.has(key)) {
+        if (refresh) refreshPending.current.add(key);
+        return;
+      }
       loadPending.current.add(key);
       try {
         const p = await rpc<Page>("list", { ref, cursor, refresh });
@@ -312,6 +316,13 @@ function App() {
         );
       } finally {
         loadPending.current.delete(key);
+        if (
+          refreshPending.current.delete(key) &&
+          (viewRef.current.expanded.includes(key) ||
+            (viewRef.current.root && refKey(viewRef.current.root) === key))
+        ) {
+          void load(ref, true);
+        }
       }
     },
     [],

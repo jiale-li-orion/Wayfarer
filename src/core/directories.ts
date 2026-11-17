@@ -114,8 +114,8 @@ export class Directories extends EventEmitter {
       if (this.uiReads.get(key) === request) this.uiReads.delete(key);
     }
   }
-  private closeUiCursor(key: string) {
-    this.uiReads.delete(key);
+  private closeUiCursor(key: string, retireRead = true) {
+    if (retireRead) this.uiReads.delete(key);
     const cursor = this.uiCursors.get(key);
     this.uiCursors.delete(key);
     if (!cursor) return;
@@ -136,7 +136,7 @@ export class Directories extends EventEmitter {
     }
   }
   invalidate(ref: Ref) {
-    this.closeUiCursor(refKey(ref));
+    this.closeUiCursor(refKey(ref), false);
     this.evict(refKey(ref));
     if (this.disposed) return;
     this.changes.set(refKey(ref), ref);

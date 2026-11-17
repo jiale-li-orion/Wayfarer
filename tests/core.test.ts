@@ -473,8 +473,9 @@ test("completed result payload is loaded on demand and search result pages stay 
       query: "match",
     });
     assert.equal((await finish(f.core, j.id)).state, "completed");
-    assert.equal(f.core.jobs.get(j.id).result, undefined);
+    // The public details request waits for the durable result write before returning.
     const first = await f.core.dispatch("job", { id: j.id, limit: 100 });
+    assert.equal(f.core.jobs.get(j.id).result, undefined);
     assert.equal(first.result.entries.length, 100);
     assert.equal(first.result.total, 230);
     assert(first.result.hasMore);
@@ -688,4 +689,37 @@ test("canvas retention bounds empty and failed off-screen directories while pres
   assert.ok(pages["0"]);
   assert.ok(pages["999"]);
   assert.equal(pages["1"], undefined);
+});
+
+test("subscribing a branch during its first page preserves the live pagination cursor", async () => {
+  const f = await fixture();
+  try {
+    for (let n = 0; n < 205; n++)
+      await fs.writeFile(path.join(f.a, String(n)), "x");
+    const endpoint = f.core.endpoints.get("a"),
+      original = endpoint.call.bind(endpoint);
+    let release!: () => void, arrived!: () => void;
+    const response = new Promise<void>((r) => (arrived = r)),
+      gate = new Promise<void>((r) => (release = r));
+    endpoint.call = async (method, args) => {
+      const result = await original(method, args);
+      if (method === "list") {
+        arrived();
+        await gate;
+      }
+      return result;
+    };
+    const ref = { endpoint: "a", path: f.a },
+      read = f.core.directories.list(ref, undefined, true);
+    await response;
+    f.core.directories.watch([ref]);
+    release();
+    const page = await read;
+    assert.ok(page.cursor);
+    endpoint.call = original;
+    const next = await f.core.directories.list(ref, page.cursor);
+    assert.equal(next.entries.length, 5);
+  } finally {
+    await f.close();
+  }
 });
