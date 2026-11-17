@@ -312,6 +312,12 @@ export class Core extends EventEmitter {
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
         return {
+          host: {
+            pid: process.pid,
+            scope: "shared-extension-host",
+            memory: process.memoryUsage(),
+            cpu: process.cpuUsage(),
+          },
           agents: this.agentStats?.(),
           transfers: this.transfers.stats(),
           lifecycle: {

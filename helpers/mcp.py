@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Resumable MCP client, Python 3.6+. One connection/recovery loop per process."""
-import sys, os, json, socket, argparse, uuid, threading, time, select, ctypes
+import sys, os, json, socket, argparse, uuid, threading, time, select, ctypes, resource
 from concurrent.futures import ThreadPoolExecutor
 parser = argparse.ArgumentParser()
 parser.add_argument('--session')
@@ -57,7 +57,17 @@ class Client:
                         state=self.state, bindingGeneration=self.generation,
                         pendingRequests=len(self.pending), subscriptions=int(self.state == 'connected'),
                         registryWatch=self.watch >= 0, waitingPoll=self.watch < 0 and self.state == 'waiting',
-                        recoveryFlows=int(not self.stopped), snapshot=self.snapshot)
+                        recoveryFlows=int(not self.stopped), snapshot=self.snapshot,
+                        resources=self.resources())
+    def resources(self):
+        usage = resource.getrusage(resource.RUSAGE_SELF)
+        rss = usage.ru_maxrss * 1024
+        try:
+            with open('/proc/self/statm') as f: rss = int(f.read().split()[1]) * os.sysconf('SC_PAGE_SIZE')
+        except (OSError, ValueError, IndexError): pass
+        return dict(pid=os.getpid(), rss=rss, peakRss=usage.ru_maxrss * 1024,
+                    cpuUserMs=usage.ru_utime * 1000, cpuSystemMs=usage.ru_stime * 1000,
+                    threads=threading.active_count())
     def wake(self):
         try: self.wake_write.send(b'x')
         except OSError: pass

@@ -275,4 +275,9 @@ def main():
         for token in list(SCANS): scan_close(token)
         if WATCH_FD>=0:os.close(WATCH_FD)
         control.shutdown(wait=False);bulk.shutdown(wait=False)
+        # stdin EOF ends this helper's ownership. A worker blocked in an OS call
+        # must not keep the remote process alive after its controlling socket left.
+        try:sys.stdout.flush()
+        except (OSError, ValueError):pass
+        os._exit(0)
 if __name__=='__main__': main()

@@ -86,3 +86,46 @@ test("Python helper protocol handles paging, binary chunks, resources, command c
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
+test("stdin EOF releases a helper with a worker blocked in a filesystem call", async () => {
+  if (process.platform === "win32") return;
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "wm-blocked-helper-"));
+  const fifo = path.join(root, "fifo");
+  await new Promise<void>((resolve, reject) => {
+    const mk = spawn("mkfifo", [fifo]);
+    mk.on("error", reject);
+    mk.on("close", (code) =>
+      code === 0 ? resolve() : reject(Error("mkfifo failed")),
+    );
+  });
+  const child = spawn("python3", ["-u", "helpers/endpoint.py"], {
+    stdio: "pipe",
+  });
+  try {
+    child.stdin.write(
+      JSON.stringify({
+        id: 1,
+        method: "read",
+        args: { path: fifo, length: 1 },
+      }) + "\n",
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const ended = new Promise<void>((resolve) =>
+      child.once("close", () => resolve()),
+    );
+    child.stdin.end();
+    await Promise.race([
+      ended,
+      new Promise((_, reject) => {
+        const timer = setTimeout(
+          () => reject(Error("helper retained a blocked worker")),
+          1500,
+        );
+        timer.unref();
+      }),
+    ]);
+    assert.equal(child.exitCode, 0);
+  } finally {
+    child.kill("SIGKILL");
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});
