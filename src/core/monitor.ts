@@ -218,7 +218,12 @@ export class SystemMonitor extends EventEmitter {
       throw Error("Unknown resource section");
     const key = JSON.stringify(args);
     const cached = s.cache.get(key);
-    if (cached && Date.now() - cached.at < 2000) return cached.value;
+    if (
+      cached &&
+      this.enabled(machine.endpoint) &&
+      Date.now() - cached.at < 2000
+    )
+      return cached.value;
     const pending = s.pending.get(key);
     if (pending) return pending;
     const task = s.chain.then(async () => {
@@ -235,6 +240,8 @@ export class SystemMonitor extends EventEmitter {
           _baseline: cold ? s.baseline : undefined,
           _checkpoint: !this.active(),
         });
+        if (!this.enabled(machine.endpoint))
+          throw Error("Endpoint explicitly disconnected");
         const afterTransport = s.channel.transportStats?.();
         if (raw._baseline) s.baseline = raw._baseline;
         delete raw._baseline;

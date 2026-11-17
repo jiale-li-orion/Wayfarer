@@ -1,0 +1,94 @@
+{
+  "nativeExports": [
+    {
+      "format": "json",
+      "bytes": 109131,
+      "valid": true
+    },
+    {
+      "format": "csv",
+      "bytes": 3566,
+      "valid": true
+    }
+  ],
+  "nativeDialogMode": "native-windows",
+  "historicalExport": {
+    "snapshots": 259,
+    "valid": true,
+    "afterWindowRestart": true,
+    "at": 1794948494808
+  },
+  "endpointIsolation": {
+    "disconnectedStatus": "offline",
+    "peerStatus": "online",
+    "recoveredGpuCount": 8
+  },
+  "windowsPdh": {
+    "separateCounterGroups": 3,
+    "oneGroupCollectedPerRead": true,
+    "networkInterfaces": 2,
+    "diskCounters": 1,
+    "windowsGpuCount": 2,
+    "elapsedMs": 9.03
+  },
+  "fileTransfer": {
+    "phases": [
+      {
+        "phase": "baseline",
+        "bytesPerPeer": 8388608,
+        "peers": 2,
+        "jobCompletionMs": 7049,
+        "sceneMs": 14343,
+        "browseQueries": 128,
+        "browseMedianMs": 2.019376999999622,
+        "browseP95Ms": 3.9800129999998717,
+        "hashesMatch": true,
+        "monitor": {
+          "readers": 0,
+          "machines": 4,
+          "historyPoints": 126,
+          "timer": false,
+          "recording": false,
+          "queuedWrites": 0,
+          "retiringChannels": 0,
+          "channels": 0,
+          "pending": 0,
+          "cached": 12
+        }
+      },
+      {
+        "phase": "recording",
+        "bytesPerPeer": 8388608,
+        "peers": 2,
+        "jobCompletionMs": 8499,
+        "sceneMs": 15234,
+        "browseQueries": 129,
+        "browseMedianMs": 2.0619430000006105,
+        "browseP95Ms": 5.481573000000935,
+        "hashesMatch": true,
+        "monitor": {
+          "readers": 0,
+          "machines": 4,
+          "historyPoints": 66,
+          "timer": true,
+          "recording": true,
+          "queuedWrites": 0,
+          "retiringChannels": 0,
+          "channels": 4,
+          "pending": 0,
+          "cached": 12
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "endpoint": "train",
+        "removed": true
+      },
+      {
+        "endpoint": "infer",
+        "removed": true
+      }
+    ]
+  }
+}

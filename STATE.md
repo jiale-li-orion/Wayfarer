@@ -1,10 +1,10 @@
-# Workspace Map · 0.3.1
+# Workspace Map · 0.4.0
 
 训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像与 VSIX：`/home/orion/agent-system-learning/workspace-map`。开发在训练机独立 worktree，本机安装验收。仓库为 `jiale-li-orion/Wayfarer`，插件显示名称 Workspace Map。
 
 ## 当前入口更新
 
-0.3.1 补齐原生活动栏／侧边栏和快捷键，复用 0.3.0 地图、任务与 Agent 核心。原生活动栏、机器／书签／操作导航与快捷键已完成独立窗口验收；类型检查、48 项检查与打包通过。Windows 推理机桥接本轮出现退出码 4294967295，保留为验收缺口。详见 docs/ACCEPTANCE.md。
+0.3.1 补齐原生活动栏／侧边栏和快捷键，复用 0.3.0 地图、任务与 Agent 核心。原生活动栏、机器／书签／操作导航与快捷键已完成独立窗口验收；类型检查、48 项检查与打包通过。0.4.0 已通过 Windows 到推理机的实际连接与文件传输核对，启动载荷改为压缩交接。详见 docs/ACCEPTANCE.md。
 
 ## 当前交付
 
@@ -28,4 +28,6 @@ PR #3 交付 Agent resume、自动续传与资源生命周期，已完成连接�
 
 ## 0.4.0 四端资源与轻量化
 
-训练机 worktree：/data/users/lijiale/worktrees/workspace-map-system-resources，分支 feat/system-resources。四端采集、资源页、只读 map_systemResources、记录／导出已接通；53 项检查通过。Windows、WSL、训练机 8 GPU、推理机 1 GPU 已通过实际采集，Codex 与 dsh 已用新 MCP 接口只读调用。长时与真实显隐验收正在进行，交付时补齐实测数据、VSIX 和 PR。详见 docs/SYSTEM_RESOURCES.md。
+四端资源页、独立采集通道、只读 map_systemResources、明确记录和 JSON／CSV 导出已实现。Windows 两张 GPU、WSL 共享 NVIDIA、训练机八卡、推理机单卡已核对；Codex／dsh 实际只读调用、50 轮页签恢复、十分钟采样与隐藏待机通过。原生文件保存、重启后历史导出与传输期间监控已完成。
+
+PR #6：feat/system-resources；当前补齐验收截图与实测记录，CI 沿既有矩阵执行。58 项检查与 13 项跨平台子集通过。源码入口见 docs/SYSTEM_RESOURCES.md，资源数据见 PERFORMANCE.md。研发工作树交付后清理，主仓库与本机镜像沿发布提交同步。

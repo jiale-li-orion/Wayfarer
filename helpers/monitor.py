@@ -342,7 +342,7 @@ if WIN:
             self.lib = ctypes.WinDLL("pdh")
             self.query = ctypes.c_void_p()
             self.handles = {}
-            self.lib.PdhOpenQueryW(None, 0, ctypes.byref(self.query))
+            self.groups = {}
             self.lib.PdhAddEnglishCounterW.argtypes = [
                 ctypes.c_void_p,
                 W.LPCWSTR,
@@ -360,6 +360,20 @@ if WIN:
             self.lib.PdhCloseQuery.argtypes = [ctypes.c_void_p]
 
         def read(self, paths):
+            key = tuple(paths)
+            now = time.monotonic()
+            group = self.groups.get(key)
+            if group and now - group[2] > 30:
+                self.lib.PdhCloseQuery(group[0])
+                del self.groups[key]
+                group = None
+            if group is None:
+                query = ctypes.c_void_p()
+                if self.lib.PdhOpenQueryW(None, 0, ctypes.byref(query)):
+                    return {}
+                group = (query, {}, now)
+            self.query, self.handles = group[:2]
+            self.groups[key] = (self.query, self.handles, now)
             for path in paths:
                 if path not in self.handles:
                     h = ctypes.c_void_p()
@@ -395,7 +409,9 @@ if WIN:
             return out
 
         def close(self):
-            self.lib.PdhCloseQuery(self.query)
+            for query, _, _ in self.groups.values():
+                self.lib.PdhCloseQuery(query)
+            self.groups.clear()
 
     PDH = Pdh()
     try:

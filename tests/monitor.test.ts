@@ -315,3 +315,34 @@ test("shutdown waits for a collector already retiring after the view was hidden"
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
+
+test("explicit disconnect takes precedence over a fresh resource cache", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wm-monitor-disable-"));
+  let enabled = true,
+    calls = 0;
+  const monitor = new SystemMonitor(
+    () => [endpoints[0]],
+    "unused",
+    dir,
+    new Profiler(() => {}),
+    undefined,
+    () => ({
+      async call<T>() {
+        calls++;
+        return { stamp: Date.now(), system: {}, gpus: [] } as T;
+      },
+      async dispose() {},
+      abort() {},
+    }),
+    () => enabled,
+  );
+  try {
+    assert.equal((await monitor.snapshot({ endpoint: "c" })).status, "online");
+    enabled = false;
+    assert.equal((await monitor.snapshot({ endpoint: "c" })).status, "offline");
+    assert.equal(calls, 1);
+  } finally {
+    await monitor.dispose();
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
