@@ -94,7 +94,7 @@ def scan_page(a):
         s['sequence']=sequence+1;s['last_sequence']=sequence;s['last_page']=result
         return result
 def run(method,a):
-    if method=='info': return dict(home=os.path.expanduser('~'),platform=sys.platform,python=sys.version.split()[0],pid=os.getpid())
+    if method=='info': return dict(home=os.path.expanduser('~'),platform=sys.platform,python=sys.version.split()[0],pid=os.getpid(),paths={k:os.environ[k] for k in ('ANDROID_HOME','ANDROID_SDK_ROOT','JAVA_HOME','FLUTTER_ROOT','VIRTUAL_ENV','CONDA_PREFIX','CARGO_HOME','RUSTUP_HOME') if os.environ.get(k)})
     if method=='watchSet':
         if WATCH_FD<0:return False
         wanted=set(a['paths'])

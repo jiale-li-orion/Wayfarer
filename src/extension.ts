@@ -128,19 +128,34 @@ export async function activate(context: vscode.ExtensionContext) {
       '" src="' +
       asset("ui.js") +
       '"></script></body></html>';
+    let jobsSubscribed = false;
+    let lastJobCount = -1;
     const send = (event: any) => {
-      if (panel?.visible) void webview.postMessage(event);
+      if (event.type === "job" && panel?.visible) {
+        const count = core.jobs.busyCount();
+        if (count !== lastJobCount) {
+          lastJobCount = count;
+          void webview.postMessage({ type: "jobCount", count });
+        }
+      }
+      if (panel?.visible && (event.type !== "job" || jobsSubscribed))
+        void webview.postMessage(event);
     };
     core.on("event", send);
     webview.onDidReceiveMessage(async (m) => {
       try {
         let result: any;
         switch (m.method) {
+          case "jobSubscription":
+            jobsSubscribed = !!m.args.enabled;
+            result = true;
+            break;
           case "bootstrap":
             result = {
               endpoints: core.endpoints.configs(),
               view: core.view,
-              jobs: core.jobs.list(),
+              jobs: core.jobs.active(),
+              projects: core.inspector.projects(),
               capabilities,
               restored: core.restored,
             };
@@ -188,6 +203,7 @@ export async function activate(context: vscode.ExtensionContext) {
     });
     panel.onDidChangeViewState((e) => {
       core.directories.setVisible(e.webviewPanel.visible);
+      if (!e.webviewPanel.visible) jobsSubscribed = false;
     });
     panel.onDidDispose(() => {
       core.off("event", send);

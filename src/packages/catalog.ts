@@ -356,6 +356,7 @@ export function recipe(i: PackageInput): Recipe {
 export async function discover(e: Endpoint, cwd?: string) {
   const names = [
     "uv",
+    "node",
     "python3",
     "python",
     "npm",
@@ -381,7 +382,7 @@ export async function discover(e: Endpoint, cwd?: string) {
   );
   const available = found.filter((x) => x.path);
   if (cwd) {
-    const separator = e.config.kind === "windows" ? "\\\\" : "/";
+    const separator = e.config.kind === "windows" ? "\\" : "/";
     for (const name of [
       "gradlew",
       "gradlew.bat",

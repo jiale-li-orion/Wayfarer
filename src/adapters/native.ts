@@ -139,6 +139,18 @@ export class NativeEndpoint implements Endpoint {
         r = {
           home: os.homedir(),
           platform: process.platform,
+          paths: Object.fromEntries(
+            [
+              "ANDROID_HOME",
+              "ANDROID_SDK_ROOT",
+              "JAVA_HOME",
+              "FLUTTER_ROOT",
+              "VIRTUAL_ENV",
+              "CONDA_PREFIX",
+              "CARGO_HOME",
+              "RUSTUP_HOME",
+            ].flatMap((k) => (process.env[k] ? [[k, process.env[k]]] : [])),
+          ),
           pid: process.pid,
         };
         break;

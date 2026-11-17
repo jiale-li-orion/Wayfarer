@@ -1,4 +1,4 @@
-# Workspace Map · 0.1.1
+# Workspace Map · 0.2.0 开发验收
 
 CPU／内存优化与实际使用验收完成。训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机源码镜像及 VSIX：`/home/orion/agent-system-learning/workspace-map`。继续开发时在训练机建立新工作树，本机用于安装验收。
 
@@ -20,3 +20,8 @@ CPU／内存优化与实际使用验收完成。训练机主仓库：`/data/user
 性能结论、范围与复测入口见 [PERFORMANCE.md](PERFORMANCE.md)，结构与生命周期见 [ARCHITECTURE.md](ARCHITECTURE.md)。原始记录仅保留有效样本，版本对应关系见 [provenance.json](docs/performance-data/20261117/provenance.json)。最终构建身份写入 VSIX 的 `dist/build-info.json`，安装回执位于本机 `artifacts/delivery.json`。
 
 本机另有 `github` remote 指向 `jiale-li-orion/Wayfarer`，本轮交付通过训练机主仓库和 VSIX 完成；GitHub 发布、Marketplace 发布分别处理。
+
+
+## 0.2.0 日常管理变更
+
+训练机工作树 `feat/daily-management` 增加按需详情、浅层项目识别与登记、工具版本任务、缓存／环境位置与占用统计、历史任务磁盘分页。查询快照限制为 64 项／8MiB，资源查询手动发起，面板任务订阅按引用计数释放。新增 3 项定向测试，连同原有检查共 31 项通过。Windows／WSL／训练机／推理机家目录只读详情已通过；真实文件操作使用临时 fixture。当前验收与性能原始记录见 `docs/performance-data/20261117-management`，发布维护采用后续独立 PR。

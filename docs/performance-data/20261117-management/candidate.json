@@ -1,0 +1,37 @@
+{
+  "source": "/data/users/lijiale/worktrees/workspace-map-daily-management",
+  "node": "v22.23.2",
+  "historyTasks": 3000,
+  "cold": {
+    "initMs": 218.09286000000003,
+    "heapDelta": 172736,
+    "rss": 93200384,
+    "cpuMs": 276.316,
+    "residentTasks": 0,
+    "pageRows": 30,
+    "pageMs": 15.803706999999974,
+    "summaryBytes": 3894,
+    "directoryP95Ms": 0.3341700000000287
+  },
+  "warm": {
+    "initMs": 3.040233999999998,
+    "heapDelta": -4992,
+    "rss": 97116160,
+    "cpuMs": 16.295,
+    "residentTasks": 0,
+    "pageRows": 30,
+    "pageMs": 9.071239999999989,
+    "summaryBytes": 3894,
+    "directoryP95Ms": 0.19547000000000025
+  },
+  "inspection": {
+    "ms": 2.033771999999999,
+    "initialCalls": 43,
+    "repeatCalls": 0,
+    "stats": {
+      "snapshots": 1,
+      "pending": 0,
+      "projects": 0
+    }
+  }
+}

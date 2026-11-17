@@ -452,3 +452,129 @@ pre {
   pointer-events: none;
   z-index: 3;
 }
+
+.inspector {
+  right: 16px;
+  top: 72px;
+  bottom: 76px;
+  width: min(440px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+}
+.inspector h2 {
+  flex-shrink: 0;
+}
+.inspector-body {
+  overflow: auto;
+  padding: 0 18px 18px;
+  overscroll-behavior: contain;
+}
+.inspector section {
+  margin-top: 20px;
+  border-top: 1px solid var(--vscode-panel-border);
+  padding-top: 14px;
+}
+.inspector h3,
+.jobs h3 {
+  font-size: var(--vscode-font-size);
+  margin: 0 0 10px;
+}
+.inspect-location {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+.path-link {
+  background: transparent;
+  color: var(--vscode-textLink-foreground);
+  text-align: left;
+  word-break: break-all;
+  white-space: normal;
+  padding: 4px 0;
+  display: block;
+}
+.properties {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 8px 12px;
+}
+.properties dt {
+  color: var(--vscode-descriptionForeground);
+}
+.properties dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.inspect-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+.inspect-row > span {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.inspect-row > div {
+  min-width: 0;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0;
+}
+.tags span {
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.inspector details {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+.inspector summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.inspector summary span {
+  color: var(--vscode-descriptionForeground);
+}
+.inspector pre {
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.inspector .actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.stamp {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--vscode-font-size);
+}
+.usage-result {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--vscode-editor-background);
+  border-radius: 6px;
+}
+button:focus-visible,
+summary:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+.jobs .job-list {
+  content-visibility: auto;
+}
+.inspector button {
+  min-height: 28px;
+}
+.inspector h2 button:first-of-type {
+  margin-left: auto;
+}
