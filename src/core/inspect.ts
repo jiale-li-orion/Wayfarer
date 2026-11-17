@@ -251,6 +251,13 @@ export class Inspector {
                 ),
             ],
           ];
+          candidates.push(
+            ["Android SDK", pp.join(info.home, "Android")],
+            [
+              "Flutter SDK",
+              info.paths?.FLUTTER_ROOT || pp.join(info.home, "flutter"),
+            ],
+          );
           for (const key of [
             "JAVA_HOME",
             "FLUTTER_ROOT",
