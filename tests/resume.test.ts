@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
+import net from "node:net";
 import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import { createInterface } from "node:readline";
@@ -620,11 +621,12 @@ test("real helper loss auto-resumes; explicit endpoint disconnect remains manual
     );
     const resource = await core.endpoints.get("remote").call("resources");
     process.kill(resource.transfer.pid, "SIGKILL");
-    await until(
-      () => core.jobs.get(job.id).state,
-      (state) => state === "completed",
+    const resumed = await until(
+      () => core.jobs.get(job.id),
+      (job) => ["completed", "failed"].includes(job.state),
       20000,
     );
+    assert.equal(resumed.state, "completed", resumed.error);
     assert.equal(
       (await core.endpoints.get("remote").call("resources")).transferUsers,
       0,
@@ -657,6 +659,74 @@ test("real helper loss auto-resumes; explicit endpoint disconnect remains manual
   } finally {
     await core.dispose();
     process.env.PATH = oldPath;
+    await f.dispose();
+  }
+});
+
+test("legacy per-request MCP sockets retain pagination across requests", async () => {
+  const f = await fixture();
+  const previousHome = process.env.HOME;
+  process.env.HOME = f.root;
+  const core = await f.open();
+  const bridge = new Bridge(
+    core,
+    path.resolve("helpers"),
+    "legacy fixture",
+    "legacy-map",
+  );
+  try {
+    await Promise.all(
+      Array.from({ length: 225 }, (_, i) =>
+        fs.writeFile(path.join(f.source, String(i)), "x"),
+      ),
+    );
+    await bridge.start();
+    const recordPath = path.join(
+      f.root,
+      ".local/share/workspace-map/sessions",
+      bridge.id + ".json",
+    );
+    await until(
+      () => fs.readFile(recordPath, "utf8").then(JSON.parse, () => undefined),
+      Boolean,
+    );
+    const record = JSON.parse(await fs.readFile(recordPath, "utf8"));
+    const request = (args: any) =>
+      new Promise<any>((resolve, reject) => {
+        const socket = net.createConnection(record.socket);
+        let buffer = "";
+        socket.on("error", reject);
+        socket.on("connect", () =>
+          socket.write(
+            JSON.stringify({ id: "legacy", method: "list", args }) + "\n",
+          ),
+        );
+        socket.on("data", (data) => {
+          buffer += data;
+          let end;
+          while ((end = buffer.indexOf("\n")) >= 0) {
+            const message = JSON.parse(buffer.slice(0, end));
+            buffer = buffer.slice(end + 1);
+            if (message.id === "legacy") {
+              socket.end();
+              message.error
+                ? reject(Error(message.error))
+                : resolve(message.result);
+            }
+          }
+        });
+      });
+    const ref = { endpoint: "source", path: f.source };
+    const first = await request({ ref, refresh: true });
+    assert.equal(first.entries.length, 200);
+    const second = await request({ ref, cursor: first.cursor });
+    assert.equal(second.entries.length, 25);
+    assert.equal(second.cursor, undefined);
+  } finally {
+    bridge.stopIngress();
+    await core.dispose();
+    await bridge.dispose();
+    process.env.HOME = previousHome;
     await f.dispose();
   }
 });

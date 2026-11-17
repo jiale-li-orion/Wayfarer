@@ -460,8 +460,6 @@ export class Jobs extends EventEmitter {
         throw Error(
           "Package manager process state must be checked; submit a new command",
         );
-      if (this.running.has(id) || this.executions.has(id))
-        throw Error("Task execution is still stopping");
       j.pauseReason = undefined;
       j.state = "queued";
       j.error = undefined;
@@ -519,7 +517,12 @@ export class Jobs extends EventEmitter {
   private pump() {
     if (this.closed) return;
     for (const j of this.records.values()) {
-      if (j.state !== "queued") continue;
+      if (
+        j.state !== "queued" ||
+        this.running.has(j.id) ||
+        this.executions.has(j.id)
+      )
+        continue;
       const n = [...this.running].filter(
         (id) => this.get(id).kind === j.kind,
       ).length;

@@ -39,6 +39,7 @@ class Client:
         self.conn, self.ident = conn, uuid.uuid4().hex
         self.messages, self.done = queue.Queue(maxsize=256), threading.Event()
         self.subscribed = True
+        self.attached = False
         self.snapshot_id = None
         self.deferred = {}
         self.state_lock = threading.Lock()
@@ -90,10 +91,11 @@ class Client:
                     msg = json.loads(line)
                     if msg.get('method') == 'clientAttach':
                         with self.state_lock:
+                            self.attached = True
                             self.snapshot_id = str(msg['id'])
                             self.subscribed = False
                     emit(dict(id=self.ident + ':' + str(msg['id']), client=self.ident,
-                              method=msg['method'], args=msg.get('args', {})))
+                              method=msg['method'], args=msg.get('args', {}), legacy=not self.attached))
         except (OSError, ValueError, KeyError): pass
         finally:
             with lock: clients.pop(self.ident, None)

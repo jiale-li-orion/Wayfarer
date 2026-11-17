@@ -160,7 +160,12 @@ export class Bridge {
                 c.stdin.write(JSON.stringify({ id: m.id, ...value }) + "\n");
             };
             const request = this.core
-              .dispatch(m.method, m.args, "agent", m.client)
+              .dispatch(
+                m.method,
+                m.args,
+                "agent",
+                m.legacy ? undefined : m.client,
+              )
               .then(
                 (result) => reply({ result }),
                 (err) => reply({ error: String(err) }),

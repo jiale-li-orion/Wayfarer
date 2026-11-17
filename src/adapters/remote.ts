@@ -193,7 +193,8 @@ export class RemoteEndpoint implements Endpoint {
     args: Record<string, any> = {},
   ): Promise<T> {
     await this.open();
-    if (this.closed || !this.child) throw Error("Endpoint connection closed");
+    if (this.closed || !this.child)
+      throw new TransportLost("Endpoint connection closed");
     const child = this.child!;
     const id = ++this.seq;
     return new Promise<T>((resolve, reject) => {
@@ -228,7 +229,7 @@ export class RemoteEndpoint implements Endpoint {
         if (e) {
           const pending = this.pending.get(id);
           this.pending.delete(id);
-          pending?.reject(e);
+          pending?.reject(new TransportLost(e.message));
         }
       });
     });
