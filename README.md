@@ -10,13 +10,13 @@ Windows 磁盘和 WSL 发行版自动发现。通过 **Workspace Map: 添加 SSH
 
 **接入 Codex** 使用已发现的 Codex CLI 增改 `workspace-map` MCP 项；**接入 dsh** 列出实际环境中的 profile，仅修改选中 profile 的本插件项。当前 dsh bundle profile 写入 `cordis.patch.yml` 的插件插入项；旧 profile 保留 `cordis.yml` 接法。现有插件、注释和授权策略继续保留。**获取 MCP 配置** 提供 WSL 与 Windows 调用形式。
 
-每个 VS Code 窗口有独立会话。Agent 通过 `map_sessions` 查看、`map_bind` 切换；快捷接入生成的配置绑定当前窗口。重开后可通过这两个工具重新绑定。跟随默认关闭，开启后显示 Agent 当前目录／文件位置；手动操作退出跟随。
+每个 VS Code 窗口有独立地图。`mapId` 是持久身份，`id` 表示本次运行；Agent 通过 `map_sessions` 查看、`map_bind` 切换。快捷接入生成 `--map` 稳定绑定，重载后自动接回同一地图；`map_connection` 查询连接状态与交接快照。升级后重新执行接入命令可更新原插件项，旧 `--session` 接法和分页继续兼容。跟随默认关闭，开启后显示 Agent 当前目录／文件位置；手动操作退出跟随。
 
-MCP 提供端点、分页目录、文件元数据／内容、导航、搜索、文件操作、包操作、资源统计和任务状态。`map_diagnostics` 直接返回缓存、监听、未完成分页和任务计数；`map_resources` 返回指定端点的进程资源与连接累计通信计数。文件读取返回 Base64，支持字节偏移与长度。后台操作立即返回任务 ID；`map_job` 查询结果，`map_jobControl` 暂停／继续／取消，日志通知推送任务进度。
+MCP 提供端点、分页目录、文件元数据／内容、导航、搜索、文件操作、包操作、资源统计和任务状态。`map_diagnostics` 直接返回缓存、监听、未完成分页和任务计数；`map_resources` 返回指定端点的进程资源与连接累计通信计数。文件读取返回 Base64，支持字节偏移与长度。后台提交持久化后返回任务 ID 和 operationId；相同 token 查询原任务，确认中断先用 `map_operation` 查收据。`map_job` 查询结果，`map_jobControl` 暂停／继续／取消，日志通知推送任务进度。
 
 ## 文件与软件操作
 
-同端移动优先原生重命名；跨文件系统／跨端使用任务私有暂存文件，校验内容与源版本后提交，再删除源。暂停任务保存进度；重开窗口后显式继续。同名规则包括跳过、改名，以及合并目录并覆盖同名文件。目录合并保留目标中其他条目。目录与普通文件的类型冲突单独报告。
+同端移动优先原生重命名；跨文件系统／跨端使用任务私有暂存文件，校验内容与源版本后提交，再删除源。窗口、进程和网络中断的传输自动接续；主动暂停和主动断开保持暂停，用户点击继续。取消清理登记的私有暂存，失败项随任务保留，可从任务面板或 `map_jobCleanup` 明确重试。同名规则包括跳过、改名，以及合并目录并覆盖同名文件。目录合并保留目标中其他条目。目录与普通文件的类型冲突单独报告。
 
 Windows 删除进入回收站；WSL／Linux SSH 删除为永久删除。软链接按链接复制，进入链接目录需要明确导航。Windows／WSL 盘符映射用于识别重复路径。程序只搬移文件系统内容；项目配置、环境变量和 Git worktree 引用由用户或 Agent 另行处理。
 
@@ -31,7 +31,7 @@ Windows 删除进入回收站；WSL／Linux SSH 删除为永久删除。软链�
 - 默认两个传输任务并行；冲突路径串行。包环境和项目分别参与互斥，目录读取走独立调用。
 - **查看性能日志** 打开 OutputChannel，包含目录读取、布局、任务排队／吞吐、包命令、Extension Host CPU／RSS、Webview heap／长任务、端点助手 CPU／RSS。
 
-运行状态位于 VS Code globalStorage。任务 `*.json` 保存状态，`*.input.json` 保存提交参数，`*.checkpoint.jsonl` 保存增量检查点，`*.log` 保存收到的命令输出。任务详情显示日志尾部。WSL 的私有 socket 与 MCP 客户端入口位于 `~/.local/share/workspace-map/`；助手随连接／窗口关闭退出。大文件传输使用按任务租用的数据助手，目录与编辑操作保留独立控制通道；最后一个传输结束、暂停或取消后释放数据助手。
+运行状态位于 VS Code globalStorage。任务 `*.json` 保存状态，`*.input.json` 保存提交参数，`*.checkpoint.jsonl` 保存增量检查点，`*.log` 保存收到的命令输出；`operations/` 保存 operationId 对应归档位置，`history/` 保存完成与取消记录。任务详情显示日志尾部。WSL 的私有 socket 与 MCP 客户端入口位于 `~/.local/share/workspace-map/`；助手随连接／窗口关闭退出。大文件传输使用按任务租用的数据助手，目录与编辑操作保留独立控制通道；最后一个传输结束、暂停或取消后释放数据助手。
 
 ## 构建与验收
 
@@ -44,11 +44,11 @@ npm test
 npm run package
 ```
 
-产物：`artifacts/workspace-map.vsix`，附带 `dist/build-info.json` 记录提交、工作树状态与构建环境。性能命令：`npm run bench`；多小文件场景：`npx tsx scripts/benchmark-small.ts`。
+产物：`artifacts/workspace-map.vsix`，附带 `dist/build-info.json` 记录提交、工作树状态与构建环境。性能命令：`npm run bench`；恢复与资源循环：`node --expose-gc --import tsx scripts/profile-resume.mjs <output.json>`；多小文件场景：`npx tsx scripts/benchmark-small.ts`。
 
 `ARCHITECTURE.md` 说明模块和恢复流程，`PERFORMANCE.md` 保留实测结果，`STATE.md` 记录交付状态。实际机器验收脚本位于 `scripts/`，使用独立临时文件／软件环境。
 
-首版边界：编辑器读取上限 64 MiB，较大文件可传输后使用本机工具打开；搜索最多保留 10,000 个匹配；目录游标闲置 120 秒后刷新。暂停／取消在当前执行段结束时生效；已经提交的文件保留，未完成暂存文件用于恢复。包管理器支持取消，完成状态以实际退出信息为准。升级、SDK 安装等命令配方已接入；发布验收对修改操作使用隔离的 pip／npm 测试包，其他生态按本机安装环境使用。
+首版边界：编辑器读取上限 64 MiB，较大文件可传输后使用本机工具打开；搜索最多保留 10,000 个匹配；目录游标闲置 120 秒后刷新。暂停／取消在当前执行段结束时生效；已经提交的文件保留，暂停时的暂存用于恢复，取消时按登记归属清理。包管理器支持取消，完成状态以实际退出信息为准。升级、SDK 安装等命令配方已接入；发布验收对修改操作使用隔离的 pip／npm 测试包，其他生态按本机安装环境使用。
 
 Marketplace 发布单独处理。
 
