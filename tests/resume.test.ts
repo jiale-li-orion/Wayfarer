@@ -451,6 +451,15 @@ test("one MCP client survives 50 rebinds and ten instance replacements with boun
       assert.equal(view.follow, false);
     }
     assert.ok(notices.some((n) => n.type === "resumed"));
+    await assert.rejects(
+      tool("write", {
+        ref: { endpoint: "target", path: path.join(f.target, "oversized") },
+        content: "x".repeat(9 * 1048576),
+      }),
+      /exceeds 8 MiB/,
+    );
+    assert.equal((await tool("connection")).pendingRequests, 0);
+    await assert.rejects(fs.stat(path.join(f.target, "oversized")));
     const originalDispatch = core.dispatch.bind(core);
     let restart: Promise<void> | undefined;
     core.dispatch = async (...params) => {

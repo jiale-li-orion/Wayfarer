@@ -9,6 +9,7 @@ import type { EndpointConfig } from "../shared/types";
 export class Bridge {
   readonly id = randomUUID();
   private closed = false;
+  private disposed = false;
   private closing?: Promise<void>;
   private starting?: Promise<void>;
   private clients = new Set<string>();
@@ -17,7 +18,7 @@ export class Bridge {
     return {
       id: this.id,
       mapId: this.mapId,
-      state: this.closed ? "closing" : "running",
+      state: this.disposed ? "closed" : this.closed ? "closing" : "running",
       clients: this.clients.size,
       subscriptions: this.clients.size,
       pendingRequests: this.pending.size,
@@ -246,5 +247,6 @@ export class Bridge {
       Math.max(0, deadline - Date.now()),
     );
     this.children = [];
+    this.disposed = true;
   }
 }

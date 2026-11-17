@@ -81,6 +81,7 @@ class Client:
             self.generation += 1
             self.map_id, self.session = map_id, session
             self.state, self.snapshot = 'waiting', None
+            self.current = None
             self.disconnect(self.conn)
             self.lock.notify_all()
         self.wake()
@@ -161,17 +162,21 @@ class Client:
             except (OSError, ValueError):
                 if not self.stopped: time.sleep(0.1)
     def request(self, method, args, binding):
+        rid = uuid.uuid4().hex
+        frame = (json.dumps(dict(id=rid, method=method, args=args)) + '\n').encode()
+        if len(frame) > 8 * 1024 * 1024:
+            raise ValueError('IPC request exceeds 8 MiB; use file transfer for large content')
         with self.lock:
             while self.state != 'connected' and not self.stopped:
                 if binding != self.generation: raise RuntimeError('Map binding changed')
                 self.lock.wait()
             if self.stopped: raise RuntimeError('MCP client closed')
             if binding != self.generation: raise RuntimeError('Map binding changed')
-            conn, rid = self.conn, uuid.uuid4().hex
+            conn = self.conn
             waiter = dict(done=threading.Event())
             self.pending[rid] = waiter
         try:
-            with self.send_lock: conn.sendall((json.dumps(dict(id=rid, method=method, args=args)) + '\n').encode())
+            with self.send_lock: conn.sendall(frame)
             waiter['done'].wait()
             with self.lock:
                 if binding != self.generation: raise RuntimeError('Map binding changed')
