@@ -312,6 +312,7 @@ export class Core extends EventEmitter {
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
         return {
+          endpointLifecycle: this.endpoints.stats(),
           host: {
             pid: process.pid,
             scope: "shared-extension-host",
@@ -844,6 +845,7 @@ export class Core extends EventEmitter {
       this.stage = "helpers";
       try {
         await this.endpoints.dispose(deadline);
+        await this.directories.drain();
       } finally {
         this.stage = "closed";
         this.profile.record("map.closed", {

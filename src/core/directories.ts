@@ -32,6 +32,18 @@ export class Directories extends EventEmitter {
   private timer?: NodeJS.Timeout;
   private polling = false;
   private disposed = false;
+  private closes = new Set<Promise<unknown>>();
+  private closingCursor(endpoint: string, cursor: string) {
+    const e = this.endpoints.items.get(endpoint);
+    if (!e) return;
+    const close = e.call("scanClose", { cursor }).catch(() => {});
+    this.closes.add(close);
+    void close.finally(() => this.closes.delete(close));
+  }
+  async drain() {
+    await Promise.allSettled([...this.closes, ...this.remoteUpdates.values()]);
+  }
+
   private owners = new Map<
     string,
     { cursors: Map<string, { endpoint: string; cursor: string }> }
@@ -44,10 +56,7 @@ export class Directories extends EventEmitter {
     this.owners.delete(id);
     if (owner)
       for (const { endpoint, cursor } of owner.cursors.values())
-        void this.endpoints.items
-          .get(endpoint)
-          ?.call("scanClose", { cursor })
-          .catch(() => {});
+        this.closingCursor(endpoint, cursor);
   }
   refreshConnections() {
     this.reconcile();
@@ -165,7 +174,7 @@ export class Directories extends EventEmitter {
       this.endpoints.enabled(ref.endpoint) &&
       (e.connected || ["local", "windows"].includes(e.config.kind))
     )
-      void e.call("scanClose", { cursor }).catch(() => {});
+      this.closingCursor(ref.endpoint, cursor);
   }
   private evict(key: string) {
     const p = this.cache.get(key);
@@ -204,6 +213,8 @@ export class Directories extends EventEmitter {
   stats() {
     return {
       clients: this.owners.size,
+      closingCursors: this.closes.size,
+      pendingWatchUpdates: this.remoteUpdates.size,
       clientCursors: [...this.owners.values()].reduce(
         (n, o) => n + o.cursors.size,
         0,
