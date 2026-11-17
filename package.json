@@ -171,34 +171,34 @@
       {
         "command": "workspaceMap.back",
         "key": "alt+left",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus"
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
       },
       {
         "command": "workspaceMap.forward",
         "key": "alt+right",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus"
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
       },
       {
         "command": "workspaceMap.parent",
         "key": "alt+up",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus"
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
       },
       {
         "command": "workspaceMap.search",
         "key": "ctrl+f",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
         "mac": "cmd+f"
       },
       {
         "command": "workspaceMap.tasks",
         "key": "ctrl+shift+j",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
         "mac": "cmd+shift+j"
       },
       {
         "command": "workspaceMap.fit",
         "key": "ctrl+0",
-        "when": "activeWebviewPanelId == workspaceMap && !inputFocus",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
         "mac": "cmd+0"
       }
     ]

@@ -173,6 +173,14 @@ export async function activate(context: vscode.ExtensionContext) {
       try {
         let result: any;
         switch (m.method) {
+          case "textInputFocus":
+            await vscode.commands.executeCommand(
+              "setContext",
+              "workspaceMap.textInputFocus",
+              !!m.args.focused && !!panel?.active,
+            );
+            result = true;
+            break;
           case "jobSubscription":
             jobsSubscribed = !!m.args.enabled;
             result = true;
@@ -234,6 +242,12 @@ export async function activate(context: vscode.ExtensionContext) {
     });
     panel.onDidChangeViewState((e) => {
       core.directories.setVisible(e.webviewPanel.visible);
+      if (!e.webviewPanel.active)
+        void vscode.commands.executeCommand(
+          "setContext",
+          "workspaceMap.textInputFocus",
+          false,
+        );
       if (!e.webviewPanel.visible) {
         jobsSubscribed = false;
         ready = false;
@@ -242,6 +256,11 @@ export async function activate(context: vscode.ExtensionContext) {
     panel.onDidDispose(() => {
       core.off("event", send);
       panel = undefined;
+      void vscode.commands.executeCommand(
+        "setContext",
+        "workspaceMap.textInputFocus",
+        false,
+      );
       ready = false;
       core.directories.setVisible(false);
       core.directories.watch([]);
