@@ -2,7 +2,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { createInterface } from "node:readline";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import type { Core } from "../core/core";
 import type { EndpointConfig } from "../shared/types";
 export class Bridge {
@@ -45,17 +45,24 @@ export class Bridge {
       try {
         const e = this.core.endpoints.get(target.id);
         const info = await e.call("info");
+        const files = await Promise.all(
+          ["mcp.py", "tools.json"].map(async (name) => ({
+            name,
+            data: await fs.readFile(path.join(this.helperDir, name)),
+          })),
+        );
+        const revision = createHash("sha256");
+        for (const file of files) revision.update(file.data);
         const dir = path.posix.join(
           info.home,
           ".local/share/workspace-map/client",
+          revision.digest("hex").slice(0, 16),
         );
         await e.call("mkdir", { path: dir });
-        for (const file of ["mcp.py", "tools.json"])
+        for (const file of files)
           await e.call("write", {
-            path: path.posix.join(dir, file),
-            data: (await fs.readFile(path.join(this.helperDir, file))).toString(
-              "base64",
-            ),
+            path: path.posix.join(dir, file.name),
+            data: file.data.toString("base64"),
             offset: 0,
             truncate: true,
           });

@@ -15,3 +15,5 @@ tsconfig.json
 .gitignore
 docs/performance-data/**
 PERFORMANCE.md
+
+.github/**
