@@ -1,11 +1,19 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import fs from "node:fs/promises";
 import { createInterface } from "node:readline";
+import {
+  grace,
+  closeChild,
+  EXIT_GRACE_MS,
+  TransportLost,
+} from "../core/lifecycle";
 import type { Endpoint, EndpointConfig } from "../shared/types";
 export const shellQuote = (s: string) => "'" + s.replaceAll("'", "'\\''") + "'";
 export class RemoteEndpoint implements Endpoint {
   private child?: ChildProcessWithoutNullStreams;
   private closed = false;
+  private closing?: Promise<void>;
+  private retiring = new Set<Promise<void>>();
   private opening?: Promise<void>;
   private seq = 0;
   private pending = new Map<
@@ -34,7 +42,9 @@ export class RemoteEndpoint implements Endpoint {
         if (--this.bulkUsers === 0) {
           this.lastTransferTransport = { ...bulk.metrics };
           this.bulk = undefined;
-          bulk.dispose();
+          const closing = bulk.dispose();
+          this.retiring.add(closing);
+          void closing.finally(() => this.retiring.delete(closing));
         }
       },
     };
@@ -140,7 +150,8 @@ export class RemoteEndpoint implements Endpoint {
           return;
         }
         this.child = undefined;
-        for (const p of this.pending.values()) p.reject(e);
+        for (const p of this.pending.values())
+          p.reject(new TransportLost(e.message));
         this.pending.clear();
         lines.close();
       };
@@ -148,7 +159,9 @@ export class RemoteEndpoint implements Endpoint {
       child.on("error", fail);
       child.on("exit", (code) =>
         fail(
-          Error("Endpoint disconnected (" + code + "): " + this.stderr.trim()),
+          new TransportLost(
+            "Endpoint disconnected (" + code + "): " + this.stderr.trim(),
+          ),
         ),
       );
     })().finally(() => {
@@ -166,6 +179,7 @@ export class RemoteEndpoint implements Endpoint {
     return {
       ...result,
       transferUsers: this.bulkUsers,
+      retiringHelpers: this.retiring.size,
       lastTransferTransport: this.lastTransferTransport,
       transfer: bulk?.connected
         ? await bulk
@@ -179,7 +193,8 @@ export class RemoteEndpoint implements Endpoint {
     args: Record<string, any> = {},
   ): Promise<T> {
     await this.open();
-    if (this.closed || !this.child) throw Error("Endpoint connection closed");
+    if (this.closed || !this.child)
+      throw new TransportLost("Endpoint connection closed");
     const child = this.child!;
     const id = ++this.seq;
     return new Promise<T>((resolve, reject) => {
@@ -214,21 +229,50 @@ export class RemoteEndpoint implements Endpoint {
         if (e) {
           const pending = this.pending.get(id);
           this.pending.delete(id);
-          pending?.reject(e);
+          pending?.reject(new TransportLost(e.message));
         }
       });
     });
   }
-  dispose() {
+  abort() {
+    this.bulk?.abort();
+    const child = this.child;
+    if (child) {
+      child.kill("SIGKILL");
+      child.stdin.destroy();
+      child.stdout.destroy();
+      child.stderr.destroy();
+    }
+    for (const p of this.pending.values())
+      p.reject(new TransportLost("Endpoint interrupted"));
+    this.pending.clear();
+  }
+  dispose(deadline = Date.now() + EXIT_GRACE_MS) {
+    return (this.closing ??= this.close(deadline));
+  }
+  private async close(deadline: number) {
     this.closed = true;
-    this.bulk?.dispose();
+    await this.opening?.catch(() => {});
+    const bulk = this.bulk;
     this.bulk = undefined;
     this.bulkUsers = 0;
-    const c = this.child;
+    const child = this.child;
+    const done = Promise.all([
+      child ? closeChild(child) : Promise.resolve(),
+      bulk?.dispose(deadline),
+      ...this.retiring,
+    ]);
+    await grace(
+      done,
+      () => {
+        this.abort();
+        bulk?.abort();
+      },
+      Math.max(0, deadline - Date.now()),
+    );
     this.child = undefined;
-    c?.stdin.end();
-    setTimeout(() => c?.kill(), 1500).unref();
-    for (const p of this.pending.values()) p.reject(Error("Endpoint closed"));
+    for (const p of this.pending.values())
+      p.reject(new TransportLost("Endpoint closed"));
     this.pending.clear();
   }
 }

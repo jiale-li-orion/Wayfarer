@@ -1,0 +1,450 @@
+{
+  "at": "2026-11-17T13:02:41.647Z",
+  "node": "v22.23.2",
+  "cycles": [
+    {
+      "cycle": 10,
+      "client": {
+        "pid": 1617821,
+        "rss": 19034112,
+        "peakRss": 19034112,
+        "cpuUserMs": 35.717999999999996,
+        "cpuSystemMs": 5.556,
+        "threads": 2
+      },
+      "clientFDs": 7,
+      "host": {
+        "rss": 92553216,
+        "heapTotal": 18718720,
+        "heapUsed": 8909776,
+        "external": 4520076,
+        "arrayBuffers": 2122468
+      },
+      "bridges": [
+        {
+          "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+          "mapId": "a",
+          "state": "running",
+          "clients": 1,
+          "subscriptions": 1,
+          "pendingRequests": 0,
+          "relays": 1
+        },
+        {
+          "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+          "mapId": "b",
+          "state": "running",
+          "clients": 0,
+          "subscriptions": 0,
+          "pendingRequests": 0,
+          "relays": 1
+        }
+      ],
+      "directories": [
+        {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        {
+          "clients": 0,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "cycle": 20,
+      "client": {
+        "pid": 1617821,
+        "rss": 19034112,
+        "peakRss": 19034112,
+        "cpuUserMs": 37.758,
+        "cpuSystemMs": 8.345,
+        "threads": 2
+      },
+      "clientFDs": 7,
+      "host": {
+        "rss": 92561408,
+        "heapTotal": 18718720,
+        "heapUsed": 8900696,
+        "external": 4520116,
+        "arrayBuffers": 2122468
+      },
+      "bridges": [
+        {
+          "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+          "mapId": "a",
+          "state": "running",
+          "clients": 1,
+          "subscriptions": 1,
+          "pendingRequests": 0,
+          "relays": 1
+        },
+        {
+          "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+          "mapId": "b",
+          "state": "running",
+          "clients": 0,
+          "subscriptions": 0,
+          "pendingRequests": 0,
+          "relays": 1
+        }
+      ],
+      "directories": [
+        {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        {
+          "clients": 0,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "cycle": 30,
+      "client": {
+        "pid": 1617821,
+        "rss": 19034112,
+        "peakRss": 19034112,
+        "cpuUserMs": 42.199,
+        "cpuSystemMs": 8.77,
+        "threads": 2
+      },
+      "clientFDs": 7,
+      "host": {
+        "rss": 92561408,
+        "heapTotal": 18718720,
+        "heapUsed": 8900720,
+        "external": 4520116,
+        "arrayBuffers": 2122468
+      },
+      "bridges": [
+        {
+          "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+          "mapId": "a",
+          "state": "running",
+          "clients": 1,
+          "subscriptions": 1,
+          "pendingRequests": 0,
+          "relays": 1
+        },
+        {
+          "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+          "mapId": "b",
+          "state": "running",
+          "clients": 0,
+          "subscriptions": 0,
+          "pendingRequests": 0,
+          "relays": 1
+        }
+      ],
+      "directories": [
+        {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        {
+          "clients": 0,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "cycle": 40,
+      "client": {
+        "pid": 1617821,
+        "rss": 19034112,
+        "peakRss": 19034112,
+        "cpuUserMs": 46.906,
+        "cpuSystemMs": 9.734,
+        "threads": 2
+      },
+      "clientFDs": 7,
+      "host": {
+        "rss": 92561408,
+        "heapTotal": 18980864,
+        "heapUsed": 8933296,
+        "external": 4539478,
+        "arrayBuffers": 2122468
+      },
+      "bridges": [
+        {
+          "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+          "mapId": "a",
+          "state": "running",
+          "clients": 1,
+          "subscriptions": 1,
+          "pendingRequests": 0,
+          "relays": 1
+        },
+        {
+          "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+          "mapId": "b",
+          "state": "running",
+          "clients": 0,
+          "subscriptions": 0,
+          "pendingRequests": 0,
+          "relays": 1
+        }
+      ],
+      "directories": [
+        {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        {
+          "clients": 0,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "cycle": 50,
+      "client": {
+        "pid": 1617821,
+        "rss": 19034112,
+        "peakRss": 19034112,
+        "cpuUserMs": 50.338,
+        "cpuSystemMs": 11.694999999999999,
+        "threads": 2
+      },
+      "clientFDs": 7,
+      "host": {
+        "rss": 92561408,
+        "heapTotal": 18980864,
+        "heapUsed": 8934104,
+        "external": 4520116,
+        "arrayBuffers": 2122468
+      },
+      "bridges": [
+        {
+          "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+          "mapId": "a",
+          "state": "running",
+          "clients": 1,
+          "subscriptions": 1,
+          "pendingRequests": 0,
+          "relays": 1
+        },
+        {
+          "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+          "mapId": "b",
+          "state": "running",
+          "clients": 0,
+          "subscriptions": 0,
+          "pendingRequests": 0,
+          "relays": 1
+        }
+      ],
+      "directories": [
+        {
+          "clients": 1,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        },
+        {
+          "clients": 0,
+          "closingCursors": 0,
+          "pendingWatchUpdates": 0,
+          "clientCursors": 0,
+          "cachedBranches": 0,
+          "cachedEntries": 0,
+          "uiCursors": 0,
+          "pendingUiReads": 0,
+          "watches": 0,
+          "editorWatches": 0,
+          "pendingChanges": 0,
+          "polling": false,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "closed": {
+    "host": {
+      "rss": 92692480,
+      "heapTotal": 19243008,
+      "heapUsed": 9009792,
+      "external": 4521368,
+      "arrayBuffers": 2122261
+    },
+    "bridges": [
+      {
+        "id": "3f21d6eb-5869-4ef7-b519-f2bb78f44eec",
+        "mapId": "a",
+        "state": "closed",
+        "clients": 0,
+        "subscriptions": 0,
+        "pendingRequests": 0,
+        "relays": 0
+      },
+      {
+        "id": "1122465f-36a5-41f8-b588-d2ff3795e823",
+        "mapId": "b",
+        "state": "closed",
+        "clients": 0,
+        "subscriptions": 0,
+        "pendingRequests": 0,
+        "relays": 0
+      }
+    ],
+    "directories": [
+      {
+        "clients": 0,
+        "closingCursors": 0,
+        "pendingWatchUpdates": 0,
+        "clientCursors": 0,
+        "cachedBranches": 0,
+        "cachedEntries": 0,
+        "uiCursors": 0,
+        "pendingUiReads": 0,
+        "watches": 0,
+        "editorWatches": 0,
+        "pendingChanges": 0,
+        "polling": false,
+        "visible": true
+      },
+      {
+        "clients": 0,
+        "closingCursors": 0,
+        "pendingWatchUpdates": 0,
+        "clientCursors": 0,
+        "cachedBranches": 0,
+        "cachedEntries": 0,
+        "uiCursors": 0,
+        "pendingUiReads": 0,
+        "watches": 0,
+        "editorWatches": 0,
+        "pendingChanges": 0,
+        "polling": false,
+        "visible": true
+      }
+    ],
+    "jobs": [
+      {
+        "records": 0,
+        "historyOnDisk": 0,
+        "retainedTerminal": 0,
+        "running": 0,
+        "runners": 0,
+        "submissions": 0,
+        "logWrites": 0,
+        "closing": true,
+        "heldLocks": 0,
+        "progressTimers": 0,
+        "states": {}
+      },
+      {
+        "records": 0,
+        "historyOnDisk": 0,
+        "retainedTerminal": 0,
+        "running": 0,
+        "runners": 0,
+        "submissions": 0,
+        "logWrites": 0,
+        "closing": true,
+        "heldLocks": 0,
+        "progressTimers": 0,
+        "states": {}
+      }
+    ]
+  }
+}

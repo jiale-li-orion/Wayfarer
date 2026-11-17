@@ -31,7 +31,7 @@ flowchart LR
 - `src/core/core.ts` 是界面和 Agent 的公共入口；视图、跟随、导航历史由这里维护。目录、任务及 UI 的状态通知独立。
 - `src/core/directories.ts` 保存有界的已知结构，画布游标独立于 Agent／编辑器。收起释放画布游标；缓存保留时间戳。监听只覆盖可见分支和编辑器保留的目录。画布可见性由 Extension Host 维护；隐藏后迟到的 watch 消息继续受可见性约束，编辑器监听独立保留。分页回复交回之前核对请求归属，已收起或被替换的请求关闭游标。
 - `src/adapters/native.ts` 与 `helpers/endpoint.py` 保留文件、目录、链接、特殊节点、无权限结果的身份。游标包含页序号，重复读取最近一页返回同页；客户端之间的扫描相互独立。
-- `src/core/jobs.ts` 持有任务生命周期与重叠路径互斥。参数一次写入，检查点按变更键追加；状态文件原子替换。旧版整份任务记录仍可读取。
+- `src/core/jobs.ts` 持有任务生命周期与重叠路径互斥。参数一次写入，检查点按变更键追加；状态文件原子替换。旧版整份任务记录仍可读取；0.3.0 在 v2 元数据结构中保存 operationId、暂停原因及 lifecycleVersion。
 - `src/packages/` 将具体生态能力转成 argv。包命令的 stdin 与助手协议隔离；输出、取消、退出状态由执行端管理。Windows 命令包装器通过 cross-spawn 处理。
 - `src/ui/` 在结构变化时请求布局；任务进度、镜头移动使用各自更新通道。缩小至远景后切换 Canvas，放大恢复完整文件控件。文件手柄与画布平移分别处理。
 - `src/mcp/` 负责窗口会话、IPC 与配置接入。MCP 交接任务 ID，计算与传输继续在 Core 执行。
@@ -47,7 +47,7 @@ flowchart TD
  E --> F[4 个缓冲复用 / 分块读写]
  F --> G[追加当前文件偏移]
  G --> H{暂停或取消}
- H -->|暂停| I[保留源与 partial / 显式继续]
+ H -->|暂停| I[保留源与 partial / 按暂停原因恢复]
  H -->|继续| F
  F -->|复制完成| J[校验源版本及内容 / 目标摘要]
  J --> K[提交目标 / 保存 committed]
@@ -63,7 +63,7 @@ flowchart TD
 
 文件内容校验与源删除分开记录。已提交目标的移动在恢复时重新核对目标，保留发生变化的源。原生改名完成但确认中断时，以文件身份核对目的位置。目录同名覆盖采用合并；额外目标条目保留。覆盖／跳过策略锁定具体目标路径，互不重叠的文件可以并行；自动改名仍持有目标目录锁，覆盖其可能选择的同级名称。路径错误、离线、包命令失败由对应任务或分支呈现，画布继续接受操作。
 
-关闭窗口先保存任务状态、停止监听，再关闭助手。旧连接退出事件只处理该连接的请求；已断开的对象拒绝后续调用，重新连接创建新对象。包进程拥有独立进程组，取消后收集实际退出结果。目录和操作权限始终来自端点账号。
+关闭窗口停止接单与监听，等待执行段 finally、任务日志和检查点，再关闭助手。旧连接退出事件只处理该连接的请求；已断开的对象拒绝后续调用，重新连接创建新对象。包进程拥有独立进程组，取消后收集实际退出结果。目录和操作权限始终来自端点账号。
 
 ## Profiling 的归属
 
@@ -111,3 +111,56 @@ flowchart LR
 MCP 客户端助手按 mcp.py＋tools.json 的内容哈希写入 `~/.local/share/workspace-map/client/<revision>`。新旧 VS Code 窗口使用各自固定助手目录，接入命令仅更新本扩展项；已配置的旧客户端继续使用其原目录与授权。后台任务共享 Core，窗口会话通过 session ID 绑定。profiling 包含工具版本命令的 endpoint、cwd、名称、耗时及退出状态。
 
 工具发现位于 `src/packages/discovery.ts`，依赖端点与原生路径；UI 共用的 `catalog.ts` 只包含命令配方与字段声明。项目登记与移除属于地图元数据，移除操作独立于端点连接状态。
+
+
+## Agent resume 与资源生命周期（0.3.0）
+
+```mermaid
+sequenceDiagram
+    participant A as Codex／dsh stdio 客户端
+    participant R as 私有 registry／relay
+    participant C as Core／Jobs
+    participant D as globalStorage
+    A->>R: --map 稳定 mapId（运行 id 每次更新）
+    R->>C: clientAttach，创建客户端游标归属
+    C-->>A: 当前视图＋任务快照
+    R-->>A: 补发握手期间按任务合并的事件，随后增量通知
+    A->>C: 提交 operationId
+    C->>D: 写入输入、任务收据及检查点
+    C-->>A: 原任务 id（同 token 同参数返回同任务）
+    Note over C,D: 后台任务归地图，客户端退出后继续
+    C->>C: 窗口退出：停止接单，标记 shutdown
+    C->>D: 等待 runner finally、租约与路径锁释放、日志落盘
+    R-->>A: 旧实例 EOF，释放旧等待器／socket
+    Note over A,R: registry 通知唤醒；缺少通知时仅等待期间每 5 秒检查
+    A->>R: 按 mapId 选择新 id；多个匹配明确显示 ambiguous
+    R->>C: 重新获取快照后接收事件
+    A->>C: 确认中断的提交先查询 operationId
+    C-->>A: 原收据；尚未接收时沿同 token 提交
+```
+
+- `mapId` 使用窗口已有的 `mapStorageId`；relay 的 `id` 和记录令牌表示本次运行。窗口 owner 记录以令牌命名，退出只删除自身文件。会话记录包含 mapId、运行状态与 token；同名地图按身份选择。
+- MCP 每进程保持一个恢复线程、一个订阅／请求复用 socket。Linux 使用 inotify 监听注册目录，连接期间阻塞等待 socket 数据；fallback 仅等待连接期间每 5 秒检查。重绑递增 generation，关闭旧 socket，使旧 pending 请求结束；读回复前复核 generation。EOF 关闭连接、watch FD、等待器与线程池。
+- relay 为每个客户端建立有界写队列，慢客户端断线后重新取快照；握手期间事件按任务合并，快照先入队，随后发出积累事件。目录游标跟随 relay 客户端身份，解绑及退出关闭本客户端游标；目录的迟到回复核对同一归属对象后交回。
+- Core 提交先按 operationId 的 SHA-256 定位任务，按规范化参数指纹核对重复调用；活动记录和 history 共同承接收据；operations 中的定长定位记录直接找到归档位置，新增提交沿固定路径查询，历史数量与查询开销分离。任务元数据先持久化再执行；提交回复等待记录写入。客户端确认丢失时先查 `map_operation`，原任务继续运行。包命令沿同一收据返回实际结果，重新执行使用新 operationId。
+- lifecycleVersion=1 的窗口／进程中断传输在启动时接续；网络断线用 `TransportLost` 分支暂停，只对这类任务安排单个恢复等待器并检查所需端点，间隔从 1 秒收敛到 30 秒。主动暂停、主动断开、取消及缺少原因的旧记录分别保留原意。重新执行继续使用既有内容核对、检查点和路径锁。
+- Transfers 在 finally 归还任务租约及借出的缓冲，Jobs 随后释放路径锁并落盘。取消沿登记的 uncommitted 私有路径清理，保留已提交目标及源处理事实；失败项写入 cleanupPending，归档后仍可通过 `map_jobCleanup` 或任务面板明确重试。
+- `lifecycle.ts` 集中 1.5 秒宽限；Core、Jobs、Endpoint、Bridge 的关闭均可重复等待。宽限结束中止归属进程与悬挂 RPC，再等待 finally 和记录写入；Native 包进程的升级 kill 定时器在进程结束时回收。视图写入串行，关闭时交接最终快照。
+- `map_diagnostics` 增加 Agent 客户端／订阅／pending、客户端游标、runner、日志写入、恢复等待器、传输租约／缓冲及退出阶段；`map_connection` 返回客户端绑定、恢复状态和最新交接快照。编辑器与面板继续各自管理订阅，后台任务使用地图生命周期。
+
+```mermaid
+stateDiagram-v2
+    [*] --> queued: 持久化提交收据
+    queued --> running: 上段已结束且获得路径锁
+    running --> paused: 主动暂停／断开、窗口退出或网络断开
+    paused --> queued: 用户继续，或对应的自动恢复条件满足
+    running --> completed: 提交结果与归档
+    running --> failed: 权限、源变化、空间等任务失败
+    failed --> queued: 用户明确继续
+    queued --> cancelled: 取消并清理登记暂存
+    paused --> cancelled: 取消并清理登记暂存
+    running --> cancelled: 执行段退出后清理
+    cancelled --> cancelled: 明确重试 cleanupPending
+```
+
+0.2.0 助手的独立请求 socket 继续沿旧分页方式工作；新助手通过 clientAttach 声明连接归属，采用完整的恢复与退出流程。升级接入命令生成稳定 mapId 绑定。目录关闭调用和退休端点均有归属集合，地图退出在助手收束后等待这些清理完成。Python helper 的 stdin EOF 结束其控制权；清理所属包进程、游标与监听后退出，即使某个 worker 仍阻塞于系统调用。

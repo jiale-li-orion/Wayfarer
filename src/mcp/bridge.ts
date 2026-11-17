@@ -3,10 +3,29 @@ import { createInterface } from "node:readline";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID, createHash } from "node:crypto";
+import { closeChild, grace, EXIT_GRACE_MS } from "../core/lifecycle";
 import type { Core } from "../core/core";
 import type { EndpointConfig } from "../shared/types";
 export class Bridge {
   readonly id = randomUUID();
+  private closed = false;
+  private disposed = false;
+  private closing?: Promise<void>;
+  private starting?: Promise<void>;
+  private clients = new Set<string>();
+  private pending = new Set<Promise<unknown>>();
+  stats() {
+    return {
+      id: this.id,
+      mapId: this.mapId,
+      state: this.disposed ? "closed" : this.closed ? "closing" : "running",
+      clients: this.clients.size,
+      subscriptions: this.clients.size,
+      pendingRequests: this.pending.size,
+      relays: this.children.length,
+    };
+  }
+
   private children: ChildProcessWithoutNullStreams[] = [];
   readonly connections: {
     distro?: string;
@@ -18,6 +37,7 @@ export class Bridge {
     private core: Core,
     private helperDir: string,
     private name: string,
+    readonly mapId: string = randomUUID(),
   ) {}
   private event = (event: any) => {
     if (event.type === "job")
@@ -35,7 +55,10 @@ export class Bridge {
             }) + "\n",
           );
   };
-  async start() {
+  start() {
+    return (this.starting ??= this.launch());
+  }
+  private async launch() {
     this.core.on("event", this.event);
     const targets =
       process.platform === "win32"
@@ -43,6 +66,7 @@ export class Bridge {
         : [this.core.endpoints.configs().find((e) => e.kind === "local")!];
     for (const target of targets) {
       try {
+        if (this.closed) break;
         const e = this.core.endpoints.get(target.id);
         const info = await e.call("info");
         const files = await Promise.all(
@@ -88,15 +112,27 @@ export class Bridge {
                   launcher,
                   this.id,
                   this.name,
+                  this.mapId,
                 ],
                 { stdio: "pipe", windowsHide: true },
               )
-            : spawn("python3", ["-u", "-c", launcher, this.id, this.name], {
-                stdio: "pipe",
-              });
+            : spawn(
+                "python3",
+                ["-u", "-c", launcher, this.id, this.name, this.mapId],
+                {
+                  stdio: "pipe",
+                },
+              );
+        if (this.closed) {
+          c.kill("SIGKILL");
+          continue;
+        }
         this.children.push(c);
+        const owned = new Set<string>();
         c.stderr.on("data", (b) =>
-          this.core.profile.record("ipc.stderr", { message: b.toString() }),
+          this.core.profile.record("ipc.stderr", {
+            message: b.toString().slice(-8192),
+          }),
         );
         const lines = createInterface({ input: c.stdout });
         lines.on("line", (line) => {
@@ -106,14 +142,37 @@ export class Bridge {
               this.core.profile.record("ipc.ready", m);
               return;
             }
-            void this.core.dispatch(m.method, m.args, "agent").then(
-              (result) =>
-                c.stdin.write(JSON.stringify({ id: m.id, result }) + "\n"),
-              (err) =>
-                c.stdin.write(
-                  JSON.stringify({ id: m.id, error: String(err) }) + "\n",
-                ),
-            );
+            if (m.clientOpen) {
+              if (this.closed) return;
+              owned.add(m.clientOpen);
+              this.clients.add(m.clientOpen);
+              this.core.attachClient(m.clientOpen);
+              return;
+            }
+            if (m.clientClose) {
+              owned.delete(m.clientClose);
+              this.clients.delete(m.clientClose);
+              this.core.releaseClient(m.clientClose);
+              return;
+            }
+            if (this.closed) return;
+            const reply = (value: any) => {
+              if (!this.closed && owned.has(m.client) && c.stdin.writable)
+                c.stdin.write(JSON.stringify({ id: m.id, ...value }) + "\n");
+            };
+            const request = this.core
+              .dispatch(
+                m.method,
+                m.args,
+                "agent",
+                m.legacy ? undefined : m.client,
+              )
+              .then(
+                (result) => reply({ result }),
+                (err) => reply({ error: String(err) }),
+              );
+            this.pending.add(request);
+            void request.finally(() => this.pending.delete(request));
           } catch (e) {
             this.core.profile.record("ipc.error", { message: String(e) });
           }
@@ -126,6 +185,11 @@ export class Bridge {
         );
         c.on("exit", () => {
           lines.close();
+          for (const id of owned) {
+            this.clients.delete(id);
+            this.core.releaseClient(id);
+          }
+          owned.clear();
           this.children = this.children.filter((child) => child !== c);
         });
         this.connections.push({
@@ -147,8 +211,8 @@ export class Bridge {
     const args = [
       "-u",
       path.posix.join(c.helperDir, "mcp.py"),
-      "--session",
-      c.session,
+      "--map",
+      this.mapId,
     ];
     return windows && c.distro
       ? {
@@ -157,9 +221,32 @@ export class Bridge {
         }
       : { command: "python3", args };
   }
-  dispose() {
+  stopIngress() {
+    if (this.closed) return;
+    this.closed = true;
     this.core.off("event", this.event);
-    for (const c of this.children) c.stdin.end();
+    for (const c of this.children)
+      if (c.stdin.writable)
+        c.stdin.write(JSON.stringify({ shutdown: true }) + "\n");
+    for (const id of this.clients) this.core.releaseClient(id);
+    this.clients.clear();
+  }
+  dispose(deadline = Date.now() + EXIT_GRACE_MS) {
+    return (this.closing ??= this.close(deadline));
+  }
+  private async close(deadline: number) {
+    this.stopIngress();
+    await this.starting;
+    await Promise.all([...this.pending]);
+    const children = [...this.children];
+    await grace(
+      Promise.all(children.map((c) => closeChild(c))),
+      () => {
+        for (const c of children) void closeChild(c, true);
+      },
+      Math.max(0, deadline - Date.now()),
+    );
     this.children = [];
+    this.disposed = true;
   }
 }

@@ -16,17 +16,18 @@
   },
   {
     "name": "map_bind",
-    "description": "Bind this MCP client to one map session.",
+    "description": "Bind to stable mapId across VS Code reloads, or legacy runtime session. Ambiguous maps require an explicit unique binding.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "session": {
           "type": "string"
+        },
+        "mapId": {
+          "type": "string"
         }
       },
-      "required": [
-        "session"
-      ],
+      "required": [],
       "additionalProperties": false
     },
     "annotations": {
@@ -67,10 +68,7 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "cursor": {
@@ -80,9 +78,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -108,16 +104,11 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -143,10 +134,7 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "offset": {
@@ -156,9 +144,7 @@
           "type": "number"
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -184,29 +170,24 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "content": {
           "type": "string"
         },
         "encoding": {
-          "enum": [
-            "utf8",
-            "base64"
-          ]
+          "enum": ["utf8", "base64"]
         },
         "exclusive": {
           "type": "boolean"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "ref",
-        "content"
-      ],
+      "required": ["ref", "content"],
       "additionalProperties": false
     },
     "annotations": {
@@ -247,10 +228,7 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         }
       },
@@ -280,20 +258,18 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "query": {
           "type": "string"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "ref",
-        "query"
-      ],
+      "required": ["ref", "query"],
       "additionalProperties": false
     },
     "annotations": {
@@ -319,16 +295,15 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -356,10 +331,7 @@
                 "description": "Absolute display path on the specified endpoint"
               }
             },
-            "required": [
-              "endpoint",
-              "path"
-            ],
+            "required": ["endpoint", "path"],
             "additionalProperties": false
           },
           "minItems": 1
@@ -375,32 +347,21 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "mode": {
-          "enum": [
-            "copy",
-            "move"
-          ]
+          "enum": ["copy", "move"]
         },
         "conflict": {
-          "enum": [
-            "skip",
-            "rename",
-            "overwrite"
-          ]
+          "enum": ["skip", "rename", "overwrite"]
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "sources",
-        "target",
-        "mode",
-        "conflict"
-      ],
+      "required": ["sources", "target", "mode", "conflict"],
       "additionalProperties": false
     },
     "annotations": {
@@ -426,20 +387,18 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "name": {
           "type": "string"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "ref",
-        "name"
-      ],
+      "required": ["ref", "name"],
       "additionalProperties": false
     },
     "annotations": {
@@ -465,20 +424,18 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "name": {
           "type": "string"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "ref",
-        "name"
-      ],
+      "required": ["ref", "name"],
       "additionalProperties": false
     },
     "annotations": {
@@ -506,18 +463,17 @@
                 "description": "Absolute display path on the specified endpoint"
               }
             },
-            "required": [
-              "endpoint",
-              "path"
-            ],
+            "required": ["endpoint", "path"],
             "additionalProperties": false
           },
           "minItems": 1
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "refs"
-      ],
+      "required": ["refs"],
       "additionalProperties": false
     },
     "annotations": {
@@ -560,9 +516,7 @@
           "maximum": 1000
         }
       },
-      "required": [
-        "id"
-      ],
+      "required": ["id"],
       "additionalProperties": false
     },
     "annotations": {
@@ -581,17 +535,10 @@
           "type": "string"
         },
         "action": {
-          "enum": [
-            "pause",
-            "resume",
-            "cancel"
-          ]
+          "enum": ["pause", "resume", "cancel"]
         }
       },
-      "required": [
-        "id",
-        "action"
-      ],
+      "required": ["id", "action"],
       "additionalProperties": false
     },
     "annotations": {
@@ -632,9 +579,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "endpoint"
-      ],
+      "required": ["endpoint"],
       "additionalProperties": false
     },
     "annotations": {
@@ -686,12 +631,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "endpoint",
-        "cwd",
-        "manager",
-        "action"
-      ],
+      "required": ["endpoint", "cwd", "manager", "action"],
       "additionalProperties": false
     },
     "annotations": {
@@ -741,14 +681,13 @@
         },
         "cacheRoot": {
           "type": "string"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "endpoint",
-        "cwd",
-        "manager",
-        "action"
-      ],
+      "required": ["endpoint", "cwd", "manager", "action"],
       "additionalProperties": false
     },
     "annotations": {
@@ -767,9 +706,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "endpoint"
-      ],
+      "required": ["endpoint"],
       "additionalProperties": false
     },
     "annotations": {
@@ -786,16 +723,10 @@
           "type": "string"
         },
         "action": {
-          "enum": [
-            "connect",
-            "disconnect"
-          ]
+          "enum": ["connect", "disconnect"]
         }
       },
-      "required": [
-        "endpoint",
-        "action"
-      ],
+      "required": ["endpoint", "action"],
       "additionalProperties": false
     },
     "annotations": {
@@ -856,19 +787,14 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "refresh": {
           "type": "boolean"
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -913,19 +839,14 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": [
-            "endpoint",
-            "path"
-          ],
+          "required": ["endpoint", "path"],
           "additionalProperties": false
         },
         "remove": {
           "type": "boolean"
         }
       },
-      "required": [
-        "ref"
-      ],
+      "required": ["ref"],
       "additionalProperties": false
     },
     "annotations": {
@@ -948,17 +869,72 @@
         },
         "refresh": {
           "type": "boolean"
+        },
+        "operationId": {
+          "type": "string",
+          "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": [
-        "endpoint"
-      ],
+      "required": ["endpoint"],
       "additionalProperties": false
     },
     "annotations": {
       "readOnlyHint": false,
       "destructiveHint": false,
       "openWorldHint": true
+    }
+  },
+  {
+    "name": "map_connection",
+    "description": "Current binding, runtime status, resume snapshot and client resources.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_operation",
+    "description": "Look up the durable task accepted for a submission token.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string"
+        }
+      },
+      "required": ["operationId"],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_jobCleanup",
+    "description": "Explicitly retry cleanup of recorded private temporary files belonging to a cancelled task.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "openWorldHint": false
     }
   }
 ]

@@ -16,3 +16,12 @@
 | 自动检查 | 训练机 34 项测试及 TypeScript 检查通过；Linux／Windows CI 已通过；Windows 执行 portable 子集，真实四端链路按本表单列 |
 
 流水线检查覆盖源码与隔离 fixture；真实端点、账号权限、网络及已安装工具以本表和 PERFORMANCE.md 的对应日期为准。后续版本更新实际覆盖结果与运行记录。
+
+## 0.3.0
+
+- Linux 48 项定向检查与类型检查通过；Windows portable 检查、构建打包由 PR CI 执行。覆盖 receipt 去重与确认丢失、checkpoint 接续、快速继续、真实 helper 断开、主动断开、暂停、取消及清理失败重试、旧任务、旧版分页、迟到游标、阻塞 worker 退出、包命令实际退出状态。
+- 两个同名 Core／relay 地图完成 50 次切换；同一客户端完成 10 次实例替换。Windows 安装窗口完成 10 次真实重载及 50 次绑定，mapId 保持相同，runtime id 更新。
+- Windows、Ubuntu WSL、训练机、推理机目录读取通过。64MiB 文件传输中重载自动接续，任务 ID、SHA-256 和源文件结果符合预期；完成后清理 fixture。
+- 主动暂停、主动断开、取消、旧版无原因记录、权限与源变化沿各自分支处理。包命令取消后保留实际输出和退出状态，重开及相同 operationId 查询沿用原结果。
+- 实际 Codex／当前 dsh headless profile 完成 connection、endpoints、jobsPage 与原任务 operation 收据查询；原全局授权保留，临时 overlay 已撤回。
+- 50 次绑定的 RSS、GC 堆和资源计数稳定；完整 600 秒待机、60 秒旧版条件对照、16MiB 复制与回读对照已记录于 PERFORMANCE.md。独立验收窗口临时回退 0.2.0 完成当前对照，最后沿 0.3.0 Release 升级。

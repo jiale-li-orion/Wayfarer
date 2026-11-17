@@ -1,9 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { EventEmitter } from "node:events";
 import { Endpoints } from "../adapters/registry";
 import { Directories } from "./directories";
+import { EXIT_GRACE_MS } from "./lifecycle";
 import { Jobs, type JobContext } from "./jobs";
 import { Transfers, type TransferInput } from "./transfer";
 import { Profiler } from "./log";
@@ -20,15 +21,58 @@ import { capabilities, recipe } from "../packages/catalog";
 import { Inspector } from "./inspect";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
+  agentStats?: () => any;
   readonly endpoints: Endpoints;
   readonly directories: Directories;
   readonly jobs: Jobs;
+  readonly transfers: Transfers;
   readonly inspector: Inspector;
   private inventories = new Map<string, string>();
   view = defaultView();
   restored = false;
   private timer?: NodeJS.Timeout;
+  private viewWrites = Promise.resolve();
   private navigationRevision = 0;
+  private closing?: Promise<void>;
+  private recovery = new Map<string, NodeJS.Timeout>();
+  private clients = new Set<string>();
+  private stage = "running";
+  private recover(id: string, delay = 1000) {
+    if (this.closing || this.recovery.has(id)) return;
+    const timer = setTimeout(async () => {
+      this.recovery.delete(id);
+      const job = this.jobs.records.get(id);
+      if (
+        this.closing ||
+        job?.state !== "paused" ||
+        job.pauseReason !== "network"
+      )
+        return;
+      const refs = [...job.input.sources, job.input.target];
+      try {
+        for (const endpoint of new Set<string>(
+          refs.map((r: Ref) => r.endpoint),
+        )) {
+          if (!this.endpoints.enabled(endpoint)) return;
+          await this.endpoints.get(endpoint).call("info");
+        }
+        this.jobs.control(id, "resume");
+      } catch {
+        this.recover(id, Math.min(delay * 2, 30000));
+      }
+    }, delay);
+    timer.unref();
+    this.recovery.set(id, timer);
+  }
+  attachClient(id: string) {
+    this.clients.add(id);
+    this.directories.attachOwner(id);
+  }
+  releaseClient(id: string) {
+    this.clients.delete(id);
+    this.directories.releaseOwner(id);
+  }
+
   constructor(
     readonly storage: string,
     helper: string,
@@ -57,10 +101,12 @@ export class Core extends EventEmitter {
     );
     this.inspector = new Inspector(this.endpoints, storage, profile);
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
-    const transfers = new Transfers(this.endpoints, (r) =>
+    const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
       this.invalidateParent(r),
-    );
+    ));
     this.jobs.register("transfer", (c) => transfers.run(c));
+    this.jobs.registerCleanup("transfer", (j) => transfers.cleanup(j));
+    this.jobs.on("recover", (id) => this.recover(id));
     this.jobs.register("package", (c) => runPackage(this.endpoints, c));
     this.jobs.register("search", (c) => this.scan(c, "search"));
     this.jobs.register("size", async (c) => {
@@ -95,17 +141,30 @@ export class Core extends EventEmitter {
       this.restored = true;
       this.directories.restore(s.cache ?? []);
     } catch {}
+    this.jobs.resumeInterrupted();
+    for (const job of this.jobs.records.values())
+      if (job.pauseReason === "network") this.recover(job.id);
   }
   private saveView() {
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => void this.persist(), 300);
+    if (this.closing) return;
+    this.timer = setTimeout(
+      () =>
+        void this.persist().catch((error) =>
+          this.profile.record("view.write", { error: String(error) }),
+        ),
+      300,
+    );
   }
-  private async persist(cache = this.directories.snapshot()) {
-    const p = path.join(this.storage, "view.json");
-    await fs.writeFile(p + ".tmp", JSON.stringify({ view: this.view, cache }), {
-      mode: 0o600,
-    });
-    await fs.rename(p + ".tmp", p);
+  private persist(cache = this.directories.snapshot()) {
+    const file = path.join(this.storage, "view.json");
+    const data = JSON.stringify({ view: this.view, cache });
+    return (this.viewWrites = this.viewWrites
+      .catch(() => {})
+      .then(async () => {
+        await fs.writeFile(file + ".tmp", data, { mode: 0o600 });
+        await fs.rename(file + ".tmp", file);
+      }));
   }
   invalidateParent(r: Ref) {
     this.inspector.invalidate(r.endpoint);
@@ -147,11 +206,86 @@ export class Core extends EventEmitter {
     method: string,
     a: any = {},
     actor: "user" | "agent" = "user",
+    client?: string,
   ): Promise<any> {
+    if (this.stage !== "running") throw Error("Map is closing");
+    if (client && !this.clients.has(client))
+      throw Error("Client connection released");
+    if (
+      a.operationId &&
+      [
+        "write",
+        "transfer",
+        "mkdir",
+        "mkdirPath",
+        "rename",
+        "renamePath",
+        "delete",
+        "package",
+        "inventory",
+        "search",
+        "size",
+      ].includes(method)
+    ) {
+      const ordered = (v: any): any =>
+        Array.isArray(v)
+          ? v.map(ordered)
+          : v && typeof v === "object"
+            ? Object.fromEntries(
+                Object.keys(v)
+                  .sort()
+                  .map((k) => [k, ordered(v[k])]),
+              )
+            : v;
+      const fingerprint = createHash("sha256")
+        .update(JSON.stringify([method, ordered(a)]))
+        .digest("hex");
+      return this.jobs.operation(a.operationId, fingerprint, (id) =>
+        this.execute(method, a, actor, client, {
+          id,
+          operationId: a.operationId,
+          operationFingerprint: fingerprint,
+        }),
+      );
+    }
+    const result = await this.execute(method, a, actor, client);
+    if (
+      [
+        "write",
+        "transfer",
+        "mkdir",
+        "mkdirPath",
+        "rename",
+        "renamePath",
+        "delete",
+        "package",
+        "inventory",
+        "size",
+        "search",
+      ].includes(method)
+    )
+      await this.jobs.durable();
+    return result;
+  }
+  private async execute(
+    method: string,
+    a: any,
+    actor: "user" | "agent",
+    client?: string,
+    identity?: {
+      id: string;
+      operationId: string;
+      operationFingerprint: string;
+    },
+  ): Promise<any> {
+    const submit = (kind: string, input: any, locks: string[] = []) =>
+      this.jobs.submit(kind, input, locks, identity);
     switch (method) {
       case "endpointControl": {
-        if (a.action === "disconnect") this.endpoints.disconnect(a.endpoint);
-        else if (a.action === "connect") {
+        if (a.action === "disconnect") {
+          this.jobs.pauseEndpoint(a.endpoint);
+          await this.endpoints.disconnect(a.endpoint);
+        } else if (a.action === "connect") {
           const e = this.endpoints.connect(a.endpoint);
           await e.call("info");
           this.directories.invalidate({
@@ -159,19 +293,39 @@ export class Core extends EventEmitter {
             path: e.config.root,
           });
         } else throw Error("Unknown connection action");
-        this.directories.watch([]);
+        this.directories.refreshConnections();
         this.emit("event", {
           type: "endpoints",
           endpoints: this.endpoints.configs(),
         });
         return true;
       }
+      case "clientAttach":
+        return { view: this.view, tasks: this.jobs.list() };
+      case "operation":
+        return (await this.jobs.receipt(a.operationId)) ?? null;
+      case "jobCleanup":
+        return this.jobs.cleanupTask(a.id);
       case "endpoints":
         return this.endpoints.configs();
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
         return {
+          endpointLifecycle: this.endpoints.stats(),
+          host: {
+            pid: process.pid,
+            scope: "shared-extension-host",
+            memory: process.memoryUsage(),
+            cpu: process.cpuUsage(),
+          },
+          agents: this.agentStats?.(),
+          transfers: this.transfers.stats(),
+          lifecycle: {
+            stage: this.stage,
+            clients: this.clients.size,
+            recoveryWaiters: this.recovery.size,
+          },
           directories: this.directories.stats(),
           jobs: this.jobs.stats(),
           inspector: this.inspector.stats(),
@@ -194,7 +348,7 @@ export class Core extends EventEmitter {
           a.ref,
           a.cursor,
           a.refresh,
-          actor === "agent" ? "agent" : "ui",
+          actor === "agent" ? (client ?? "agent") : "ui",
         );
       case "stat": {
         const endpoint = this.endpoints.get(a.ref.endpoint);
@@ -228,11 +382,21 @@ export class Core extends EventEmitter {
         await fs.mkdir(dir, { recursive: true, mode: 0o700 });
         const inputFile = path.join(dir, randomUUID());
         await fs.writeFile(inputFile, b, { mode: 0o600 });
-        return this.jobs.submit(
-          "mutation",
-          { method: "write", ref: a.ref, inputFile, exclusive: !!a.exclusive },
-          [alias(e.config, a.ref.path)],
-        );
+        try {
+          return submit(
+            "mutation",
+            {
+              method: "write",
+              ref: a.ref,
+              inputFile,
+              exclusive: !!a.exclusive,
+            },
+            [alias(e.config, a.ref.path)],
+          );
+        } catch (error) {
+          await fs.rm(inputFile, { force: true });
+          throw error;
+        }
       }
       case "watch":
         this.directories.watch(a.refs);
@@ -284,7 +448,11 @@ export class Core extends EventEmitter {
               path: pathApi(e.config).dirname(ref.path),
             };
         }
-        if (revision !== this.navigationRevision) return this.view;
+        if (
+          revision !== this.navigationRevision ||
+          (client && !this.clients.has(client))
+        )
+          return this.view;
         if (actor === "agent") {
           this.view.agent = ref;
           this.view.agentEntry = entry;
@@ -350,7 +518,7 @@ export class Core extends EventEmitter {
         const keys = [...i.sources, ...targets].map((r) =>
           alias(this.endpoints.get(r.endpoint).config, r.path),
         );
-        return this.jobs.submit("transfer", i, keys);
+        return submit("transfer", i, keys);
       }
       case "mkdir":
       case "rename":
@@ -361,7 +529,7 @@ export class Core extends EventEmitter {
           method === "delete"
             ? this.selectedRoots(a.refs ?? [a.ref])
             : (a.refs ?? [a.ref]);
-        return this.jobs.submit(
+        return submit(
           "mutation",
           { method, ...a, ...(method === "delete" ? { refs } : {}) },
           refs.flatMap((r) => {
@@ -382,9 +550,9 @@ export class Core extends EventEmitter {
       }
       case "search":
         if (!String(a.query ?? "").trim()) throw Error("请输入搜索名称");
-        return this.jobs.submit(method, a);
+        return submit(method, a);
       case "size":
-        return this.jobs.submit(method, a);
+        return submit(method, a);
       case "inspect":
         return this.inspector.detail(a.ref, !!a.refresh);
       case "projects":
@@ -404,12 +572,12 @@ export class Core extends EventEmitter {
       case "inventory": {
         const key = JSON.stringify([a.endpoint, a.cwd ?? ""]);
         const previous = this.inventories.get(key);
-        if (previous) {
+        if (previous && !identity) {
           const job = this.jobs.records.get(previous);
           if (job && ["running", "queued"].includes(job.state))
             return this.jobs.summary(job);
         }
-        const job = this.jobs.submit("inventory", a);
+        const job = submit("inventory", a);
         this.inventories.set(key, job.id);
         return this.jobs.summary(job);
       }
@@ -468,7 +636,7 @@ export class Core extends EventEmitter {
           if (environment) locks.push(alias(config, environment));
         }
         if (a.entry) locks.push(alias(config, a.entry));
-        return this.jobs.submit("package", a, locks);
+        return submit("package", a, locks);
       }
       case "profile":
         this.profile.record(a.stage, a.fields);
@@ -656,14 +824,37 @@ export class Core extends EventEmitter {
     }
     return c.job.result;
   }
-  async dispose() {
+  dispose() {
+    return (this.closing ??= this.close());
+  }
+  private async close() {
+    const deadline = Date.now() + EXIT_GRACE_MS;
+    this.stage = "draining";
     clearTimeout(this.timer);
+    for (const timer of this.recovery.values()) clearTimeout(timer);
+    this.recovery.clear();
+    for (const id of this.clients) this.releaseClient(id);
     const cache = this.directories.snapshot();
     this.directories.dispose();
-    await this.jobs.dispose();
-    await this.inspector.dispose();
-    await this.persist(cache);
-    this.endpoints.dispose();
-    this.profile.stop();
+    try {
+      await this.jobs.dispose(() => this.endpoints.abort());
+      this.stage = "persisting";
+      await this.inspector.dispose();
+      await this.persist(cache);
+    } finally {
+      this.stage = "helpers";
+      try {
+        await this.endpoints.dispose(deadline);
+        await this.directories.drain();
+      } finally {
+        this.stage = "closed";
+        this.profile.record("map.closed", {
+          jobs: this.jobs.stats(),
+          directories: this.directories.stats(),
+        });
+        this.removeAllListeners();
+        this.profile.stop();
+      }
+    }
   }
 }

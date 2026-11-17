@@ -3,6 +3,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { Core } from "./core/core";
+import { EXIT_GRACE_MS } from "./core/lifecycle";
 import { Profiler } from "./core/log";
 import { Bridge } from "./mcp/bridge";
 import { connectCodex, connectDsh, dshProfiles } from "./mcp/integrations";
@@ -10,7 +11,8 @@ import { FileProvider } from "./filesystem/provider";
 import type { Ref, EndpointConfig } from "./shared/types";
 import { pathApi } from "./shared/paths";
 import { capabilities } from "./packages/catalog";
-let active: { core: Core; bridge: Bridge } | undefined;
+let active:
+  { core: Core; bridge: Bridge; release: () => Promise<void> } | undefined;
 export async function activate(context: vscode.ExtensionContext) {
   const output = vscode.window.createOutputChannel("Workspace Map", {
     log: true,
@@ -21,28 +23,40 @@ export async function activate(context: vscode.ExtensionContext) {
     context.workspaceState.get<string>("mapStorageId") ?? randomUUID();
   let storage = path.join(context.globalStorageUri.fsPath, stored);
   await fs.mkdir(storage, { recursive: true });
-  try {
-    const owner = JSON.parse(
-      await fs.readFile(path.join(storage, "owner.json"), "utf8"),
-    );
+  const ownerToken = randomUUID();
+  const owners = path.join(storage, "owners");
+  await fs.mkdir(owners, { recursive: true });
+  const files = (await fs.readdir(owners)).map((name) =>
+    path.join(owners, name),
+  );
+  files.push(path.join(storage, "owner.json")); // Upgrade from the previous pid-only record.
+  let occupied = false;
+  for (const file of files) {
+    const owner = await fs
+      .readFile(file, "utf8")
+      .then(JSON.parse, () => undefined);
+    if (!owner) continue;
     try {
       process.kill(owner.pid, 0);
-      stored = randomUUID();
-      storage = path.join(context.globalStorageUri.fsPath, stored);
-    } catch {}
-  } catch {}
-  await fs.mkdir(storage, { recursive: true });
+      occupied = true;
+    } catch {
+      await fs.unlink(file).catch(() => {});
+    }
+  }
+  if (occupied) {
+    stored = randomUUID();
+    storage = path.join(context.globalStorageUri.fsPath, stored);
+  }
+  const ownerFile = path.join(storage, "owners", ownerToken + ".json");
+  await fs.mkdir(path.dirname(ownerFile), { recursive: true });
   await fs.writeFile(
-    path.join(storage, "owner.json"),
-    JSON.stringify({ pid: process.pid }),
-    { mode: 0o600 },
+    ownerFile,
+    JSON.stringify({ pid: process.pid, token: ownerToken, mapId: stored }),
+    { mode: 0o600, flag: "wx" },
   );
   await context.workspaceState.update("mapStorageId", stored);
-  context.subscriptions.push({
-    dispose: () => {
-      void fs.unlink(path.join(storage, "owner.json")).catch(() => {});
-    },
-  });
+  // Each instance removes only the record whose name contains its own token.
+  const release = () => fs.unlink(ownerFile).catch(() => {});
   const config = vscode.workspace.getConfiguration("workspaceMap");
   const helper = path.join(context.extensionPath, "dist/helpers/endpoint.py");
   const core = new Core(storage, helper, profile, {
@@ -60,8 +74,10 @@ export async function activate(context: vscode.ExtensionContext) {
     core,
     path.join(context.extensionPath, "dist/helpers"),
     vscode.workspace.name ?? "Workspace Map",
+    stored,
   );
-  active = { core, bridge };
+  core.agentStats = () => bridge.stats();
+  active = { core, bridge, release };
   void bridge.start();
   const provider = new FileProvider(core);
   context.subscriptions.push(
@@ -415,6 +431,7 @@ export async function activate(context: vscode.ExtensionContext) {
         language: "json",
         content: JSON.stringify(
           {
+            mapId: bridge.mapId,
             session: bridge.id,
             wsl: bridge.config(c.c),
             windows: bridge.config(c.c, true),
@@ -558,7 +575,16 @@ export async function deactivate() {
   const a = active;
   active = undefined;
   if (a) {
-    a.bridge.dispose();
-    await a.core.dispose();
+    const deadline = Date.now() + EXIT_GRACE_MS;
+    a.bridge.stopIngress();
+    try {
+      await a.core.dispose();
+    } finally {
+      try {
+        await a.bridge.dispose(deadline);
+      } finally {
+        await a.release();
+      }
+    }
   }
 }

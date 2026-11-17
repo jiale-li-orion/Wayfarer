@@ -12,6 +12,23 @@ const pending = new Map<
 >();
 const listeners = new Set<(v: any) => void>();
 export function rpc<T = any>(method: string, args: any = {}): Promise<T> {
+  if (
+    [
+      "write",
+      "transfer",
+      "mkdir",
+      "mkdirPath",
+      "rename",
+      "renamePath",
+      "delete",
+      "package",
+      "inventory",
+      "size",
+      "search",
+    ].includes(method) &&
+    !args.operationId
+  )
+    args = { ...args, operationId: crypto.randomUUID() };
   const id = pageId + ":" + ++seq;
   vscode.postMessage({ id, method, args });
   return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
@@ -44,3 +61,14 @@ export function subscribeJobs(listener: (event: any) => void) {
     if (--jobReaders === 0) void rpc("jobSubscription", { enabled: false });
   };
 }
+
+window.addEventListener(
+  "pagehide",
+  () => {
+    for (const p of pending.values()) p.reject(Error("Map panel closed"));
+    pending.clear();
+    listeners.clear();
+    jobReaders = 0;
+  },
+  { once: true },
+);

@@ -7,15 +7,28 @@ import type { Endpoint, EndpointConfig } from "../shared/types";
 export class Endpoints {
   readonly items = new Map<string, Endpoint>();
   private disconnected = new Set<string>();
+  private retiring = new Map<Endpoint, Promise<void>>();
+  stats() {
+    return { retiring: this.retiring.size };
+  }
+  private retire(endpoint: Endpoint) {
+    if (this.retiring.has(endpoint)) return;
+    const closing = Promise.resolve(endpoint.dispose()).catch((error) =>
+      this.log("endpoint.close: " + String(error)),
+    );
+    this.retiring.set(endpoint, closing);
+    void closing.finally(() => this.retiring.delete(endpoint));
+  }
+
   enabled(id: string) {
     return !this.disconnected.has(id);
   }
-  disconnect(id: string) {
+  async disconnect(id: string) {
     const endpoint = this.get(id);
     if (!["ssh", "wsl"].includes(endpoint.config.kind))
       throw Error("本机文件系统保持可用");
-    endpoint.dispose();
     this.disconnected.add(id);
+    await endpoint.dispose();
   }
   connect(id: string) {
     const endpoint = this.items.get(id);
@@ -30,7 +43,8 @@ export class Endpoints {
   add(c: EndpointConfig) {
     if (!/^[a-zA-Z0-9_-]+$/.test(c.id))
       throw Error("Endpoint id must use letters, numbers, _ or -");
-    this.items.get(c.id)?.dispose();
+    const previous = this.items.get(c.id);
+    if (previous) this.retire(previous);
     this.disconnected.delete(c.id);
     const e =
       c.kind === "local" || c.kind === "windows"
@@ -101,7 +115,15 @@ export class Endpoints {
       });
     for (const c of extra) this.add(c);
   }
-  dispose() {
-    for (const e of this.items.values()) e.dispose();
+  abort() {
+    for (const e of new Set([...this.items.values(), ...this.retiring.keys()]))
+      e.abort?.();
+  }
+  async dispose(deadline?: number) {
+    await Promise.all(
+      [...this.items.values()]
+        .map((e) => e.dispose(deadline))
+        .concat([...this.retiring.values()]),
+    );
   }
 }
