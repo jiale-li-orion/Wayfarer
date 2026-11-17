@@ -1,0 +1,71 @@
+{
+  "baseline-repeat": {
+    "windowsUIHost": {
+      "pid": 26864,
+      "rssMedianMiB": 124.86,
+      "rssPeakMiB": 125.04,
+      "pssMedianMiB": 0.0,
+      "privateMedianMiB": 122.24,
+      "cpuPercentOfOneCore": 0.026,
+      "fdsLast": null,
+      "handlesLast": 410
+    },
+    "wslHost": {
+      "pid": 432726,
+      "rssMedianMiB": 463.6,
+      "rssPeakMiB": 468.95,
+      "pssMedianMiB": 413.95,
+      "privateMedianMiB": 0.0,
+      "cpuPercentOfOneCore": 2.846,
+      "fdsLast": 70,
+      "handlesLast": null
+    },
+    "windowsSamples": 12,
+    "linuxSamples": 13,
+    "seconds": 59.97,
+    "warmOperationMedianMs": 97.38,
+    "warmOperationP95Ms": 712.24,
+    "coldOperationsMs": [
+      369.29,
+      1785.79
+    ]
+  },
+  "candidate-repeat": {
+    "windowsUIHost": {
+      "pid": 18608,
+      "rssMedianMiB": 134.05,
+      "rssPeakMiB": 134.11,
+      "pssMedianMiB": 0.0,
+      "privateMedianMiB": 126.61,
+      "cpuPercentOfOneCore": 0.026,
+      "fdsLast": null,
+      "handlesLast": 400
+    },
+    "wslHost": {
+      "pid": 437163,
+      "rssMedianMiB": 316.02,
+      "rssPeakMiB": 334.0,
+      "pssMedianMiB": 263.01,
+      "privateMedianMiB": 0.0,
+      "cpuPercentOfOneCore": 5.336,
+      "fdsLast": 68,
+      "handlesLast": null
+    },
+    "windowsSamples": 13,
+    "linuxSamples": 13,
+    "seconds": 59.97,
+    "warmOperationMedianMs": 105.05,
+    "warmOperationP95Ms": 167.02,
+    "coldOperationsMs": [
+      465.75,
+      3345.09
+    ]
+  },
+  "clipboard": {
+    "fixtureReady": true,
+    "restored": false,
+    "userClipboardChanged": true,
+    "syntheticImageCleared": true,
+    "restorationFailure": "Clipboard sequence changed during Windows format promotion; original clipboard was not restored. Synthetic image cleared after matching its full payload."
+  }
+}

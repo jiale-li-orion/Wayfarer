@@ -81,3 +81,7 @@ MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用�
 | 定位已加载节点 | Ctrl+0 | 地图 |
 
 macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜索 Workspace Map 后修改。侧边栏沿用 VS Code 的方向键、Enter 和展开／收起操作。
+
+### 与现有 VS Code 生态协作
+
+[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)记录实际精简与对照条件；[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)梳理现有语言服务、扩展工具、Codex 实验 LSP MCP 与 Wayfarer 的接入边界。本轮新增评审和开发探针，产品接口保持现状。

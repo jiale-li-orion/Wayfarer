@@ -2,6 +2,12 @@
 
 训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像与 VSIX：`/home/orion/agent-system-learning/workspace-map`。开发在训练机独立 worktree，本机安装验收。仓库为 `jiale-li-orion/Wayfarer`，插件显示名称 Workspace Map。
 
+## 环境精简与生态评审（2026-11-18）
+
+日常 Windows／WSL 处置已完成：12 种扩展的 14 份安装移除；停用内置 Copilot 业务入口，保留编辑、语言与专业生态。约 60 秒对照中 WSL 宿主 PSS 414 → 263MiB，CPU 原值单列。图标项目识别路径问题通过支持的设置处理，地图 MCP 改用稳定 mapId。四端目录、TS 查询和缓冲区修改、停用 Copilot 后的现有工具调用通过；dsh CLI 启动通过。图片插入通过，剪贴板恢复失败已记录并移除一次性脚本。
+
+[资源与处置](docs/ENVIRONMENT_AUDIT.md)与[共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)为本轮交付。已确认 Codex 两端包中有默认关闭的实验 LSP MCP（诊断／引用／工作区符号），下一轮先评审复用，再补缺口。公共 API 与 0.3.1 产品实现保持现状。
+
 ## 当前入口更新
 
 0.3.1 补齐原生活动栏／侧边栏和快捷键，复用 0.3.0 地图、任务与 Agent 核心。原生活动栏、机器／书签／操作导航与快捷键已完成独立窗口验收；类型检查、48 项检查与打包通过。Windows 推理机桥接本轮出现退出码 4294967295，保留为验收缺口。详见 docs/ACCEPTANCE.md。
