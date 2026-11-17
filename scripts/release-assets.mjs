@@ -19,7 +19,7 @@ await fs.writeFile(
   "artifacts/release.json",
   JSON.stringify(release, null, 2) + "\n",
 );
-const changes = await fs.readFile("CHANGELOG.md", "utf8");
+const changes = (await fs.readFile("CHANGELOG.md", "utf8")).replace(/\r\n/g,"\n");
 const section = changes
   .split("## " + pkg.version + "\n")[1]
   ?.split("\n## ")[0]
