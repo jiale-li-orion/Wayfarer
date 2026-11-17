@@ -92,6 +92,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   );
   context.subscriptions.push(createSidebar(core));
+  await vscode.commands.executeCommand(
+    "setContext",
+    "workspaceMap.textInputFocus",
+    false,
+  );
   let panel: vscode.WebviewPanel | undefined;
   let ready = false;
   let pendingAction: string | undefined;

@@ -76,18 +76,17 @@ window.addEventListener(
 // VS Code inputFocus covers workbench inputs; DOM inputs inside a Webview
 // publish their own context so map shortcuts leave text editing in place.
 let textFocused = false;
-const updateTextFocus = () => {
+const updateTextFocus = (force = false) => {
   const element = document.activeElement;
   const focused =
     element instanceof HTMLElement &&
     (element.matches("input,textarea,select") || element.isContentEditable);
-  if (focused === textFocused) return;
+  if (!force && focused === textFocused) return;
   textFocused = focused;
   void rpc("textInputFocus", { focused }).catch(() => {});
 };
-window.addEventListener("focusin", updateTextFocus);
-window.addEventListener("focusout", () => queueMicrotask(updateTextFocus));
-window.addEventListener("focus", () => {
-  textFocused = false;
-  updateTextFocus();
-});
+window.addEventListener("focusin", () => updateTextFocus());
+window.addEventListener("focusout", () =>
+  queueMicrotask(() => updateTextFocus()),
+);
+window.addEventListener("focus", () => updateTextFocus(true));
