@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -96,6 +96,11 @@
         "command": "workspaceMap.fit",
         "title": "Workspace Map: 定位已加载节点",
         "icon": "$(screen-full)"
+      },
+      {
+        "command": "workspaceMap.resources",
+        "title": "Workspace Map: 查看机器资源",
+        "icon": "$(pulse)"
       }
     ],
     "configuration": {
@@ -117,6 +122,11 @@
           "default": 2,
           "minimum": 1,
           "maximum": 8
+        },
+        "workspaceMap.monitorPython": {
+          "type": "string",
+          "default": "",
+          "description": "Local resource collector Python executable (standard library only). Empty uses python on Windows or python3 on Linux."
         }
       }
     },
@@ -211,7 +221,7 @@
     "bench:lifecycle": "tsx scripts/benchmark-lifecycle.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix && node scripts/release-assets.mjs",
     "vscode:prepublish": "npm run build",
-    "test:portable": "tsx --test tests/portable.test.ts"
+    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",

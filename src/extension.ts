@@ -3,6 +3,7 @@ import path from "node:path";
 import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { createSidebar } from "./sidebar";
+import { createResourceView } from "./resources";
 import { Core } from "./core/core";
 import { EXIT_GRACE_MS } from "./core/lifecycle";
 import { Profiler } from "./core/log";
@@ -63,6 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const core = new Core(storage, helper, profile, {
     pageSize: config.get<number>("pageSize"),
     transferConcurrency: config.get<number>("transferConcurrency"),
+    monitorPython: config.get<string>("monitorPython") || undefined,
     trash: async (p) => {
       await vscode.workspace.fs.delete(vscode.Uri.file(p), {
         recursive: true,
@@ -92,6 +94,7 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   );
   context.subscriptions.push(createSidebar(core));
+  context.subscriptions.push(createResourceView(context, core));
   await vscode.commands.executeCommand(
     "setContext",
     "workspaceMap.textInputFocus",
@@ -544,7 +547,7 @@ export async function activate(context: vscode.ExtensionContext) {
   let cpu = process.cpuUsage();
   let at = performance.now();
   const sampling = new Set<string>();
-  const resourceTimer = setInterval(() => {
+  const sampleResources = () => {
     const next = process.cpuUsage();
     const now = performance.now();
     const memory = process.memoryUsage();
@@ -580,9 +583,35 @@ export async function activate(context: vscode.ExtensionContext) {
         )
         .finally(() => sampling.delete(id));
     }
-  }, 15000);
-  resourceTimer.unref();
-  context.subscriptions.push({ dispose: () => clearInterval(resourceTimer) });
+  };
+  let resourceTimer: NodeJS.Timeout | undefined;
+  const resourceActivity = () => {
+    if (core.jobs.busyCount() && !resourceTimer) {
+      resourceTimer = setInterval(sampleResources, 15000);
+      resourceTimer.unref();
+    } else if (!core.jobs.busyCount() && resourceTimer) {
+      clearInterval(resourceTimer);
+      resourceTimer = undefined;
+    }
+  };
+  core.jobs.on("change", resourceActivity);
+  resourceActivity();
+  const monitorSample = () => {
+    profile.record("host.resources", {
+      scope: "shared-extension-host",
+      rss: process.memoryUsage().rss,
+      cpu: process.cpuUsage(),
+      monitor: core.monitor.stats(),
+    });
+  };
+  core.monitor.on("sample", monitorSample);
+  context.subscriptions.push({
+    dispose: () => {
+      if (resourceTimer) clearInterval(resourceTimer);
+      core.jobs.off("change", resourceActivity);
+      core.monitor.off("sample", monitorSample);
+    },
+  });
 }
 async function addEndpoint(core: Core, config: vscode.WorkspaceConfiguration) {
   const wsls = core.endpoints

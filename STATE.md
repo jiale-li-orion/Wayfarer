@@ -25,3 +25,7 @@ PR #3 交付 Agent resume、自动续传与资源生命周期，已完成连接�
 - 产品关系见 ARCHITECTURE.md；升级、回退和配置见 docs/RELEASE.md；性能原始记录见 docs/performance-data。
 
 发布沿 GitHub PR、main 检查与 v0.3.0 标签生成 VSIX、SHA-256 和提交元数据。交付后清理开发工作树。协同整理与 Marketplace 按后续需求推进。
+
+## 0.4.0 四端资源与轻量化
+
+训练机 worktree：/data/users/lijiale/worktrees/workspace-map-system-resources，分支 feat/system-resources。四端采集、资源页、只读 map_systemResources、记录／导出已接通；53 项检查通过。Windows、WSL、训练机 8 GPU、推理机 1 GPU 已通过实际采集，Codex 与 dsh 已用新 MCP 接口只读调用。长时与真实显隐验收正在进行，交付时补齐实测数据、VSIX 和 PR。详见 docs/SYSTEM_RESOURCES.md。

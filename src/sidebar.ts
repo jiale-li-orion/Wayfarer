@@ -34,6 +34,7 @@ export function createSidebar(core: Core): vscode.Disposable {
     ["connectCodex", "接入 Codex", "plug"],
     ["connectDsh", "接入 dsh", "plug"],
     ["mcpConfig", "MCP 配置", "settings-gear"],
+    ["resources", "机器资源", "pulse"],
     ["logs", "性能日志", "output"],
   ];
   const provider: vscode.TreeDataProvider<Item> = {

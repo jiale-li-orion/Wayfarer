@@ -17,3 +17,7 @@ docs/performance-data/**
 PERFORMANCE.md
 
 .github/**
+
+docs/images/**
+**/__pycache__/**
+**/*.pyc
