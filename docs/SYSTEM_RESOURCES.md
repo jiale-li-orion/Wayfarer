@@ -46,3 +46,13 @@ NVIDIA 优先通过驱动的 NVML 读取 GPU 利用率、显存、温度、功�
 实际 CPU／内存、驱动核对及编辑／传输兼容结果记入 PERFORMANCE.md 和 docs/ACCEPTANCE.md。研发在训练机独立工作树，本机验收配置、工具版本和授权策略各自保留。
 
 Windows PDH 按摘要、进程 GPU 内存和磁盘／网络分组收集，切换页签后停止读取未选中的计数器组；差分基线过期后重新预热。Windows 本地脚本使用原生文件对话框和独立临时目录验证导出，采集与文件传输分别记录资源和内容校验结果。
+
+## 实机界面
+
+总览 → 单机 GPU 列表 → GPU 详情。公开截图遮盖设备 UUID。
+
+![机器总览](images/resources/01-overview.png)
+
+![单机 GPU 列表](images/resources/02-machine-gpus.png)
+
+![GPU 详情](images/resources/03-gpu-detail.png)
