@@ -62,6 +62,18 @@ export async function connect() {
     }
     if (m.method === "Runtime.executionContextCreated")
       contexts.push({ session: m.sessionId, ...m.params.context });
+    if (
+      m.method === "Runtime.executionContextDestroyed" ||
+      m.method === "Runtime.executionContextsCleared"
+    ) {
+      for (let i = contexts.length - 1; i >= 0; i--)
+        if (
+          contexts[i].session === m.sessionId &&
+          (m.method.endsWith("Cleared") ||
+            contexts[i].id === m.params.executionContextId)
+        )
+          contexts.splice(i, 1);
+    }
   };
   await new Promise((r, j) => {
     ws.onopen = r;
@@ -92,15 +104,19 @@ export async function connect() {
       );
   };
   const command = async (text) => {
-    if (!/^acceptance(?:-[a-z-]+)? \(Workspace\)$/.test(session.name))
+    if (
+      !/^acceptance(?:-[a-z-]+)? \((?:Workspace|工作区)\)(?: \[WSL: [^\]]+\])?$/.test(
+        session.name,
+      )
+    )
       throw Error("Use an isolated acceptance window");
-    const title = ("*" + session.name + "*").replaceAll("'", "''");
+    const title = session.name.replaceAll("'", "''");
     const script = `Add-Type @"
 using System;
 using System.Runtime.InteropServices;
 public class MapWindow { [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h,int n); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }
 "@
-$p=Get-Process Code | Where-Object { $_.MainWindowTitle -like '${title}' } | Select-Object -First 1
+$p=Get-Process Code | Where-Object { $_.MainWindowTitle.Contains('${title}') } | Select-Object -First 1
 if (!$p) { throw 'Acceptance window missing' }
 [MapWindow]::ShowWindow($p.MainWindowHandle,9) | Out-Null
 [MapWindow]::SetForegroundWindow($p.MainWindowHandle) | Out-Null`;
@@ -176,27 +192,56 @@ if (!$p) { throw 'Acceptance window missing' }
       )
     ).result.value;
   }
+  let canvasTarget, canvasSession;
   async function canvas() {
-    for (let n = 0; n < 40; n++) {
+    if (canvasSession)
+      await call("Target.detachFromTarget", { sessionId: canvasSession }).catch(
+        () => {},
+      );
+    canvasSession = undefined;
+    canvasTarget = undefined;
+    for (let n = 0; n < 200; n++) {
       const t = (await targets()).find(
         (t) =>
           t.type === "iframe" &&
           t.url.includes("extensionId=orion-workspace.workspace-map"),
       );
       if (t) {
-        const s = (
-          await call("Target.attachToTarget", {
-            targetId: t.targetId,
-            flatten: true,
-          })
-        ).sessionId;
-        await call("Runtime.enable", {}, s);
-        for (const c of contexts.filter((c) => c.session === s)) {
+        if (canvasTarget !== t.targetId) {
+          if (canvasSession)
+            await call("Target.detachFromTarget", {
+              sessionId: canvasSession,
+            }).catch(() => {});
+          canvasTarget = t.targetId;
+          canvasSession = (
+            await call("Target.attachToTarget", {
+              targetId: t.targetId,
+              flatten: true,
+            })
+          ).sessionId;
+          await call("Runtime.enable", {}, canvasSession);
+        }
+        const s = canvasSession;
+        const nested = await call(
+          "Runtime.evaluate",
+          {
+            expression:
+              '!!document.getElementById("active-frame")?.contentDocument?.getElementById("root")?.childElementCount',
+            returnByValue: true,
+          },
+          s,
+        );
+        if (nested.result?.value) {
+          await call("Performance.enable", {}, s);
+          return { session: s, nested: true };
+        }
+        for (const c of contexts.filter((c) => c.session === s).reverse()) {
           const r = await call(
             "Runtime.evaluate",
             {
               contextId: c.id,
-              expression: '!!document.getElementById("root")',
+              expression:
+                '!!document.getElementById("root")?.childElementCount',
               returnByValue: true,
             },
             s,
@@ -217,6 +262,8 @@ if (!$p) { throw 'Acceptance window missing' }
     throw Error("Map canvas not ready");
   }
   const evaluate = async (c, expression, awaitPromise = false) => {
+    if (c.nested)
+      expression = `((document,window)=>(${expression}))(document.getElementById("active-frame").contentDocument,document.getElementById("active-frame").contentWindow)`;
     const r = await call(
       "Runtime.evaluate",
       { contextId: c.context, expression, returnByValue: true, awaitPromise },

@@ -1,5 +1,6 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import fs from "node:fs/promises";
+import { deflateSync } from "node:zlib";
 import { createInterface } from "node:readline";
 import {
   grace,
@@ -64,6 +65,9 @@ export class RemoteEndpoint implements Endpoint {
     private helperPath: string,
     private log: (s: string) => void = () => {},
   ) {}
+  transportStats() {
+    return { ...this.metrics, pending: this.pending.size };
+  }
   get connected() {
     return !!this.child;
   }
@@ -75,12 +79,23 @@ export class RemoteEndpoint implements Endpoint {
       const source = await fs.readFile(this.helperPath, "utf8");
       if (this.closed) throw Error("Endpoint connection closed");
       const launcher =
-        "import base64;exec(compile(base64.b64decode(" +
-        JSON.stringify(Buffer.from(source).toString("base64")) +
-        '),"<workspace-map>","exec"))';
+        "import base64,zlib;exec(compile(zlib.decompress(base64.b64decode(" +
+        JSON.stringify(deflateSync(Buffer.from(source)).toString("base64")) +
+        "))," +
+        JSON.stringify(
+          this.helperPath.endsWith("monitor.py")
+            ? "<workspace-map-monitor>"
+            : "<workspace-map>",
+        ) +
+        ',"exec"))';
       const python = this.config.python ?? "python3";
       let command: string, args: string[];
-      if (this.config.kind === "wsl") {
+      if (["local", "windows"].includes(this.config.kind)) {
+        command =
+          this.config.python ??
+          (process.platform === "win32" ? "python" : "python3");
+        args = ["-u", "-c", launcher];
+      } else if (this.config.kind === "wsl") {
         command = "wsl.exe";
         args = [
           "-d",

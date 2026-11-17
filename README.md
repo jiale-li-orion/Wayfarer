@@ -81,3 +81,7 @@ MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用�
 | 定位已加载节点 | Ctrl+0 | 地图 |
 
 macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜索 Workspace Map 后修改。侧边栏沿用 VS Code 的方向键、Enter 和展开／收起操作。
+
+### 机器资源
+
+侧边栏「常用操作 → 机器资源」查看 Windows、WSL 与 SSH 主机；四端摘要、进程分页、GPU 和磁盘／网络逐级展开。页面隐藏停止自动采样，明确开始的记录保留后台生命周期。MCP 使用只读 `map_systemResources`；具体口径、资源归属和导出见 [说明](docs/SYSTEM_RESOURCES.md)。

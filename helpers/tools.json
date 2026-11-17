@@ -936,5 +936,65 @@
       "destructiveHint": true,
       "openWorldHint": false
     }
+  },
+  {
+    "name": "map_systemResources",
+    "description": "Read machine resource summaries, paginated processes, GPUs and selected process/GPU details. Queries reuse visible UI samples; a one-off request releases its collector afterward. CPU per process is percent of one logical CPU. Windows commit/working set and Linux RSS/PSS are distinct. No process arguments or environment are returned. Omit endpoint to list machine targets and cached summaries; then pass its endpoint to sample.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        },
+        "section": {
+          "type": "string",
+          "enum": [
+            "summary",
+            "processes",
+            "gpus",
+            "io",
+            "process",
+            "gpu"
+          ]
+        },
+        "search": {
+          "type": "string"
+        },
+        "sort": {
+          "type": "string",
+          "enum": [
+            "rss",
+            "cpuPercent",
+            "gpuMemory",
+            "pid",
+            "name"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "pid": {
+          "type": "integer"
+        },
+        "identity": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true
+    }
   }
 ]
