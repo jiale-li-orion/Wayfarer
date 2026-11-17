@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -75,6 +75,7 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "bench": "tsx scripts/benchmark.ts",
+    "bench:lifecycle": "tsx scripts/benchmark-lifecycle.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix",
     "vscode:prepublish": "npm run build"
   },

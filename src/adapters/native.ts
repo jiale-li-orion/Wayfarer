@@ -9,6 +9,7 @@ import type { Endpoint, EndpointConfig, Entry } from "../shared/types";
 import { changed, normalized } from "../shared/paths";
 type Scan = {
   sequence: number;
+  users: number;
   lastSequence?: number;
   lastPage?: any;
   gate?: Promise<void>;
@@ -22,6 +23,20 @@ type Scan = {
 export class NativeEndpoint implements Endpoint {
   private closed = false;
   private scans = new Map<string, Scan>();
+  private scanTimer?: NodeJS.Timeout;
+  private syncScanTimer() {
+    if (this.scans.size && !this.scanTimer && !this.closed) {
+      this.scanTimer = setInterval(() => {
+        for (const [id, scan] of this.scans)
+          if (!scan.users && Date.now() - scan.time > 120000)
+            void this.closeScan(id);
+      }, 30000);
+      this.scanTimer.unref();
+    } else if (!this.scans.size || this.closed) {
+      clearInterval(this.scanTimer);
+      this.scanTimer = undefined;
+    }
+  }
   private procs = new Map<
     string,
     {
@@ -140,6 +155,9 @@ export class NativeEndpoint implements Endpoint {
         );
         break;
       case "resources":
+        for (const [id, scan] of this.scans)
+          if (!scan.users && Date.now() - scan.time > 120000)
+            await this.closeScan(id);
         r = {
           scope: "shared-extension-host",
           pid: process.pid,
@@ -147,6 +165,10 @@ export class NativeEndpoint implements Endpoint {
           cpu: process.cpuUsage(),
           cursors: this.scans.size,
           processes: this.procs.size,
+          children: [...this.procs.values()].map((p) => ({
+            pid: p.child.pid,
+            exitCode: p.code,
+          })),
         };
         break;
       case "sshHosts": {
@@ -401,7 +423,7 @@ export class NativeEndpoint implements Endpoint {
   }
   private async list(p: string, a: any) {
     for (const [id, s] of this.scans)
-      if (Date.now() - s.time > 120000) await this.closeScan(id);
+      if (!s.users && Date.now() - s.time > 120000) await this.closeScan(id);
     const id = a.cursor?.split(":")[0] ?? randomUUID();
     const sequence = a.cursor ? Number(a.cursor.split(":")[1] ?? 0) : 0;
     let s = this.scans.get(id);
@@ -411,6 +433,7 @@ export class NativeEndpoint implements Endpoint {
         throw Error("Too many open directory cursors");
       s = {
         sequence: 0,
+        users: 0,
         path: p,
         kind: a.kind ?? "list",
         stack: [await fs.opendir(p, { bufferSize: 64 })],
@@ -419,6 +442,7 @@ export class NativeEndpoint implements Endpoint {
         time: Date.now(),
       };
       this.scans.set(id, s);
+      this.syncScanTimer();
     }
     if (s.path !== p || s.kind !== (a.kind ?? "list"))
       throw Error("Cursor belongs to another directory");
@@ -427,6 +451,7 @@ export class NativeEndpoint implements Endpoint {
     s.gate = new Promise<void>((resolve) => {
       release = resolve;
     });
+    s.users++;
     await previous;
     try {
       if (sequence !== s.sequence) {
@@ -438,6 +463,24 @@ export class NativeEndpoint implements Endpoint {
       const limit = Math.min(1000, a.limit ?? 200);
       const end = performance.now() + 40;
       while (s.stack.length && entries.length < limit) {
+        if (s.kind === "list") {
+          const batch: string[] = [];
+          while (
+            s.stack.length &&
+            batch.length < Math.min(16, limit - entries.length)
+          ) {
+            const directory = s.stack.at(-1)!;
+            const item = await directory.read();
+            if (!item) {
+              await directory.close();
+              s.stack.pop();
+            } else batch.push(path.join(directory.path, item.name));
+          }
+          entries.push(
+            ...(await Promise.all(batch.map((q) => this.stat(q, false)))),
+          );
+          continue;
+        }
         const d = s.stack.at(-1)!;
         const item = await d.read();
         if (!item) {
@@ -446,8 +489,7 @@ export class NativeEndpoint implements Endpoint {
           continue;
         }
         const q = path.join(d.path, item.name);
-        if (s.kind === "list") entries.push(await this.stat(q, false));
-        else {
+        {
           try {
             if (item.isDirectory())
               s.stack.push(await fs.opendir(q, { bufferSize: 64 }));
@@ -474,7 +516,10 @@ export class NativeEndpoint implements Endpoint {
       }
       s.time = Date.now();
       const cursor = s.stack.length ? id + ":" + (sequence + 1) : undefined;
-      if (!cursor) this.scans.delete(id);
+      if (!cursor) {
+        this.scans.delete(id);
+        this.syncScanTimer();
+      }
       const result = {
         entries,
         cursor,
@@ -488,6 +533,7 @@ export class NativeEndpoint implements Endpoint {
       s.lastPage = result;
       return result;
     } finally {
+      s.users--;
       release();
     }
   }
@@ -495,6 +541,7 @@ export class NativeEndpoint implements Endpoint {
     id = id.split(":")[0];
     const s = this.scans.get(id);
     this.scans.delete(id);
+    this.syncScanTimer();
     if (s) await Promise.allSettled(s.stack.map((d) => d.close()));
   }
   private kill(c: ChildProcess) {
@@ -517,6 +564,7 @@ export class NativeEndpoint implements Endpoint {
   }
   dispose() {
     this.closed = true;
+    this.syncScanTimer();
     for (const s of this.scans.keys()) void this.closeScan(s);
     for (const r of this.procs.values()) this.kill(r.child);
     this.procs.clear();

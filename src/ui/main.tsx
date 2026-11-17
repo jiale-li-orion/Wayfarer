@@ -1,3 +1,4 @@
+import { trimBranches } from "./branchCache";
 import React, {
   memo,
   useCallback,
@@ -211,6 +212,8 @@ function App() {
   const [endpoints, setEndpoints] = useState<EndpointConfig[]>([]);
   const [view, setView] = useState<ViewState>(defaultView);
   const [branches, setBranches] = useState<Record<string, Page>>({});
+  const branchesRef = useRef(branches);
+  branchesRef.current = branches;
   const [nodes, setNodes] = useState<MapNode[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selected, setSelected] = useState<Ref[]>([]);
@@ -290,28 +293,23 @@ function App() {
               ? { ...p, entries: [...(prev[key]?.entries ?? []), ...p.entries] }
               : p,
           };
-          let count = Object.values(next).reduce(
-            (n, b) => n + b.entries.length,
-            0,
-          );
-          for (const k of Object.keys(next)) {
-            if (count <= 16000) break;
-            if (k !== key && !dataRef.current.has(k)) {
-              count -= next[k].entries.length;
-              delete next[k];
-            }
-          }
-          return next;
+          return trimBranches(next, key, dataRef.current);
         });
       } catch (e) {
-        setBranches((prev) => ({
-          ...prev,
-          [key]: {
-            entries: prev[key]?.entries ?? [],
-            stamp: Date.now(),
-            error: String(e),
-          },
-        }));
+        setBranches((prev) =>
+          trimBranches(
+            {
+              ...prev,
+              [key]: {
+                entries: prev[key]?.entries ?? [],
+                stamp: Date.now(),
+                error: String(e),
+              },
+            },
+            key,
+            dataRef.current,
+          ),
+        );
       } finally {
         loadPending.current.delete(key);
       }
@@ -662,6 +660,11 @@ function App() {
           heapBytes: memory?.usedJSHeapSize,
           heapLimit: memory?.jsHeapSizeLimit,
           nodes: dataRef.current.size,
+          cachedBranches: Object.keys(branchesRef.current).length,
+          cachedEntries: Object.values(branchesRef.current).reduce(
+            (n, page) => n + page.entries.length,
+            0,
+          ),
           longTasks,
           longTaskMs: longMs,
         },

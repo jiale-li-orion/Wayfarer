@@ -799,5 +799,17 @@
       "readOnlyHint": false,
       "destructiveHint": false
     }
+  },
+  {
+    "name": "map_diagnostics",
+    "description": "Read map-owned cache, watcher, cursor and task counts without traversing directories or starting endpoints. Host process resource samples remain shared with other extensions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true
+    }
   }
 ]

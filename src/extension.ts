@@ -98,6 +98,7 @@ export async function activate(context: vscode.ExtensionContext) {
       enableScripts: true,
       localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "dist")],
     };
+    core.directories.setVisible(panel.visible);
     panel.iconPath = new vscode.ThemeIcon("map");
     const webview = panel.webview;
     const nonce = randomUUID().replaceAll("-", "");
@@ -186,12 +187,12 @@ export async function activate(context: vscode.ExtensionContext) {
       }
     });
     panel.onDidChangeViewState((e) => {
-      if (!e.webviewPanel.visible) core.directories.watch([]);
-      else void core.dispatch("setView", { expanded: core.view.expanded });
+      core.directories.setVisible(e.webviewPanel.visible);
     });
     panel.onDidDispose(() => {
       core.off("event", send);
       panel = undefined;
+      core.directories.setVisible(false);
       core.directories.watch([]);
     });
   };
@@ -441,7 +442,8 @@ export async function activate(context: vscode.ExtensionContext) {
       cpuUserMs: (next.user - cpu.user) / 1000,
       cpuSystemMs: (next.system - cpu.system) / 1000,
       intervalMs: now - at,
-      jobs: core.jobs.records.size,
+      jobs: core.jobs.stats(),
+      directories: core.directories.stats(),
     });
     cpu = next;
     at = now;

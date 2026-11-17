@@ -13,6 +13,16 @@ export class RemoteEndpoint implements Endpoint {
     { resolve: (v: any) => void; reject: (e: Error) => void }
   >();
   private stderr = "";
+  private metrics = {
+    calls: 0,
+    failures: 0,
+    sentBytes: 0,
+    receivedBytes: 0,
+    serializeMs: 0,
+    parseMs: 0,
+    rpcElapsedMs: 0,
+    peakPending: 0,
+  };
   constructor(
     public config: EndpointConfig,
     private helperPath: string,
@@ -79,7 +89,10 @@ export class RemoteEndpoint implements Endpoint {
       const lines = createInterface({ input: child.stdout });
       lines.on("line", (line) => {
         try {
+          const start = performance.now();
           const v = JSON.parse(line);
+          this.metrics.parseMs += performance.now() - start;
+          this.metrics.receivedBytes += Buffer.byteLength(line) + 1;
           const p = this.pending.get(v.id);
           if (!p) return;
           this.pending.delete(v.id);
@@ -126,11 +139,38 @@ export class RemoteEndpoint implements Endpoint {
     const child = this.child!;
     const id = ++this.seq;
     return new Promise<T>((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
-      child.stdin.write(JSON.stringify({ id, method, args }) + "\n", (e) => {
+      const start = performance.now();
+      const frame = JSON.stringify({ id, method, args }) + "\n";
+      this.metrics.serializeMs += performance.now() - start;
+      this.metrics.sentBytes += Buffer.byteLength(frame);
+      this.metrics.calls++;
+      this.pending.set(id, {
+        resolve: (value) => {
+          this.metrics.rpcElapsedMs += performance.now() - start;
+          resolve(
+            method === "resources"
+              ? {
+                  ...value,
+                  transport: { ...this.metrics, pending: this.pending.size },
+                }
+              : value,
+          );
+        },
+        reject: (error) => {
+          this.metrics.failures++;
+          this.metrics.rpcElapsedMs += performance.now() - start;
+          reject(error);
+        },
+      });
+      this.metrics.peakPending = Math.max(
+        this.metrics.peakPending,
+        this.pending.size,
+      );
+      child.stdin.write(frame, (e) => {
         if (e) {
+          const pending = this.pending.get(id);
           this.pending.delete(id);
-          reject(e);
+          pending?.reject(e);
         }
       });
     });

@@ -128,7 +128,16 @@ def run(method,a):
         try:
             with open('/proc/self/statm') as f:rss=int(f.read().split()[1])*os.sysconf('SC_PAGE_SIZE')
         except OSError:pass
-        return dict(pid=os.getpid(),rss=rss,peakRss=ru.ru_maxrss*1024,cpuUserMs=ru.ru_utime*1000,cpuSystemMs=ru.ru_stime*1000,cursors=len(SCANS),processes=len(PROCS),watches=len(WATCHES))
+        children=[]
+        with STATE: processes=list(PROCS.values())
+        for rec in processes:
+            child=dict(pid=rec['p'].pid,exitCode=rec['p'].poll())
+            try:
+                with open('/proc/%s/stat'%child['pid']) as f: fields=f.read().rsplit(')',1)[1].split()
+                child.update(cpuMs=(int(fields[11])+int(fields[12]))*1000/os.sysconf('SC_CLK_TCK'),rss=int(fields[21])*os.sysconf('SC_PAGE_SIZE'))
+            except (OSError,ValueError,IndexError):pass
+            children.append(child)
+        return dict(pid=os.getpid(),rss=rss,peakRss=ru.ru_maxrss*1024,cpuUserMs=ru.ru_utime*1000,cpuSystemMs=ru.ru_stime*1000,cursors=len(SCANS),processes=len(PROCS),watches=len(WATCHES),children=children)
     if method=='statMany':
         values=[]
         for p in a['paths'][:64]:

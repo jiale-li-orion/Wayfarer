@@ -87,13 +87,11 @@ export class Core extends EventEmitter {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => void this.persist(), 300);
   }
-  private async persist() {
+  private async persist(cache = this.directories.snapshot()) {
     const p = path.join(this.storage, "view.json");
-    await fs.writeFile(
-      p + ".tmp",
-      JSON.stringify({ view: this.view, cache: this.directories.snapshot() }),
-      { mode: 0o600 },
-    );
+    await fs.writeFile(p + ".tmp", JSON.stringify({ view: this.view, cache }), {
+      mode: 0o600,
+    });
     await fs.rename(p + ".tmp", p);
   }
   invalidateParent(r: Ref) {
@@ -158,6 +156,16 @@ export class Core extends EventEmitter {
         return this.endpoints.configs();
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
+      case "diagnostics":
+        return {
+          directories: this.directories.stats(),
+          jobs: this.jobs.stats(),
+          endpoints: [...this.endpoints.items.values()].map((e) => ({
+            id: e.config.id,
+            connected: !!e.connected,
+            enabled: this.endpoints.enabled(e.config.id),
+          })),
+        };
       case "addEndpoint": {
         this.endpoints.add(a);
         this.emit("event", {
@@ -309,7 +317,22 @@ export class Core extends EventEmitter {
           !["skip", "rename", "overwrite"].includes(i.conflict)
         )
           throw Error("Explicit mode and conflict rule required");
-        const keys = [...i.sources, i.target].map((r) =>
+        const targetConfig = this.endpoints.get(i.target.endpoint).config;
+        // Auto-rename can choose another sibling, so it reserves the directory.
+        // Fixed destinations reserve their actual paths; independent files can run together.
+        const targets =
+          i.conflict === "rename"
+            ? [i.target]
+            : i.sources.map((source) => ({
+                endpoint: i.target.endpoint,
+                path: pathApi(targetConfig).join(
+                  i.target.path,
+                  pathApi(this.endpoints.get(source.endpoint).config).basename(
+                    source.path,
+                  ),
+                ),
+              }));
+        const keys = [...i.sources, ...targets].map((r) =>
           alias(this.endpoints.get(r.endpoint).config, r.path),
         );
         return this.jobs.submit("transfer", i, keys);
@@ -588,9 +611,10 @@ export class Core extends EventEmitter {
   }
   async dispose() {
     clearTimeout(this.timer);
+    const cache = this.directories.snapshot();
     this.directories.dispose();
     await this.jobs.dispose();
-    await this.persist();
+    await this.persist(cache);
     this.endpoints.dispose();
     this.profile.stop();
   }

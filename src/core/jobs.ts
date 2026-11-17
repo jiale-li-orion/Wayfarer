@@ -162,6 +162,18 @@ export class Jobs extends EventEmitter {
     const { checkpoint, input, result, logs, ...summary } = j;
     return summary;
   }
+  stats() {
+    const states: Record<string, number> = {};
+    for (const j of this.records.values())
+      states[j.state] = (states[j.state] ?? 0) + 1;
+    return {
+      records: this.records.size,
+      running: this.running.size,
+      heldLocks: this.held.size,
+      progressTimers: this.timers.size,
+      states,
+    };
+  }
   list() {
     return [...this.records.values()]
       .sort((a, b) => b.created - a.created)

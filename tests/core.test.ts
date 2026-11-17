@@ -504,3 +504,188 @@ test("canvas path controls retain Windows drive, UNC and POSIX filename semantic
     ["/", "tmp", "a\\b"],
   );
 });
+
+test("late directory reply releases its cursor after collapse; hidden map keeps editor watchers", async () => {
+  const f = await fixture();
+  try {
+    for (let n = 0; n < 205; n++)
+      await fs.writeFile(path.join(f.a, `item-${n}`), "x");
+    const endpoint = f.core.endpoints.get("a"),
+      original = endpoint.call.bind(endpoint);
+    let release!: () => void, arrived!: () => void;
+    const gate = new Promise<void>((r) => (release = r)),
+      response = new Promise<void>((r) => (arrived = r));
+    endpoint.call = async (method, args) => {
+      const result = await original(method, args);
+      if (method === "list") {
+        arrived();
+        await gate;
+      }
+      return result;
+    };
+    const ref = { endpoint: "a", path: f.a };
+    f.core.directories.watch([ref]);
+    const read = f.core.directories.list(ref, undefined, true);
+    await response;
+    f.core.directories.watch([]);
+    release();
+    const page = await read;
+    assert.equal(page.entries.length, 200);
+    assert.equal(page.cursor, undefined);
+    assert.equal((await original("resources")).cursors, 0);
+    endpoint.call = original;
+    const releaseEditor = f.core.directories.retain(ref);
+    f.core.directories.watch([ref]);
+    f.core.directories.setVisible(false);
+    f.core.directories.watch([{ endpoint: "b", path: f.b }]);
+    assert.equal(f.core.directories.stats().watches, 1);
+    assert.equal(f.core.directories.stats().editorWatches, 1);
+    releaseEditor();
+    assert.equal(f.core.directories.stats().watches, 0);
+    f.core.directories.setVisible(true);
+    assert.equal(f.core.directories.stats().watches, 1);
+  } finally {
+    await f.close();
+  }
+});
+
+test("file bursts invalidate cached data immediately and notify each branch once", async () => {
+  const f = await fixture();
+  try {
+    const ref = { endpoint: "a", path: f.a };
+    await f.core.directories.list(ref);
+    let changes = 0;
+    f.core.directories.on("change", () => changes++);
+    for (let i = 0; i < 600; i++) f.core.directories.invalidate(ref);
+    await fs.writeFile(path.join(f.a, "new.txt"), "new");
+    const fresh = await f.core.directories.list(ref);
+    assert.equal(fresh.entries[0].name, "new.txt");
+    await new Promise((r) => setTimeout(r, 200));
+    assert.equal(changes, 1);
+    f.core.directories.invalidate(ref);
+    f.core.directories.dispose();
+    await new Promise((r) => setTimeout(r, 200));
+    assert.equal(changes, 1);
+    assert.equal(f.core.directories.stats().cachedEntries, 0);
+  } finally {
+    await f.close();
+  }
+});
+
+test("fixed distinct targets share a directory concurrently; same target and auto-rename remain serialized", async () => {
+  const f = await fixture();
+  const endpoint = f.core.endpoints.get("b"),
+    original = endpoint.call.bind(endpoint);
+  let release!: () => void;
+  try {
+    for (const file of ["one", "two"])
+      await fs.writeFile(path.join(f.a, file), file.repeat(1024));
+    for (const [conflict, names, expected] of [
+      ["overwrite", ["one", "two"], 2],
+      ["overwrite", ["one", "one"], 1],
+      ["rename", ["one", "two"], 1],
+    ] as const) {
+      const gate = new Promise<void>((r) => (release = r));
+      endpoint.call = async (method, args) => {
+        if (method === "stat" && args?.path === f.b) await gate;
+        return original(method, args);
+      };
+      const jobs = await Promise.all(
+        names.map((name) =>
+          f.core.dispatch("transfer", {
+            sources: [{ endpoint: "a", path: path.join(f.a, name) }],
+            target: { endpoint: "b", path: f.b },
+            mode: "copy",
+            conflict,
+          }),
+        ),
+      );
+      for (
+        let n = 0;
+        n < 100 && jobs.filter((j) => j.state === "running").length < expected;
+        n++
+      )
+        await new Promise((r) => setTimeout(r, 10));
+      assert.equal(jobs.filter((j) => j.state === "running").length, expected);
+      release();
+      for (const j of jobs)
+        assert.equal((await finish(f.core, j.id)).state, "completed");
+      assert.equal(
+        await fs.readFile(path.join(f.b, "one"), "utf8"),
+        "one".repeat(1024),
+      );
+      assert.equal(
+        await fs.readFile(path.join(f.b, "two"), "utf8"),
+        "two".repeat(1024),
+      );
+    }
+  } finally {
+    release?.();
+    endpoint.call = original;
+    await f.close();
+  }
+});
+
+test("current dsh bundle patch inserts one MCP plugin and preserves unrelated overlays", async () => {
+  const f = await fixture();
+  try {
+    const { connectDsh } = await import("../src/mcp/integrations");
+    const { parse } = await import("yaml");
+    const file = path.join(f.a, "cordis.patch.yml");
+    await fs.writeFile(
+      file,
+      "# user policy\n- id: permissions\n  config:\n    mode: ask\n- insert:\n    - id: unrelated\n      name: example\n",
+    );
+    const bridge: any = {
+      connections: [{ endpoint: "a" }],
+      config: () => ({
+        command: "python3",
+        args: ["mcp.py", "--session", "first"],
+      }),
+    };
+    await connectDsh(f.core, bridge, "a", file);
+    bridge.config = () => ({
+      command: "python3",
+      args: ["mcp.py", "--session", "second"],
+    });
+    await connectDsh(f.core, bridge, "a", file);
+    const raw = await fs.readFile(file, "utf8"),
+      rows = parse(raw);
+    const plugins = rows.flatMap((r: any) => r.insert ?? []);
+    assert.equal(
+      plugins.filter((p: any) => p.id === "mcp-workspace-map").length,
+      1,
+    );
+    assert.equal(
+      plugins.find((p: any) => p.id === "mcp-workspace-map").config.args.at(-1),
+      "second",
+    );
+    assert.equal(rows[0].config.mode, "ask");
+    assert.ok(plugins.find((p: any) => p.id === "unrelated"));
+    assert.ok(raw.includes("# user policy"));
+  } finally {
+    await f.close();
+  }
+});
+
+test("canvas retention bounds empty and failed off-screen directories while preserving visible pages", async () => {
+  const { trimBranches } = await import("../src/ui/branchCache");
+  let pages: any = {};
+  for (let n = 0; n < 1000; n++)
+    pages = trimBranches(
+      {
+        ...pages,
+        [String(n)]: {
+          entries: [],
+          stamp: n,
+          error: n % 2 ? "offline" : undefined,
+        },
+      },
+      String(n),
+      new Set(["0"]),
+    );
+  assert.equal(Object.keys(pages).length, 128);
+  assert.ok(pages["0"]);
+  assert.ok(pages["999"]);
+  assert.equal(pages["1"], undefined);
+});
