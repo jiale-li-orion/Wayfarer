@@ -65,3 +65,19 @@ MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用�
 ### 发布与维护
 
 源码仓库为 [Wayfarer](https://github.com/jiale-li-orion/Wayfarer)，插件继续显示 Workspace Map。构建、安装、升级、回退与 MCP 配置说明见 [docs/RELEASE.md](docs/RELEASE.md)，实际机器覆盖见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。标签工作流交付 VSIX、SHA-256、提交身份和版本说明；PR 产物供审阅验收。
+
+## 侧边栏与快捷键（0.3.1）
+
+点击活动栏的地图图标，展开 **机器／书签／常用操作**。点击机器或书签在编辑区打开对应地图。标题栏提供打开地图、添加 SSH 和后台任务；常用操作还提供搜索、Codex／dsh 接入、MCP 配置和性能日志。侧边栏可通过 VS Code 的视图菜单移到右侧。
+
+| 操作 | Windows／Linux | 生效位置 |
+|---|---|---|
+| 打开／聚焦地图 | Ctrl+Alt+M | 全局 |
+| 聚焦侧边栏 | Ctrl+Alt+Shift+M | 全局 |
+| 返回／前进 | Alt+←／Alt+→ | 地图 |
+| 上一级 | Alt+↑ | 地图 |
+| 搜索当前子树 | Ctrl+F | 地图 |
+| 后台任务 | Ctrl+Shift+J | 地图 |
+| 定位已加载节点 | Ctrl+0 | 地图 |
+
+macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜索 Workspace Map 后修改。侧边栏沿用 VS Code 的方向键、Enter 和展开／收起操作。

@@ -441,6 +441,20 @@ function App() {
   }, [flow]);
   useEffect(() => {
     const listen = (m: any) => {
+      if (m.type === "uiAction") {
+        if (m.action === "search") setSearchOpen(true);
+        if (m.action === "tasks") {
+          setJobsOpen(true);
+          setDetailOpen(false);
+        }
+        if (m.action === "fit")
+          void flow.fitView({
+            duration: 0,
+            padding: 0.2,
+            maxZoom: 1,
+            includeHiddenNodes: true,
+          });
+      }
       if (m.type === "view") {
         setView(m.view);
         if (m.focus) requestedFocus.current = true;

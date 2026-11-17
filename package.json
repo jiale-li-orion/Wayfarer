@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -24,27 +24,78 @@
     "commands": [
       {
         "command": "workspaceMap.open",
-        "title": "Workspace Map: 打开目录地图"
+        "title": "Workspace Map: 打开目录地图",
+        "icon": "$(map)"
       },
       {
         "command": "workspaceMap.addEndpoint",
-        "title": "Workspace Map: 添加 SSH 连接"
+        "title": "Workspace Map: 添加 SSH 连接",
+        "icon": "$(add)"
       },
       {
         "command": "workspaceMap.connectCodex",
-        "title": "Workspace Map: 接入 Codex"
+        "title": "Workspace Map: 接入 Codex",
+        "icon": "$(plug)"
       },
       {
         "command": "workspaceMap.connectDsh",
-        "title": "Workspace Map: 接入 dsh"
+        "title": "Workspace Map: 接入 dsh",
+        "icon": "$(plug)"
       },
       {
         "command": "workspaceMap.mcpConfig",
-        "title": "Workspace Map: 获取 MCP 配置"
+        "title": "Workspace Map: 获取 MCP 配置",
+        "icon": "$(settings-gear)"
       },
       {
         "command": "workspaceMap.logs",
-        "title": "Workspace Map: 查看性能日志"
+        "title": "Workspace Map: 查看性能日志",
+        "icon": "$(output)"
+      },
+      {
+        "command": "workspaceMap.sidebar",
+        "title": "Workspace Map: 显示侧边栏",
+        "icon": "$(layout-sidebar-left)"
+      },
+      {
+        "command": "workspaceMap.openLocation",
+        "title": "Workspace Map: 打开位置",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "workspaceMap.back",
+        "title": "Workspace Map: 返回",
+        "icon": "$(arrow-left)"
+      },
+      {
+        "command": "workspaceMap.forward",
+        "title": "Workspace Map: 前进",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "workspaceMap.parent",
+        "title": "Workspace Map: 上一级",
+        "icon": "$(arrow-up)"
+      },
+      {
+        "command": "workspaceMap.home",
+        "title": "Workspace Map: 全部机器",
+        "icon": "$(home)"
+      },
+      {
+        "command": "workspaceMap.search",
+        "title": "Workspace Map: 搜索当前子树",
+        "icon": "$(search)"
+      },
+      {
+        "command": "workspaceMap.tasks",
+        "title": "Workspace Map: 后台任务",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "workspaceMap.fit",
+        "title": "Workspace Map: 定位已加载节点",
+        "icon": "$(screen-full)"
       }
     ],
     "configuration": {
@@ -68,7 +119,89 @@
           "maximum": 8
         }
       }
-    }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "workspaceMap",
+          "title": "Workspace Map",
+          "icon": "media/map.svg"
+        }
+      ]
+    },
+    "views": {
+      "workspaceMap": [
+        {
+          "id": "workspaceMap.locations",
+          "name": "目录地图",
+          "icon": "media/map.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "workspaceMap.open",
+          "when": "view == workspaceMap.locations",
+          "group": "navigation@0"
+        },
+        {
+          "command": "workspaceMap.addEndpoint",
+          "when": "view == workspaceMap.locations",
+          "group": "navigation@1"
+        },
+        {
+          "command": "workspaceMap.tasks",
+          "when": "view == workspaceMap.locations",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "workspaceMap.open",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m"
+      },
+      {
+        "command": "workspaceMap.sidebar",
+        "key": "ctrl+alt+shift+m",
+        "mac": "cmd+alt+shift+m"
+      },
+      {
+        "command": "workspaceMap.back",
+        "key": "alt+left",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
+      },
+      {
+        "command": "workspaceMap.forward",
+        "key": "alt+right",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
+      },
+      {
+        "command": "workspaceMap.parent",
+        "key": "alt+up",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus"
+      },
+      {
+        "command": "workspaceMap.search",
+        "key": "ctrl+f",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
+        "mac": "cmd+f"
+      },
+      {
+        "command": "workspaceMap.tasks",
+        "key": "ctrl+shift+j",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
+        "mac": "cmd+shift+j"
+      },
+      {
+        "command": "workspaceMap.fit",
+        "key": "ctrl+0",
+        "when": "activeWebviewPanelId == workspaceMap && !inputFocus && !workspaceMap.textInputFocus",
+        "mac": "cmd+0"
+      }
+    ]
   },
   "scripts": {
     "build": "node scripts/build.mjs",
