@@ -174,7 +174,6 @@ export class Inspector {
     );
   }
   register(ref: Ref, remove = false) {
-    this.endpoints.get(ref.endpoint);
     if (remove) this.registered.delete(refKey(ref));
     else this.registered.set(refKey(ref), ref);
     this.persist();

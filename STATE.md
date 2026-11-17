@@ -1,4 +1,4 @@
-# Workspace Map · 0.2.0 开发验收
+# Workspace Map · 0.2.0
 
 CPU／内存优化与实际使用验收完成。训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机源码镜像及 VSIX：`/home/orion/agent-system-learning/workspace-map`。继续开发时在训练机建立新工作树，本机用于安装验收。
 
@@ -24,4 +24,12 @@ CPU／内存优化与实际使用验收完成。训练机主仓库：`/data/user
 
 ## 0.2.0 日常管理变更
 
-训练机工作树 `feat/daily-management` 增加按需详情、浅层项目识别与登记、工具版本任务、缓存／环境位置与占用统计、历史任务磁盘分页。查询快照限制为 64 项／8MiB，资源查询手动发起，面板任务订阅按引用计数释放。新增 3 项定向测试，连同原有检查共 31 项通过。Windows／WSL／训练机／推理机家目录只读详情已通过；真实文件操作使用临时 fixture。当前验收与性能原始记录见 `docs/performance-data/20261117-management`，发布维护采用后续独立 PR。
+功能分支 `feat/daily-management` 增加按需详情、浅层项目识别与登记、工具版本任务、缓存／环境位置与占用统计、历史任务磁盘分页。查询快照限制为 64 项／8MiB，资源查询手动发起，面板任务订阅按引用计数释放。新增 3 项定向测试，连同原有检查共 31 项通过。Windows／WSL／训练机／推理机家目录只读详情已通过；真实文件操作使用临时 fixture。当前验收与性能原始记录见 `docs/performance-data/20261117-management`，发布维护采用后续独立 PR。
+
+
+## 发布维护交付
+
+- 功能 PR：https://github.com/jiale-li-orion/Wayfarer/pull/1；发布维护 PR：https://github.com/jiale-li-orion/Wayfarer/pull/2。第二份以第一份功能分支为基底，按 #1→#2 顺序审阅合并。GitHub main 为 a8ac0f3，训练机原 main 为 f337610；#1 同时交接原 0.1.1 提交，两个 PR 分支由训练机提交并通过本机镜像推送。
+- 维护分支 `chore/release-maintenance` 包含 Windows／Linux PR CI、标签发布、构建身份与 SHA-256、升级回退说明和内容哈希隔离的 MCP 助手。扩展显示名称 Workspace Map，仓库名称 Wayfarer。最终 VSIX 的提交身份见 artifacts/release.json。
+- 训练机 34 项检查通过，Linux／Windows CI 通过。四端工具清单、Android／Flutter／winget 只读查询、Codex／dsh 新接口及升级恢复均完成。性能对照见 PERFORMANCE.md；当前实机覆盖见 docs/ACCEPTANCE.md。
+- 开发工作树在交付后清理；后续从对应 PR 分支／合并提交建立新工作树。当前代码镜像与交付文件保留于本机 workspace-map 仓库。Marketplace、Agent 跨会话重连与协同整理沿后续需求处理。

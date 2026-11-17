@@ -109,3 +109,5 @@ flowchart LR
 `.github/workflows/check.yml` 对 PR 做 Linux 全套与 Windows portable 检查；`release.yml` 在 `v*` 标签上检查版本、构建 VSIX 并发布摘要和元数据。`scripts/release-assets.mjs` 从实际 VSIX 计算 SHA-256，和源码提交一起写入 release.json。安装、配置、升级、回退与实机范围见 `docs/RELEASE.md`、`docs/ACCEPTANCE.md`。
 
 MCP 客户端助手按 mcp.py＋tools.json 的内容哈希写入 `~/.local/share/workspace-map/client/<revision>`。新旧 VS Code 窗口使用各自固定助手目录，接入命令仅更新本扩展项；已配置的旧客户端继续使用其原目录与授权。后台任务共享 Core，窗口会话通过 session ID 绑定。profiling 包含工具版本命令的 endpoint、cwd、名称、耗时及退出状态。
+
+工具发现位于 `src/packages/discovery.ts`，依赖端点与原生路径；UI 共用的 `catalog.ts` 只包含命令配方与字段声明。项目登记与移除属于地图元数据，移除操作独立于端点连接状态。
