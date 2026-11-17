@@ -12,7 +12,8 @@ const sessions = await Promise.all(
       JSON.parse(await fs.readFile(path.join(root, f), "utf8")),
     ),
 );
-const map = sessions.sort((a, b) => b.created - a.created)[0];
+const map = sessions.find(s => s.id === process.env.WM_SESSION);
+if (!map) throw Error("Set WM_SESSION to the isolated acceptance window");
 function ipc(method, args = {}) {
   return new Promise((resolve, reject) => {
     const id = randomUUID();

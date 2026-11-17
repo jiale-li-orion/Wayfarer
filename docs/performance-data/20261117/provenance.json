@@ -1,0 +1,12 @@
+{
+  "baseline": "a8ac0f3",
+  "lifecycleCandidate": "1609ed2",
+  "dedicatedTransferCandidate": "89c5bda",
+  "smallFilesCandidate": "4ac8394",
+  "installedWorkload": "4ac8394",
+  "finalCompatibilityFix": "0adcba0",
+  "fixtures": "temporary directories and local test packages",
+  "timing": "WSL and Windows installed VS Code; CPU microseconds/milliseconds per source; RSS includes shared pages",
+  "sampling": "15s process samples; UI focus emulation for CDP measurement; real tab hide releases map watchers",
+  "excluded": "interrupted runs and mixed user navigation during the first hidden phase"
+}

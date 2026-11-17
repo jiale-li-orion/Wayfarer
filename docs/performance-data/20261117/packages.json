@@ -1,0 +1,386 @@
+[
+  {
+    "manager": "uv",
+    "action": "install",
+    "endpoint": "wsl-ubuntu",
+    "python": "/tmp/workspace-map-packages-tOd5OX/venv/bin/python",
+    "plan": {
+      "argv": [
+        "/home/orion/.local/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/tmp/workspace-map-packages-tOd5OX/venv/bin/python",
+        "/tmp/workspace-map-packages-tOd5OX/wm_profile_fixture-1.0.0-py3-none-any.whl"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 325.231627,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.local/bin/uv\",\"pip\",\"install\",\"--python\",\"/tmp/workspace-map-packages-tOd5OX/venv/bin/python\",\"/tmp/workspace-map-packages-tOd5OX/wm_profile_fixture-1.0.0-py3-none-any.whl\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}Using Python 3.13.11 environment at: venv\nResolved 1 package in 3ms\nPrepared 1 package in 7ms\nInstalled 1 package in 0.83ms\n + wm-profile-fixture==1.0.0 (from file:///tmp/workspace-map-packages-tOd5OX/wm_profile_fixture-1.0.0-py3-none-any.whl)\n",
+    "maxHelperRss": 21946368,
+    "maxChildRss": 23769088,
+    "childPids": [
+      83693
+    ]
+  },
+  {
+    "manager": "uv",
+    "action": "list",
+    "endpoint": "wsl-ubuntu",
+    "python": "/tmp/workspace-map-packages-tOd5OX/venv/bin/python",
+    "plan": {
+      "argv": [
+        "/home/orion/.local/bin/uv",
+        "pip",
+        "list",
+        "--python",
+        "/tmp/workspace-map-packages-tOd5OX/venv/bin/python"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": false
+    },
+    "ms": 326.24381300000005,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.local/bin/uv\",\"pip\",\"list\",\"--python\",\"/tmp/workspace-map-packages-tOd5OX/venv/bin/python\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}Using Python 3.13.11 environment at: venv\nPackage            Version\n------------------ -------\nwm-profile-fixture 1.0.0\n",
+    "maxHelperRss": 21946368,
+    "maxChildRss": 0,
+    "childPids": [
+      83733
+    ]
+  },
+  {
+    "manager": "uv",
+    "action": "uninstall",
+    "endpoint": "wsl-ubuntu",
+    "python": "/tmp/workspace-map-packages-tOd5OX/venv/bin/python",
+    "plan": {
+      "argv": [
+        "/home/orion/.local/bin/uv",
+        "pip",
+        "uninstall",
+        "--python",
+        "/tmp/workspace-map-packages-tOd5OX/venv/bin/python",
+        "wm-profile-fixture"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 228.42167799999993,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.local/bin/uv\",\"pip\",\"uninstall\",\"--python\",\"/tmp/workspace-map-packages-tOd5OX/venv/bin/python\",\"wm-profile-fixture\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}Using Python 3.13.11 environment at: venv\nUninstalled 1 package in 1ms\n - wm-profile-fixture==1.0.0 (from file:///tmp/workspace-map-packages-tOd5OX/wm_profile_fixture-1.0.0-py3-none-any.whl)\n",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": [
+      83765
+    ]
+  },
+  {
+    "manager": "pnpm",
+    "action": "install",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm",
+        "add",
+        "/tmp/workspace-map-packages-tOd5OX/fixture-package"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/pnpm",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 9235.268531,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm\",\"add\",\"/tmp/workspace-map-packages-tOd5OX/fixture-package\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/pnpm\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}Already up to date\n\ndependencies:\n+ wm-profile-fixture 1.0.0 <- ../fixture-package\n\nDone in 1.3s using pnpm v11.28.5\nUpdate available! 11.28.5 → 12.21.0.\nChangelog: https://pnpm.io/v/12.21.0\nTo update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -\n",
+    "maxHelperRss": 21958656,
+    "maxChildRss": 189349888,
+    "childPids": [
+      83783
+    ]
+  },
+  {
+    "manager": "pnpm",
+    "action": "list",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm",
+        "list"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/pnpm",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": false
+    },
+    "ms": 876.2041150000005,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm\",\"list\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/pnpm\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}Legend: production dependency, optional only, dev only\n\nwm-test-pnpm@1.0.0 /tmp/workspace-map-packages-tOd5OX/pnpm (PRIVATE)\n│\n│   dependencies:\n└── wm-profile-fixture@link:../fixture-package\n\n1 package\n",
+    "maxHelperRss": 21958656,
+    "maxChildRss": 150794240,
+    "childPids": [
+      84033
+    ]
+  },
+  {
+    "manager": "pnpm",
+    "action": "uninstall",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm",
+        "remove",
+        "wm-profile-fixture"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/pnpm",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 850.0995759999987,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/pnpm\",\"remove\",\"wm-profile-fixture\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/pnpm\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}✓ Lockfile passes supply-chain policies (verified 9s ago)\nAlready up to date\n\ndependencies:\n- wm-profile-fixture 1.0.0\n\nDone in 585ms using pnpm v11.28.5\n",
+    "maxHelperRss": 21958656,
+    "maxChildRss": 153276416,
+    "childPids": [
+      84092
+    ]
+  },
+  {
+    "manager": "bun",
+    "action": "install",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.npm-global/bin/bun",
+        "add",
+        "/tmp/workspace-map-packages-tOd5OX/fixture-package"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/bun",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 252.01000999999997,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.npm-global/bin/bun\",\"add\",\"/tmp/workspace-map-packages-tOd5OX/fixture-package\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/bun\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}bun add v1.3.14 (0d9b296a)\nSaved lockfile\n\ninstalled wm-profile-fixture@../fixture-package\n\n1 package installed [10.00ms]\n",
+    "maxHelperRss": 21958656,
+    "maxChildRss": 151552,
+    "childPids": [
+      84162
+    ]
+  },
+  {
+    "manager": "bun",
+    "action": "list",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.npm-global/bin/bun",
+        "pm",
+        "ls"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/bun",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": false
+    },
+    "ms": 325.64697799999885,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.npm-global/bin/bun\",\"pm\",\"ls\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/bun\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}/tmp/workspace-map-packages-tOd5OX/bun node_modules (1)\n└── wm-profile-fixture@../fixture-package\n",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": [
+      84174
+    ]
+  },
+  {
+    "manager": "bun",
+    "action": "uninstall",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.npm-global/bin/bun",
+        "remove",
+        "wm-profile-fixture"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/bun",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 114.69453799999974,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.npm-global/bin/bun\",\"remove\",\"wm-profile-fixture\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/bun\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}bun remove v1.3.14 (0d9b296a)\n\npackage.json has no dependencies! Deleted empty lockfile\n\n- wm-profile-fixture\n1 package removed [1.00ms]\n",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": []
+  },
+  {
+    "manager": "java",
+    "action": "info",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/usr/bin/java",
+        "-version"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": false
+    },
+    "ms": 343.25610499999857,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/usr/bin/java\",\"-version\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":false}openjdk version \"21.0.13.0.3\" 2026-10-24\nOpenJDK Runtime Environment (build 21.0.13.0.3+1-1-24.04.1-Ubuntu)\nOpenJDK 64-Bit Server VM (build 21.0.13.0.3+1-1-24.04.1-Ubuntu, mixed mode, sharing)\n",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": [
+      84197
+    ]
+  },
+  {
+    "manager": "cargo",
+    "available": false
+  },
+  {
+    "manager": "rustup",
+    "available": false
+  },
+  {
+    "manager": "gradle",
+    "action": "cache-info",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "filesystem.size",
+        "/tmp/workspace-map-packages-tOd5OX/gradle"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "选定端点的缓存目录",
+      "mutating": false
+    },
+    "ms": 134.99096699999973,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"filesystem.size\",\"/tmp/workspace-map-packages-tOd5OX/gradle\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"选定端点的缓存目录\",\"mutating\":false}",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": []
+  },
+  {
+    "manager": "gradle",
+    "action": "cache-clean-entry",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "delete-cache-entry",
+        "/tmp/workspace-map-packages-tOd5OX/gradle/fixture"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "选定缓存目录",
+      "mutating": true
+    },
+    "ms": 132.48308499999985,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"delete-cache-entry\",\"/tmp/workspace-map-packages-tOd5OX/gradle/fixture\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"选定缓存目录\",\"mutating\":true}Permanent delete cache entry: /tmp/workspace-map-packages-tOd5OX/gradle/fixture",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": []
+  },
+  {
+    "manager": "maven",
+    "action": "cache-info",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "filesystem.size",
+        "/tmp/workspace-map-packages-tOd5OX/maven"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "选定端点的缓存目录",
+      "mutating": false
+    },
+    "ms": 134.77413499999966,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"filesystem.size\",\"/tmp/workspace-map-packages-tOd5OX/maven\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"选定端点的缓存目录\",\"mutating\":false}",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": []
+  },
+  {
+    "manager": "maven",
+    "action": "cache-clean-entry",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "delete-cache-entry",
+        "/tmp/workspace-map-packages-tOd5OX/maven/fixture"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX",
+      "source": "选定缓存目录",
+      "mutating": true
+    },
+    "ms": 121.66389499999968,
+    "state": "completed",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"delete-cache-entry\",\"/tmp/workspace-map-packages-tOd5OX/maven/fixture\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX\",\"source\":\"选定缓存目录\",\"mutating\":true}Permanent delete cache entry: /tmp/workspace-map-packages-tOd5OX/maven/fixture",
+    "maxHelperRss": 21954560,
+    "maxChildRss": 0,
+    "childPids": []
+  },
+  {
+    "manager": "npm",
+    "action": "install",
+    "endpoint": "wsl-ubuntu",
+    "plan": {
+      "argv": [
+        "/home/orion/.nvm/versions/node/v22.23.2/bin/npm",
+        "install",
+        "/tmp/workspace-map-packages-tOd5OX/cancel.tgz"
+      ],
+      "cwd": "/tmp/workspace-map-packages-tOd5OX/cancel-project",
+      "source": "当前环境中管理器已配置的源",
+      "mutating": true
+    },
+    "ms": 1869.3380660000003,
+    "state": "cancelled",
+    "output": "{\"endpoint\":\"wsl-ubuntu\",\"argv\":[\"/home/orion/.nvm/versions/node/v22.23.2/bin/npm\",\"install\",\"/tmp/workspace-map-packages-tOd5OX/cancel.tgz\"],\"cwd\":\"/tmp/workspace-map-packages-tOd5OX/cancel-project\",\"source\":\"当前环境中管理器已配置的源\",\"mutating\":true}\n> wm-profile-cancel@1.0.0 postinstall\n> node hook.js\n\nfixture-ready\nCancellation requested; last exit status: -15",
+    "maxHelperRss": 21958656,
+    "maxChildRss": 90898432,
+    "childPids": [
+      84261
+    ]
+  },
+  {
+    "cancelReaped": true,
+    "resources": {
+      "pid": 78383,
+      "rss": 21954560,
+      "peakRss": 21430272,
+      "cpuUserMs": 795.328,
+      "cpuSystemMs": 667.9,
+      "cursors": 0,
+      "processes": 0,
+      "watches": 0,
+      "children": [],
+      "transport": {
+        "calls": 1243,
+        "failures": 0,
+        "sentBytes": 134291,
+        "receivedBytes": 2876856,
+        "serializeMs": 8.806199999687124,
+        "parseMs": 27.194699999868135,
+        "rpcElapsedMs": 5093.633900000053,
+        "peakPending": 11,
+        "pending": 0
+      },
+      "transferUsers": 0,
+      "lastTransferTransport": {
+        "calls": 11,
+        "failures": 0,
+        "sentBytes": 1174,
+        "receivedBytes": 11185597,
+        "serializeMs": 0.06269999995129183,
+        "parseMs": 14.309499999973923,
+        "rpcElapsedMs": 776.3778999999631,
+        "peakPending": 4
+      }
+    }
+  }
+]
