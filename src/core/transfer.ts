@@ -34,7 +34,31 @@ export class Transfers {
   ) {}
   async run(ctx: JobContext) {
     const input = ctx.job.input as TransferInput;
-    const dest = this.endpoints.get(input.target.endpoint);
+    const directMove =
+      input.mode === "move" &&
+      input.sources.every((s) => s.endpoint === input.target.endpoint);
+    const scopes = new Map<string, { endpoint: Endpoint; release(): void }>();
+    const get = (id: string) => {
+      let scope = scopes.get(id);
+      if (!scope) {
+        const endpoint = this.endpoints.get(id);
+        scope =
+          !directMove && endpoint.openTransfer
+            ? endpoint.openTransfer()
+            : { endpoint, release() {} };
+        scopes.set(id, scope);
+      }
+      return scope.endpoint;
+    };
+    try {
+      return await this.perform(ctx, get);
+    } finally {
+      for (const scope of scopes.values()) scope.release();
+    }
+  }
+  private async perform(ctx: JobContext, get: (id: string) => Endpoint) {
+    const input = ctx.job.input as TransferInput;
+    const dest = get(input.target.endpoint);
     const dpath = pathApi(dest.config);
     const target = await dest.call<Entry>("stat", { path: input.target.path });
     if (target.kind !== "directory") throw Error("Target must be a directory");
@@ -48,7 +72,7 @@ export class Transfers {
       ctx.check();
       const itemKey = source.endpoint + ":" + source.path;
       if (ctx.job.checkpoint["done:" + itemKey]) continue;
-      const src = this.endpoints.get(source.endpoint);
+      const src = get(source.endpoint);
       const spath = pathApi(src.config);
       const name = spath.basename(source.path);
       assertName(dest.config, name);

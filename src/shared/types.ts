@@ -54,6 +54,7 @@ export interface Endpoint {
     length: number,
   ): Promise<number>;
   writeBuffer?(path: string, buffer: Buffer, offset: number): Promise<number>;
+  openTransfer?(): { endpoint: Endpoint; release(): void };
   dispose(): void;
 }
 export type JobState =

@@ -723,3 +723,63 @@ test("subscribing a branch during its first page preserves the live pagination c
     await f.close();
   }
 });
+
+test("transfer scopes release after completion, failure and cancellation", async () => {
+  const f = await fixture();
+  let leases = 0;
+  const endpoint = f.core.endpoints.get("b"),
+    original = endpoint.call.bind(endpoint);
+  endpoint.openTransfer = () => {
+    leases++;
+    return {
+      endpoint,
+      release() {
+        leases--;
+      },
+    };
+  };
+  let release: (() => void) | undefined;
+  try {
+    const source = path.join(f.a, "payload");
+    await fs.writeFile(source, Buffer.alloc(1048576, 71));
+    const submit = (p: string) =>
+      f.core.dispatch("transfer", {
+        sources: [{ endpoint: "a", path: p }],
+        target: { endpoint: "b", path: f.b },
+        mode: "copy",
+        conflict: "overwrite",
+      });
+    assert.equal(
+      (await finish(f.core, (await submit(source)).id)).state,
+      "completed",
+    );
+    assert.equal(leases, 0);
+    assert.equal(
+      (await finish(f.core, (await submit(path.join(f.a, "missing"))).id))
+        .state,
+      "failed",
+    );
+    assert.equal(leases, 0);
+    let reached!: () => void;
+    const entered = new Promise<void>((r) => (reached = r)),
+      gate = new Promise<void>((r) => (release = r));
+    endpoint.call = async (method, args) => {
+      if (method === "stat" && args?.path === f.b) {
+        reached();
+        await gate;
+      }
+      return original(method, args);
+    };
+    const job = await submit(source);
+    await entered;
+    f.core.jobs.control(job.id, "cancel");
+    release!();
+    assert.equal((await finish(f.core, job.id)).state, "cancelled");
+    assert.equal(leases, 0);
+    assert.equal((await fs.stat(source)).size, 1048576);
+  } finally {
+    release?.();
+    endpoint.call = original;
+    await f.close();
+  }
+});

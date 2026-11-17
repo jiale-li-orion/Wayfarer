@@ -13,6 +13,32 @@ export class RemoteEndpoint implements Endpoint {
     { resolve: (v: any) => void; reject: (e: Error) => void }
   >();
   private stderr = "";
+  private bulk?: RemoteEndpoint;
+  private bulkUsers = 0;
+  private lastTransferTransport?: Record<string, number>;
+  openTransfer() {
+    if (this.closed) throw Error("Endpoint connection closed");
+    const bulk = (this.bulk ??= new RemoteEndpoint(
+      this.config,
+      this.helperPath,
+      this.log,
+    ));
+    this.bulkUsers++;
+    let released = false;
+    return {
+      endpoint: bulk,
+      release: () => {
+        if (released) return;
+        released = true;
+        if (this.bulk !== bulk) return;
+        if (--this.bulkUsers === 0) {
+          this.lastTransferTransport = { ...bulk.metrics };
+          this.bulk = undefined;
+          bulk.dispose();
+        }
+      },
+    };
+  }
   private metrics = {
     calls: 0,
     failures: 0,
@@ -134,6 +160,24 @@ export class RemoteEndpoint implements Endpoint {
     method: string,
     args: Record<string, any> = {},
   ): Promise<T> {
+    const result = await this.request<T>(method, args);
+    if (method !== "resources") return result;
+    const bulk = this.bulk;
+    return {
+      ...result,
+      transferUsers: this.bulkUsers,
+      lastTransferTransport: this.lastTransferTransport,
+      transfer: bulk?.connected
+        ? await bulk
+            .request("resources")
+            .catch((error) => ({ error: String(error) }))
+        : undefined,
+    } as T;
+  }
+  private async request<T = any>(
+    method: string,
+    args: Record<string, any> = {},
+  ): Promise<T> {
     await this.open();
     if (this.closed || !this.child) throw Error("Endpoint connection closed");
     const child = this.child!;
@@ -177,6 +221,9 @@ export class RemoteEndpoint implements Endpoint {
   }
   dispose() {
     this.closed = true;
+    this.bulk?.dispose();
+    this.bulk = undefined;
+    this.bulkUsers = 0;
     const c = this.child;
     this.child = undefined;
     c?.stdin.end();
