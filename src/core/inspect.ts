@@ -6,7 +6,7 @@ import { pathApi } from "../shared/paths";
 import type { Endpoints } from "../adapters/registry";
 import type { JobContext } from "./jobs";
 import type { Profiler } from "./log";
-import { discover } from "../packages/catalog";
+import { discover } from "../packages/discovery";
 
 const markers: Record<string, string> = {
   "package.json": "Node",
