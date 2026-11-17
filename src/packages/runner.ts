@@ -76,6 +76,13 @@ export async function runPackage(endpoints: Endpoints, ctx: JobContext) {
       (v) => {
         if (v.output) ctx.log(v.output);
         ctx.log("Cancellation requested; last exit status: " + v.code);
+        ctx.job.result = { exitCode: v.code, command: plan, interrupted: true };
+        ctx.job.checkpoint.process = {
+          id,
+          pid,
+          exitCode: v.code,
+          ended: Date.now(),
+        };
       },
       () => {},
     );

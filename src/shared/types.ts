@@ -55,13 +55,23 @@ export interface Endpoint {
   ): Promise<number>;
   writeBuffer?(path: string, buffer: Buffer, offset: number): Promise<number>;
   openTransfer?(): { endpoint: Endpoint; release(): void };
-  dispose(): void;
+  dispose(deadline?: number): void | Promise<void>;
+  abort?(): void;
 }
 export type JobState =
   "queued" | "running" | "paused" | "completed" | "failed" | "cancelled";
 export interface Job {
   id: string;
   kind: string;
+  operationId?: string;
+  operationFingerprint?: string;
+  pauseReason?:
+    | "shutdown"
+    | "process-interrupted"
+    | "network"
+    | "user"
+    | "endpoint-disconnected";
+  cleanupPending?: { endpoint: string; path: string; error?: string }[];
   state: JobState;
   created: number;
   updated: number;

@@ -10,12 +10,12 @@ export class Endpoints {
   enabled(id: string) {
     return !this.disconnected.has(id);
   }
-  disconnect(id: string) {
+  async disconnect(id: string) {
     const endpoint = this.get(id);
     if (!["ssh", "wsl"].includes(endpoint.config.kind))
       throw Error("本机文件系统保持可用");
-    endpoint.dispose();
     this.disconnected.add(id);
+    await endpoint.dispose();
   }
   connect(id: string) {
     const endpoint = this.items.get(id);
@@ -101,7 +101,10 @@ export class Endpoints {
       });
     for (const c of extra) this.add(c);
   }
-  dispose() {
-    for (const e of this.items.values()) e.dispose();
+  abort() {
+    for (const e of this.items.values()) e.abort?.();
+  }
+  async dispose(deadline?: number) {
+    await Promise.all([...this.items.values()].map((e) => e.dispose(deadline)));
   }
 }

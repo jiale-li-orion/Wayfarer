@@ -76,6 +76,22 @@ export function TaskPanel({
           {job.files} 项 · {(job.bytes / 1048576).toFixed(1)} MiB ·{" "}
           {new Date(job.created).toLocaleString()}
         </p>
+        {job.pauseReason && (
+          <p>
+            {
+              {
+                shutdown: "窗口退出，等待接续",
+                "process-interrupted": "进程中断，等待接续",
+                network: "网络恢复后自动继续",
+                user: "已主动暂停",
+                "endpoint-disconnected": "端点已主动断开，连接后可继续",
+              }[job.pauseReason]
+            }
+          </p>
+        )}
+        {!!job.cleanupPending?.length && (
+          <p>暂存待清理 · {job.cleanupPending.length} 项</p>
+        )}
         {job.error && <p className="failure">{job.error}</p>}
         <div className="actions">
           {["running", "queued"].includes(job.state) &&
@@ -87,6 +103,17 @@ export function TaskPanel({
           )}
           {!["completed", "cancelled"].includes(job.state) && (
             <button onClick={() => action(job.id, "cancel")}>取消</button>
+          )}
+          {!!job.cleanupPending?.length && (
+            <button
+              onClick={() =>
+                void rpc("jobCleanup", { id: job.id })
+                  .then(() => load())
+                  .catch((e) => onError(String(e)))
+              }
+            >
+              清理任务暂存
+            </button>
           )}
           <button
             onClick={() =>

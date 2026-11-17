@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { Endpoints } from "../adapters/registry";
-import type { Endpoint, Entry, Ref } from "../shared/types";
+import type { Endpoint, Entry, Ref, Job } from "../shared/types";
 import { alias, assertName, changed, contains, pathApi } from "../shared/paths";
 import type { JobContext } from "./jobs";
 export interface TransferInput {
@@ -30,10 +30,50 @@ async function maybe(e: Endpoint, p: string) {
   }
 }
 export class Transfers {
+  private leases = 0;
+  private buffers = 0;
+  private bufferBytes = 0;
+  stats() {
+    return {
+      leases: this.leases,
+      buffers: this.buffers,
+      bufferBytes: this.bufferBytes,
+    };
+  }
+
   constructor(
     private endpoints: Endpoints,
     private invalidate: (r: Ref) => void,
   ) {}
+  async cleanup(job: Job) {
+    const registered =
+      job.cleanupPending ??
+      Object.values(job.checkpoint)
+        .filter((v: any) => v?.partial && !v.committed)
+        .map((v: any) => ({
+          endpoint: job.input.target.endpoint,
+          path: v.partial,
+        }));
+    const remaining: NonNullable<Job["cleanupPending"]> = [];
+    for (const item of registered) {
+      try {
+        const endpoint = this.endpoints.get(item.endpoint);
+        const paths = pathApi(endpoint.config);
+        if (
+          !paths
+            .basename(item.path)
+            .startsWith(".workspace-map-" + job.id + "-")
+        )
+          throw Error("Temporary file ownership mismatch");
+        const entry = await maybe(endpoint, item.path);
+        if (entry)
+          await endpoint.call("remove", { path: item.path, expected: entry });
+      } catch (error) {
+        remaining.push({ ...item, error: String(error) });
+      }
+    }
+    job.cleanupPending = remaining;
+  }
   async run(ctx: JobContext) {
     const input = ctx.job.input as TransferInput;
     const directMove =
@@ -49,13 +89,17 @@ export class Transfers {
             ? endpoint.openTransfer()
             : { endpoint, release() {} };
         scopes.set(id, scope);
+        this.leases++;
       }
       return scope.endpoint;
     };
     try {
       return await this.perform(ctx, get);
     } finally {
-      for (const scope of scopes.values()) scope.release();
+      for (const scope of scopes.values()) {
+        scope.release();
+        this.leases--;
+      }
     }
   }
   private async perform(ctx: JobContext, get: (id: string) => Endpoint) {
@@ -76,12 +120,16 @@ export class Transfers {
       }
       if (!buffer)
         buffer = await new Promise<Buffer>((resolve) => waiting.push(resolve));
+      this.buffers++;
+      this.bufferBytes += buffer.length;
       let released = false;
       return {
         buffer,
-        release() {
+        release: () => {
           if (released) return;
           released = true;
+          this.buffers--;
+          this.bufferBytes -= buffer!.length;
           const next = waiting.shift();
           if (next) next(buffer!);
           else free.push(buffer!);
@@ -422,6 +470,7 @@ export class Transfers {
         offset: 0,
       };
       ctx.job.checkpoint[k] = f;
+      await save();
       await dst.call("write", {
         path: f.partial,
         data: "",
@@ -433,7 +482,18 @@ export class Transfers {
     if (changed(f.source, s))
       throw Error("Source changed; source and partial retained: " + p);
     if (!f.committed) {
-      const partial = await dst.call<Entry>("stat", { path: f.partial });
+      let partial = await maybe(dst, f.partial);
+      if (!partial && f.offset === 0) {
+        await dst.call("write", {
+          path: f.partial,
+          data: "",
+          offset: 0,
+          exclusive: true,
+        });
+        partial = await dst.call<Entry>("stat", { path: f.partial });
+      }
+      if (!partial)
+        throw Error("Partial file missing after committed progress");
       if (partial.kind !== "file" || partial.size < f.offset)
         throw Error("Partial file changed: " + f.partial);
       if (f.offset) {

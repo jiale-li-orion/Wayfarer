@@ -2,10 +2,11 @@ import fs from "node:fs/promises";
 import { createReadStream } from "node:fs";
 import { createInterface } from "node:readline";
 import path from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, createHash } from "node:crypto";
 import { EventEmitter } from "node:events";
 import type { Job } from "../shared/types";
 import { Profiler } from "./log";
+import { grace, TransportLost } from "./lifecycle";
 export class Stopped extends Error {
   constructor(public state: "paused" | "cancelled") {
     super(state);
@@ -30,6 +31,98 @@ export class Jobs extends EventEmitter {
   private writes = Promise.resolve();
   private timers = new Map<string, NodeJS.Timeout>();
   private closed = false;
+  private closing?: Promise<void>;
+  private executions = new Map<string, Promise<void>>();
+  private cleanups = new Map<string, (j: Job) => Promise<void>>();
+  private submissions = new Map<string, Promise<any>>();
+  private logs = new Set<Promise<void>>();
+  private receipts = new Set<string>();
+  private get operationsDir() {
+    return path.join(this.dir, "operations");
+  }
+  registerCleanup(kind: string, cleanup: (j: Job) => Promise<void>) {
+    this.cleanups.set(kind, cleanup);
+  }
+  async operation(
+    id: string,
+    fingerprint: string,
+    create: (jobId: string) => Promise<any>,
+  ) {
+    if (!id || id.length > 256) throw Error("Invalid operationId");
+    const jobId = "op-" + createHash("sha256").update(id).digest("hex");
+    const existing = this.submissions.get(jobId);
+    if (existing) {
+      await existing;
+      return this.receipt(id, fingerprint);
+    }
+    const work = (async () => {
+      const old = await this.receipt(id, fingerprint);
+      if (old) return old;
+      const result = await create(jobId);
+      const job = this.get(result.id);
+      await this.writes;
+      return this.summary(job);
+    })();
+    this.submissions.set(jobId, work);
+    try {
+      return await work;
+    } finally {
+      this.submissions.delete(jobId);
+    }
+  }
+  async receipt(id: string, fingerprint?: string) {
+    const jobId = "op-" + createHash("sha256").update(id).digest("hex");
+    let job = this.records.get(jobId);
+    if (!job) {
+      const locator = await fs
+        .readFile(path.join(this.operationsDir, jobId + ".json"), "utf8")
+        .then(JSON.parse, (error) => {
+          if (error.code !== "ENOENT") throw error;
+          return undefined;
+        });
+      if (!locator) return undefined;
+      job = await this.stored(jobId, locator.created);
+    }
+    if (fingerprint && job!.operationFingerprint !== fingerprint)
+      throw Error("operationId already used for different arguments");
+    await this.writes;
+    return this.summary(job!);
+  }
+  resumeInterrupted() {
+    if (this.closed) return;
+    for (const job of this.records.values())
+      if (
+        job.kind === "transfer" &&
+        job.state === "paused" &&
+        ["shutdown", "process-interrupted"].includes(job.pauseReason ?? "")
+      ) {
+        job.state = "queued";
+        job.pauseReason = undefined;
+      }
+    this.pump();
+  }
+  pauseEndpoint(endpoint: string) {
+    for (const job of this.records.values()) {
+      if (job.kind !== "transfer" || this.terminal(job)) continue;
+      const input = job.input;
+      if (
+        input.target?.endpoint !== endpoint &&
+        !input.sources?.some((r: any) => r.endpoint === endpoint)
+      )
+        continue;
+      if (job.pauseReason === "user" || job.state === "failed") continue;
+      job.pauseReason = "endpoint-disconnected";
+      if (this.running.has(job.id)) this.requests.set(job.id, "paused");
+      else job.state = "paused";
+      void this.save(job).catch((error) =>
+        this.profile.record("journal.write", {
+          job: job.id,
+          error: String(error),
+        }),
+      );
+    }
+  }
+
   private get historyDir() {
     return path.join(this.dir, "history");
   }
@@ -50,6 +143,7 @@ export class Jobs extends EventEmitter {
       this.locks.delete(j.id);
       this.dirty.delete(j.id);
       this.inputs.delete(j.id);
+      this.receipts.delete(j.id);
     }
   }
   private dirty = new Map<string, Set<string>>();
@@ -66,6 +160,7 @@ export class Jobs extends EventEmitter {
   }
   async init() {
     await fs.mkdir(this.historyDir, { recursive: true, mode: 0o700 });
+    await fs.mkdir(this.operationsDir, { recursive: true, mode: 0o700 });
     for await (const entry of await fs.opendir(this.historyDir))
       if (entry.name.endsWith(".json")) this.historyCount++;
     for (const f of await fs.readdir(this.dir)) {
@@ -89,7 +184,7 @@ export class Jobs extends EventEmitter {
           this.historyCount++;
           continue;
         }
-        if (version === 2) {
+        if (version >= 2) {
           if (j.state !== "completed")
             j.input = JSON.parse(
               await fs.readFile(
@@ -125,10 +220,12 @@ export class Jobs extends EventEmitter {
             }
           }
         }
-        this.track(j, version !== 2);
+        this.track(j, !(version >= 2));
         if (["queued", "running"].includes(j.state)) {
           j.state = "paused";
-          j.progress = "窗口已关闭，可继续";
+          if (j.kind === "transfer" && version >= 3)
+            j.pauseReason ??= "process-interrupted";
+          j.progress = "执行中断，检查点已保留";
         }
         if (j.state === "completed") {
           j.input = undefined;
@@ -142,12 +239,22 @@ export class Jobs extends EventEmitter {
       }
     }
   }
-  submit(kind: string, input: any, locks: string[] = []): Job {
+  submit(
+    kind: string,
+    input: any,
+    locks: string[] = [],
+    identity?: {
+      id: string;
+      operationId: string;
+      operationFingerprint: string;
+    },
+  ): Job {
     if (this.closed) throw Error("Session is closing");
     if (!this.runners.has(kind)) throw Error("Unknown task kind");
     const now = Date.now();
     const j: Job = {
-      id: randomUUID(),
+      id: identity?.id ?? randomUUID(),
+      ...(identity ?? {}),
       kind,
       state: "queued",
       created: now,
@@ -158,6 +265,7 @@ export class Jobs extends EventEmitter {
       logs: [],
       checkpoint: { locks },
     };
+    if (this.records.has(j.id)) throw Error("Task already exists");
     this.track(j, true);
     this.records.set(j.id, j);
     this.locks.set(j.id, locks);
@@ -206,6 +314,10 @@ export class Jobs extends EventEmitter {
         this.terminal(j),
       ).length,
       running: this.running.size,
+      runners: this.executions.size,
+      submissions: this.submissions.size,
+      logWrites: this.logs.size,
+      closing: this.closed,
       heldLocks: this.held.size,
       progressTimers: this.timers.size,
       states,
@@ -215,6 +327,9 @@ export class Jobs extends EventEmitter {
     return [...this.records.values()]
       .sort((a, b) => b.created - a.created)
       .map((j) => this.summary(j));
+  }
+  durable() {
+    return this.writes;
   }
   busyCount() {
     let count = 0;
@@ -263,7 +378,7 @@ export class Jobs extends EventEmitter {
       total: this.historyCount,
     };
   }
-  private async stored(id: string) {
+  private async stored(id: string, created?: number) {
     if (!id || path.basename(id) !== id || id.includes("\\"))
       throw Error("Invalid task id");
     const current = await fs
@@ -273,6 +388,13 @@ export class Jobs extends EventEmitter {
         return undefined;
       });
     if (current) return JSON.parse(current);
+    if (created !== undefined)
+      return JSON.parse(
+        await fs.readFile(
+          path.join(this.historyDir, this.archiveName({ id, created })),
+          "utf8",
+        ),
+      );
     for await (const entry of await fs.opendir(this.historyDir)) {
       if (entry.name.endsWith("-" + id + ".json"))
         return JSON.parse(
@@ -338,14 +460,37 @@ export class Jobs extends EventEmitter {
         throw Error(
           "Package manager process state must be checked; submit a new command",
         );
+      if (this.running.has(id) || this.executions.has(id))
+        throw Error("Task execution is still stopping");
+      j.pauseReason = undefined;
       j.state = "queued";
       j.error = undefined;
       this.requests.delete(id);
     } else {
       const state = action === "pause" ? "paused" : "cancelled";
+      if (action === "pause") j.pauseReason = "user";
       if (["completed", "cancelled"].includes(j.state)) return j;
       if (this.running.has(id)) this.requests.set(id, state);
-      else j.state = state;
+      else if (state === "cancelled" && this.cleanups.has(j.kind)) {
+        j.state = "running";
+        this.running.add(id);
+        this.requests.set(id, "cancelled");
+        const cleanup = this.cancel(j)
+          .catch((error) => {
+            j.error = "Task journal: " + String(error);
+            this.profile.record("journal.write", {
+              job: j.id,
+              error: String(error),
+            });
+            this.emit("change", j);
+          })
+          .finally(() => {
+            this.running.delete(id);
+            this.executions.delete(id);
+            this.pump();
+          });
+        this.executions.set(id, cleanup);
+      } else j.state = state;
     }
     void this.save(j)
       .then(() => this.trimHistory())
@@ -385,7 +530,11 @@ export class Jobs extends EventEmitter {
         continue;
       this.running.add(j.id);
       this.held.set(j.id, this.locks.get(j.id) ?? []);
-      void this.run(j);
+      const execution = this.run(j).finally(() => {
+        if (this.executions.get(j.id) === execution)
+          this.executions.delete(j.id);
+      });
+      this.executions.set(j.id, execution);
     }
   }
   private async run(j: Job) {
@@ -411,7 +560,7 @@ export class Jobs extends EventEmitter {
         this.schedule(j);
       },
       log: (s) => {
-        void fs
+        const writing = fs
           .appendFile(path.join(this.dir, j.id + ".log"), s + "\n", {
             mode: 0o600,
           })
@@ -421,6 +570,8 @@ export class Jobs extends EventEmitter {
               error: String(error),
             }),
           );
+        this.logs.add(writing);
+        void writing.finally(() => this.logs.delete(writing));
         j.logs.push(s.slice(-16384));
         while (j.logs.join("").length > 32768) j.logs.shift();
         this.profile.record("job.output", { job: j.id, text: s.slice(-8192) });
@@ -431,7 +582,9 @@ export class Jobs extends EventEmitter {
     };
     try {
       j.result = await this.runners.get(j.kind)!(ctx);
+      ctx.check();
       j.state = "completed";
+      j.pauseReason = undefined;
       j.checkpoint = { locks: j.checkpoint.locks };
     } catch (e) {
       if (e instanceof Stopped || this.closed || this.requests.has(j.id)) {
@@ -439,10 +592,16 @@ export class Jobs extends EventEmitter {
           e instanceof Stopped
             ? e.state
             : (this.requests.get(j.id) ?? "paused");
+      } else if (j.kind === "transfer" && e instanceof TransportLost) {
+        j.state = "paused";
+        j.pauseReason = "network";
+        j.error = String(e);
+        this.emit("recover", j.id);
       } else {
         j.state = "failed";
         j.error = String(e);
       }
+      if (j.state === "cancelled") await this.cleanup(j);
     } finally {
       clearTimeout(this.timers.get(j.id));
       this.timers.delete(j.id);
@@ -464,6 +623,7 @@ export class Jobs extends EventEmitter {
         j.input = undefined;
         j.logs = [];
       }
+      this.executions.delete(j.id);
       this.emit("change", j);
       this.profile.record("job.end", {
         job: j.id,
@@ -497,11 +657,14 @@ export class Jobs extends EventEmitter {
   private save(j: Job) {
     const { input, checkpoint, result, logs, ...metadata } = j;
     const completed = this.terminal(metadata);
-    const payload = completed ? JSON.stringify({ result, logs }) : undefined;
+    const payload =
+      completed && (input !== undefined || result !== undefined)
+        ? JSON.stringify({ result, logs })
+        : undefined;
     const data = JSON.stringify({
       ...metadata,
       ...(!completed ? { result, logs } : {}),
-      journalVersion: 2,
+      journalVersion: 3,
     });
     const dirty = this.dirty.get(j.id) ?? new Set<string>();
     const changes = [...dirty]
@@ -521,7 +684,7 @@ export class Jobs extends EventEmitter {
     this.writes = this.writes
       .catch(() => {})
       .then(async () => {
-        if (!this.inputs.has(j.id)) {
+        if (!this.inputs.has(j.id) && input !== undefined) {
           await fs.writeFile(
             path.join(this.dir, j.id + ".input.json"),
             JSON.stringify(input),
@@ -539,6 +702,16 @@ export class Jobs extends EventEmitter {
           );
         await fs.writeFile(file + ".tmp", data, { mode: 0o600 });
         await fs.rename(file + ".tmp", file);
+        if (metadata.operationId && !this.receipts.has(j.id)) {
+          const locator = path.join(this.operationsDir, j.id + ".json");
+          await fs.writeFile(
+            locator + ".tmp",
+            JSON.stringify({ created: j.created }),
+            { mode: 0o600 },
+          );
+          await fs.rename(locator + ".tmp", locator);
+          this.receipts.add(j.id);
+        }
         if (completed) {
           const previous = await fs
             .stat(path.join(this.dir, j.id + ".json"))
@@ -552,16 +725,51 @@ export class Jobs extends EventEmitter {
       });
     return this.writes;
   }
-  async dispose() {
+  private async cleanup(j: Job) {
+    try {
+      await this.cleanups.get(j.kind)?.(j);
+    } catch (error) {
+      this.profile.record("job.cleanup", { job: j.id, error: String(error) });
+    }
+  }
+  private async cancel(j: Job) {
+    await this.cleanup(j);
+    j.state = "cancelled";
+    j.updated = Date.now();
+    await this.save(j);
+    this.emit("change", j);
+    this.trimHistory();
+  }
+  async cleanupTask(id: string) {
+    const job = this.records.get(id) ?? (await this.stored(id));
+    if (job.state !== "cancelled")
+      throw Error("Cleanup is for cancelled tasks");
+    await this.cleanup(job);
+    await this.save(job);
+    return this.summary(job);
+  }
+  dispose(force: () => void = () => {}) {
+    return (this.closing ??= this.close(force));
+  }
+  private async close(force: () => void) {
     this.closed = true;
-    for (const id of this.running) this.requests.set(id, "paused");
+    for (const id of this.running) {
+      const j = this.get(id);
+      if (!this.requests.has(id)) {
+        this.requests.set(id, "paused");
+        j.pauseReason = "shutdown";
+      }
+    }
     for (const t of this.timers.values()) clearTimeout(t);
     this.timers.clear();
     for (const j of this.records.values())
-      if (["running", "queued"].includes(j.state)) {
+      if (j.state === "queued" && !this.running.has(j.id)) {
         j.state = "paused";
+        j.pauseReason = "shutdown";
         await this.save(j);
       }
+    await grace(Promise.all([...this.executions.values()]), force);
+    await Promise.all([...this.logs]);
     await this.writes;
   }
 }

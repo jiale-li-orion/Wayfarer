@@ -1,3 +1,4 @@
+import { grace, EXIT_GRACE_MS } from "../core/lifecycle";
 import fs from "node:fs/promises";
 import { type Dir } from "node:fs";
 import path from "node:path";
@@ -565,20 +566,49 @@ export class NativeEndpoint implements Endpoint {
         });
       else {
         process.kill(-c.pid, "SIGTERM");
-        setTimeout(() => {
+        const killTimer = setTimeout(() => {
           if (c.exitCode === null && c.signalCode === null)
             try {
               process.kill(-c.pid!, "SIGKILL");
             } catch {}
-        }, 750).unref();
+        }, 750);
+        killTimer.unref();
+        c.once("close", () => clearTimeout(killTimer));
       }
     } catch {}
   }
-  dispose() {
+  private closing?: Promise<void>;
+  abort() {
+    for (const r of this.procs.values()) {
+      try {
+        if (process.platform === "win32") r.child.kill("SIGKILL");
+        else process.kill(-r.child.pid!, "SIGKILL");
+      } catch {}
+    }
+  }
+  dispose(deadline = Date.now() + EXIT_GRACE_MS) {
+    return (this.closing ??= this.close(deadline));
+  }
+  private async close(deadline: number) {
     this.closed = true;
     this.syncScanTimer();
-    for (const s of this.scans.keys()) void this.closeScan(s);
-    for (const r of this.procs.values()) this.kill(r.child);
+    const processes = [...this.procs.values()].map((r) => {
+      if (r.child.exitCode !== null || r.child.signalCode !== null)
+        return Promise.resolve();
+      const exited = new Promise<void>((resolve) =>
+        r.child.once("close", () => resolve()),
+      );
+      this.kill(r.child);
+      return exited;
+    });
+    await grace(
+      Promise.all([
+        ...processes,
+        ...[...this.scans.keys()].map((s) => this.closeScan(s)),
+      ]),
+      () => this.abort(),
+      Math.max(0, deadline - Date.now()),
+    );
     this.procs.clear();
   }
 }

@@ -32,6 +32,27 @@ export class Directories extends EventEmitter {
   private timer?: NodeJS.Timeout;
   private polling = false;
   private disposed = false;
+  private owners = new Map<
+    string,
+    { cursors: Map<string, { endpoint: string; cursor: string }> }
+  >();
+  attachOwner(id: string) {
+    if (!this.owners.has(id)) this.owners.set(id, { cursors: new Map() });
+  }
+  releaseOwner(id: string) {
+    const owner = this.owners.get(id);
+    this.owners.delete(id);
+    if (owner)
+      for (const { endpoint, cursor } of owner.cursors.values())
+        void this.endpoints.items
+          .get(endpoint)
+          ?.call("scanClose", { cursor })
+          .catch(() => {});
+  }
+  refreshConnections() {
+    this.reconcile();
+  }
+
   constructor(
     private endpoints: Endpoints,
     private profile: Profiler,
@@ -43,7 +64,7 @@ export class Directories extends EventEmitter {
     ref: Ref,
     cursor?: string,
     refresh = false,
-    scope: "ui" | "agent" | "editor" = "ui",
+    scope: string = "ui",
   ): Promise<Page> {
     const key = refKey(ref),
       known = this.cache.get(key);
@@ -63,6 +84,9 @@ export class Directories extends EventEmitter {
     if (!cursor && scope === "ui") this.closeUiCursor(key);
     const request = {};
     if (scope === "ui") this.uiReads.set(key, request);
+    const owner = this.owners.get(scope);
+    if (cursor && owner && !owner.cursors.has(cursor))
+      throw Error("Cursor belongs to another client");
     const endpoint = this.endpoints.get(ref.endpoint);
     try {
       const page = await this.profile.time(
@@ -89,6 +113,21 @@ export class Directories extends EventEmitter {
             .call("scanClose", { cursor: page.cursor })
             .catch(() => {});
         return { ...page, hasMore: !!page.cursor, cursor: undefined };
+      }
+      if (owner) {
+        if (cursor) owner.cursors.delete(cursor);
+        if (this.owners.get(scope) !== owner) {
+          if (page.cursor)
+            await endpoint
+              .call("scanClose", { cursor: page.cursor })
+              .catch(() => {});
+          throw Error("Client released while reading directory");
+        }
+        if (page.cursor)
+          owner.cursors.set(page.cursor, {
+            endpoint: ref.endpoint,
+            cursor: page.cursor,
+          });
       }
       if (scope === "ui") {
         if (page.cursor) this.uiCursors.set(key, page.cursor);
@@ -164,6 +203,11 @@ export class Directories extends EventEmitter {
   }
   stats() {
     return {
+      clients: this.owners.size,
+      clientCursors: [...this.owners.values()].reduce(
+        (n, o) => n + o.cursors.size,
+        0,
+      ),
       cachedBranches: this.cache.size,
       cachedEntries: this.entries,
       uiCursors: this.uiCursors.size,
@@ -366,6 +410,7 @@ export class Directories extends EventEmitter {
   }
   dispose() {
     this.disposed = true;
+    for (const id of this.owners.keys()) this.releaseOwner(id);
     this.external.clear();
     this.watch([]);
     clearTimeout(this.changeTimer);
