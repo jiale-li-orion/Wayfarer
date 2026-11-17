@@ -9,6 +9,8 @@ export interface TransferInput {
   mode: "copy" | "move";
   conflict: "skip" | "rename" | "overwrite";
 }
+type BufferLease = { buffer: Buffer; release(): void };
+type AcquireBuffer = () => Promise<BufferLease>;
 type FileProgress = {
   source: Entry;
   dest: string;
@@ -63,11 +65,29 @@ export class Transfers {
     const target = await dest.call<Entry>("stat", { path: input.target.path });
     if (target.kind !== "directory") throw Error("Target must be a directory");
     let skipped = 0;
-    let buffers: Buffer[] | undefined;
-    const getBuffers = () =>
-      (buffers ??= Array.from({ length: 4 }, () =>
-        Buffer.allocUnsafe(1048576),
-      ));
+    const free: Buffer[] = [];
+    const waiting: ((buffer: Buffer) => void)[] = [];
+    let allocated = 0;
+    const acquireBuffer: AcquireBuffer = async () => {
+      let buffer = free.pop();
+      if (!buffer && allocated < 4) {
+        allocated++;
+        buffer = Buffer.allocUnsafe(1048576);
+      }
+      if (!buffer)
+        buffer = await new Promise<Buffer>((resolve) => waiting.push(resolve));
+      let released = false;
+      return {
+        buffer,
+        release() {
+          if (released) return;
+          released = true;
+          const next = waiting.shift();
+          if (next) next(buffer!);
+          else free.push(buffer!);
+        },
+      };
+    };
     for (const source of input.sources) {
       ctx.check();
       const itemKey = source.endpoint + ":" + source.path;
@@ -202,7 +222,7 @@ export class Transfers {
         out,
         input.mode === "move",
         input.conflict === "overwrite",
-        getBuffers,
+        acquireBuffer,
       );
       this.invalidate(source);
       this.invalidate({ endpoint: dest.config.id, path: out });
@@ -219,7 +239,8 @@ export class Transfers {
     out: string,
     move: boolean,
     overwrite: boolean,
-    getBuffers: () => Buffer[],
+    acquireBuffer: AcquireBuffer,
+    parallel = true,
   ): Promise<void> {
     ctx.check();
     const k = src.config.id + ":" + p;
@@ -254,6 +275,7 @@ export class Transfers {
       // Snapshot child names before mutation: deleting source entries while scanning may skip files.
       const pendingKey = "children:" + k;
       let children: string[] = ctx.job.checkpoint[pendingKey];
+      const smallFiles = new Set<string>();
       if (!children) {
         children = [];
         try {
@@ -265,6 +287,9 @@ export class Transfers {
               limit: 200,
             });
             children.push(...page.entries.map((e: Entry) => e.path));
+            for (const entry of page.entries as Entry[])
+              if (entry.kind === "file" && entry.size <= 262144)
+                smallFiles.add(entry.path);
             cursor = page.cursor;
           } while (cursor);
         } finally {
@@ -273,17 +298,50 @@ export class Transfers {
         ctx.job.checkpoint[pendingKey] = children;
         await save();
       }
-      for (const child of children)
-        await this.copy(
-          ctx,
-          src,
-          child,
-          dst,
-          dpath.join(out, pathApi(src.config).basename(child)),
-          move,
-          overwrite,
-          getBuffers,
-        );
+      const batch: Promise<void>[] = [],
+        targets = new Set<string>();
+      const flush = async () => {
+        const results = await Promise.allSettled(batch.splice(0));
+        targets.clear();
+        const error = results.find((r) => r.status === "rejected");
+        if (error?.status === "rejected") throw error.reason;
+      };
+      for (const child of children) {
+        const target = dpath.join(out, pathApi(src.config).basename(child));
+        const key = alias(dst.config, target);
+        if (parallel && smallFiles.has(child)) {
+          if (targets.has(key)) await flush();
+          targets.add(key);
+          batch.push(
+            this.copy(
+              ctx,
+              src,
+              child,
+              dst,
+              target,
+              move,
+              overwrite,
+              acquireBuffer,
+              false,
+            ),
+          );
+          if (batch.length === 4) await flush();
+        } else {
+          await flush();
+          await this.copy(
+            ctx,
+            src,
+            child,
+            dst,
+            target,
+            move,
+            overwrite,
+            acquireBuffer,
+            parallel,
+          );
+        }
+      }
+      await flush();
       if (move) await src.call("remove", { path: p }); // rmdir refuses new children added during transfer.
       ctx.job.checkpoint[k] = { removed: move, committed: true };
       await save();
@@ -388,7 +446,6 @@ export class Transfers {
       }
       const chunk = 1048576;
       const window = 4;
-      const buffers = getBuffers();
       while (f.offset < s.size) {
         ctx.check();
         const start = f.offset;
@@ -397,38 +454,44 @@ export class Transfers {
           (_, i) => start + i * chunk,
         );
         const results = await Promise.allSettled(
-          offsets.map(async (offset, index) => {
-            const length = Math.min(chunk, s.size - offset);
-            let data: string | undefined;
-            let bytes: number;
-            const buffer = buffers[index];
-            if (src.readInto)
-              bytes = await src.readInto(p, buffer, offset, length);
-            else {
-              data = await src.call<string>("read", {
-                path: p,
-                offset,
-                length,
-              });
-              bytes =
-                (data.length * 3) / 4 -
-                (data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0);
-              if (dst.writeBuffer) buffer.write(data, 0, "base64");
+          offsets.map(async (offset) => {
+            const lease = await acquireBuffer();
+            try {
+              ctx.check();
+              const length = Math.min(chunk, s.size - offset);
+              let data: string | undefined;
+              let bytes: number;
+              const buffer = lease.buffer;
+              if (src.readInto)
+                bytes = await src.readInto(p, buffer, offset, length);
+              else {
+                data = await src.call<string>("read", {
+                  path: p,
+                  offset,
+                  length,
+                });
+                bytes =
+                  (data.length * 3) / 4 -
+                  (data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0);
+                if (dst.writeBuffer) buffer.write(data, 0, "base64");
+              }
+              if (bytes !== length) throw Error("Source changed during read");
+              if (dst.writeBuffer)
+                await dst.writeBuffer(
+                  f!.partial,
+                  buffer.subarray(0, bytes),
+                  offset,
+                );
+              else
+                await dst.call("write", {
+                  path: f!.partial,
+                  data: data ?? buffer.subarray(0, bytes).toString("base64"),
+                  offset,
+                });
+              return bytes;
+            } finally {
+              lease.release();
             }
-            if (bytes !== length) throw Error("Source changed during read");
-            if (dst.writeBuffer)
-              await dst.writeBuffer(
-                f!.partial,
-                buffer.subarray(0, bytes),
-                offset,
-              );
-            else
-              await dst.call("write", {
-                path: f!.partial,
-                data: data ?? buffer.subarray(0, bytes).toString("base64"),
-                offset,
-              });
-            return bytes;
           }),
         );
         const error = results.find((r) => r.status === "rejected");

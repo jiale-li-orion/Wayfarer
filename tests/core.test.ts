@@ -783,3 +783,54 @@ test("transfer scopes release after completion, failure and cancellation", async
     await f.close();
   }
 });
+
+test("bounded small-file batches preserve distinct bytes across pause and resume", async () => {
+  const f = await fixture();
+  const source = path.join(f.a, "batch"),
+    target = path.join(f.b, "batch");
+  await fs.mkdir(source);
+  const expected = new Map<string, Buffer>();
+  for (let n = 0; n < 24; n++) {
+    const bytes = Buffer.alloc([0, 1, 1023, 65537, 262144][n % 5], n + 11);
+    expected.set(`file-${n}`, bytes);
+    await fs.writeFile(path.join(source, `file-${n}`), bytes);
+  }
+  const endpoint = f.core.endpoints.get("b"),
+    write = endpoint.writeBuffer!.bind(endpoint);
+  let release!: () => void, reached!: () => void;
+  const gate = new Promise<void>((r) => (release = r)),
+    entered = new Promise<void>((r) => (reached = r));
+  endpoint.writeBuffer = async (...args) => {
+    reached();
+    await gate;
+    return write(...args);
+  };
+  try {
+    const job = await f.core.dispatch("transfer", {
+      sources: [{ endpoint: "a", path: source }],
+      target: { endpoint: "b", path: f.b },
+      mode: "move",
+      conflict: "overwrite",
+    });
+    await entered;
+    f.core.jobs.control(job.id, "pause");
+    release();
+    assert.equal((await finish(f.core, job.id)).state, "paused");
+    endpoint.writeBuffer = write;
+    f.core.jobs.control(job.id, "resume");
+    assert.equal((await finish(f.core, job.id)).state, "completed");
+    assert.equal(
+      await fs.stat(source).then(
+        () => true,
+        () => false,
+      ),
+      false,
+    );
+    for (const [name, bytes] of expected)
+      assert.deepEqual(await fs.readFile(path.join(target, name)), bytes);
+  } finally {
+    release?.();
+    endpoint.writeBuffer = write;
+    await f.close();
+  }
+});
