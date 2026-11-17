@@ -82,6 +82,10 @@ MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用�
 
 macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜索 Workspace Map 后修改。侧边栏沿用 VS Code 的方向键、Enter 和展开／收起操作。
 
+### 机器资源
+
+侧边栏「常用操作 → 机器资源」查看 Windows、WSL 与 SSH 主机；四端摘要、进程分页、GPU 和磁盘／网络逐级展开。页面隐藏停止自动采样，明确开始的记录保留后台生命周期。MCP 使用只读 `map_systemResources`；具体口径、资源归属和导出见 [说明](docs/SYSTEM_RESOURCES.md)。
+
 ### 与现有 VS Code 生态协作
 
-[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)记录实际精简与对照条件；[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)梳理现有语言服务、扩展工具、Codex 实验 LSP MCP 与 Wayfarer 的接入边界。本轮新增评审和开发探针，产品接口保持现状。
+[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)记录实际精简与对照条件；[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)梳理现有语言服务、扩展工具、Codex 实验 LSP MCP 与 Wayfarer 的接入边界。该评审记录现有能力与后续接入边界；产品现状见 STATE.md。

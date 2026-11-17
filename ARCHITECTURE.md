@@ -170,3 +170,7 @@ stateDiagram-v2
 `src/sidebar.ts` 提供原生 TreeView，机器来自 Endpoint 配置，书签来自 ViewState，操作通过已注册命令进入。侧边栏仅读取内存元数据；地图继续在原编辑区 Webview 中运行，沿用唯一 Core、目录缓存与监听归属。隐藏时标记待刷新，重新显示再通知 TreeView；端点和书签变化触发更新，释放视图时撤销事件监听。
 
 按键和侧边栏共用 extension.ts 的导航与界面命令。导航先更新 Core，再显示地图；搜索、任务和定位消息在 Webview bootstrap 回复后交接。隐藏或关闭地图重置 ready 状态，重新打开时继续交接待执行的界面操作。后台任务和 Agent 恢复沿原生命周期。
+
+## 四端系统资源（0.4.0）
+
+SystemMonitor 在原有 Core 下管理独立资源通道；资源页、MCP 共享机器快照，记录拥有独立订阅生命周期。Windows 多盘符合并，Python stdio 采集器通过 NVML、WinAPI／DXGI／PDH 或 /proc 读取资源。采集与目录控制／传输数据通道分离，页面隐藏释放其采集兴趣；明确记录与活动任务各自保留。完整链路、指标口径和只读 API 见 [SYSTEM_RESOURCES](docs/SYSTEM_RESOURCES.md)。

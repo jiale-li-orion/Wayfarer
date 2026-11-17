@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { build } from "esbuild";
-import { mkdir, writeFile, readFile, cp } from "node:fs/promises";
+import { mkdir, writeFile, readFile, cp, rm } from "node:fs/promises";
 await mkdir("dist", { recursive: true });
 await mkdir("artifacts", { recursive: true });
 await Promise.all([
@@ -26,6 +26,16 @@ await Promise.all([
     define: { "process.env.NODE_ENV": '"production"' },
   }),
   build({
+    entryPoints: ["src/ui/resources.tsx"],
+    outfile: "dist/resources.js",
+    bundle: true,
+    platform: "browser",
+    format: "iife",
+    minify: true,
+    target: "es2022",
+    define: { "process.env.NODE_ENV": '"production"' },
+  }),
+  build({
     entryPoints: ["src/ui/layout.worker.ts"],
     outfile: "dist/layout.js",
     bundle: true,
@@ -35,7 +45,12 @@ await Promise.all([
     target: "es2022",
   }),
 ]);
-await cp("helpers", "dist/helpers", { recursive: true });
+await rm("dist/helpers", { recursive: true, force: true });
+await cp("helpers", "dist/helpers", {
+  recursive: true,
+  filter: (source) =>
+    !source.includes("__pycache__") && !source.endsWith(".pyc"),
+});
 const metadata = {
   version: JSON.parse(await readFile("package.json", "utf8")).version,
   commit: execFileSync("git", ["rev-parse", "HEAD"], {

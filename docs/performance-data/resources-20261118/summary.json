@@ -1,0 +1,166 @@
+{
+  "scenario": "Windows VS Code 1.146.0, Ubuntu WSL; four connected resource targets; driver-read-only GPU sampling",
+  "resources": {
+    "resourceSeconds": 642.704,
+    "idleSeconds": 639.131,
+    "cycles": 50,
+    "perEndpoint": {
+      "windows-c": {
+        "samples": 61,
+        "cpuOneCorePercent": 0.027,
+        "collectorRssMiBMedian": 54.38,
+        "collectorRssMiBLast": 56.05,
+        "sampleMsMedian": 0,
+        "gpuCount": 2,
+        "gpuSources": [
+          "DXGI",
+          "NVML"
+        ]
+      },
+      "wsl-ubuntu": {
+        "samples": 61,
+        "cpuOneCorePercent": 0.0169,
+        "collectorRssMiBMedian": 39.72,
+        "collectorRssMiBLast": 39.73,
+        "sampleMsMedian": 4.76,
+        "gpuCount": 1,
+        "gpuSources": [
+          "NVML"
+        ]
+      },
+      "train": {
+        "samples": 61,
+        "cpuOneCorePercent": 0.0565,
+        "collectorRssMiBMedian": 47.2,
+        "collectorRssMiBLast": 47.2,
+        "sampleMsMedian": 1.27,
+        "gpuCount": 8,
+        "gpuSources": [
+          "NVML"
+        ]
+      },
+      "infer": {
+        "samples": 61,
+        "cpuOneCorePercent": 0.0055,
+        "collectorRssMiBMedian": 39.77,
+        "collectorRssMiBLast": 39.8,
+        "sampleMsMedian": 0.4,
+        "gpuCount": 1,
+        "gpuSources": [
+          "NVML"
+        ]
+      }
+    },
+    "idleHost": {
+      "scope": "shared-extension-host",
+      "cpuOneCorePercent": 0.0268,
+      "heapFirstMiB": 28.65,
+      "heapLastMiB": 29.29,
+      "allSamplesStopped": true,
+      "sampleCount": 41
+    },
+    "allCyclesStopped": true,
+    "cacheCounts": {
+      "first": 17,
+      "last": 17
+    },
+    "recordingBytes": 499118,
+    "recordingLines": 259,
+    "gpuChecks": {
+      "windows-c": 2,
+      "wsl-ubuntu": 1,
+      "train": 8,
+      "infer": 1
+    },
+    "completed": "2026-11-17T19:34:04.153Z"
+  },
+  "selectedProcessView": {
+    "seconds": 59.969,
+    "cpuOneCorePercent": 0.9525338091347194,
+    "medianSampleMs": 47.27,
+    "medianResponseBytes": 12710,
+    "processCount": 2509,
+    "rssLastMiB": 47.28125
+  },
+  "gpuComparison": {
+    "nvidia-smi": {
+      "calls": 5,
+      "medianCpuMs": 294.99399999999997,
+      "medianWallMs": 376.618595328182
+    },
+    "NVML": {
+      "calls": 5,
+      "medianCpuMs": 2.032000000000034,
+      "medianWallMs": 2.0415987819433212
+    }
+  },
+  "wslWorkspacePortDiscovery": {
+    "before": {
+      "durationSeconds": 25.286528,
+      "idleSeconds": 23.798668,
+      "activeOneCorePercent": 5.884002738533345,
+      "findCandidatePortsInclusiveMs": 252.983,
+      "spawnInclusiveMs": 497.261,
+      "gcMs": 176.558
+    },
+    "after": {
+      "durationSeconds": 25.149703,
+      "idleSeconds": 24.846053,
+      "activeOneCorePercent": 1.2073701228201394,
+      "findCandidatePortsInclusiveMs": 0.0,
+      "spawnInclusiveMs": 0.0,
+      "gcMs": 10.645
+    }
+  },
+  "windowsSecondarySidebar": [
+    {
+      "phase": "secondary-visible-before",
+      "seconds": 25.05860733985901,
+      "totalCpuOneCorePercent": 30.741,
+      "sharedWebviewRenderer": {
+        "role": "renderer",
+        "cpuOneCorePercent": 16.524,
+        "privateMedianMiB": 740.27,
+        "rssMedianMiB": 631.51
+      }
+    },
+    {
+      "phase": "secondary-hidden",
+      "seconds": 25.05666732788086,
+      "totalCpuOneCorePercent": 22.323,
+      "sharedWebviewRenderer": {
+        "role": "renderer",
+        "cpuOneCorePercent": 5.113,
+        "privateMedianMiB": 742.0,
+        "rssMedianMiB": 621.5
+      }
+    },
+    {
+      "phase": "secondary-visible-after",
+      "seconds": 25.09229350090027,
+      "totalCpuOneCorePercent": 14.322,
+      "sharedWebviewRenderer": {
+        "role": "renderer",
+        "cpuOneCorePercent": 9.341,
+        "privateMedianMiB": 737.66,
+        "rssMedianMiB": 620.82
+      }
+    }
+  ],
+  "agentCompatibility": {
+    "codex": {
+      "tool": "map_systemResources",
+      "endpoint": "train",
+      "gpuCount": 8,
+      "source": "NVML",
+      "actualModelTurn": true
+    },
+    "dsh": {
+      "tool": "map_systemResources",
+      "endpoint": "infer",
+      "gpuCount": 1,
+      "source": "NVML",
+      "actualModelTurn": true
+    }
+  }
+}

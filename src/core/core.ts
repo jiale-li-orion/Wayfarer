@@ -19,6 +19,7 @@ import {
 import { alias, assertName, pathApi } from "../shared/paths";
 import { capabilities, recipe } from "../packages/catalog";
 import { Inspector } from "./inspect";
+import { SystemMonitor } from "./monitor";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
   agentStats?: () => any;
@@ -27,6 +28,7 @@ export class Core extends EventEmitter {
   readonly jobs: Jobs;
   readonly transfers: Transfers;
   readonly inspector: Inspector;
+  readonly monitor: SystemMonitor;
   private inventories = new Map<string, string>();
   view = defaultView();
   restored = false;
@@ -81,6 +83,7 @@ export class Core extends EventEmitter {
       pageSize?: number;
       transferConcurrency?: number;
       trash?: (p: string) => Promise<void>;
+      monitorPython?: string;
     } = {},
   ) {
     super();
@@ -88,6 +91,15 @@ export class Core extends EventEmitter {
       helper,
       (s) => profile.record("endpoint", { message: s }),
       options.trash,
+    );
+    this.monitor = new SystemMonitor(
+      () => this.endpoints.configs(),
+      path.join(path.dirname(helper), "monitor.py"),
+      storage,
+      profile,
+      options.monitorPython,
+      undefined,
+      (id) => this.endpoints.enabled(id),
     );
     this.directories = new Directories(
       this.endpoints,
@@ -100,6 +112,7 @@ export class Core extends EventEmitter {
       options.transferConcurrency,
     );
     this.inspector = new Inspector(this.endpoints, storage, profile);
+    this.monitor.projects = () => this.inspector.projects();
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
     const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
       this.invalidateParent(r),
@@ -308,6 +321,8 @@ export class Core extends EventEmitter {
         return this.jobs.cleanupTask(a.id);
       case "endpoints":
         return this.endpoints.configs();
+      case "systemResources":
+        return this.monitor.snapshot(a);
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
@@ -329,6 +344,7 @@ export class Core extends EventEmitter {
           directories: this.directories.stats(),
           jobs: this.jobs.stats(),
           inspector: this.inspector.stats(),
+          monitor: this.monitor.stats(),
           endpoints: [...this.endpoints.items.values()].map((e) => ({
             id: e.config.id,
             connected: !!e.connected,
@@ -839,6 +855,7 @@ export class Core extends EventEmitter {
     for (const id of this.clients) this.releaseClient(id);
     const cache = this.directories.snapshot();
     this.directories.dispose();
+    await this.monitor.dispose();
     try {
       await this.jobs.dispose(() => this.endpoints.abort());
       this.stage = "persisting";

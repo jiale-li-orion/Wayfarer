@@ -3,3 +3,6 @@ dist/
 artifacts/
 .local/
 *.vsix
+
+__pycache__/
+*.py[cod]
