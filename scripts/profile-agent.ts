@@ -6,6 +6,7 @@ import { spawn, execFileSync } from "node:child_process";
 import { createInterface } from "node:readline";
 import { randomUUID } from "node:crypto";
 import { Core } from "../src/core/core";
+import { WorkspaceStore } from "../src/core/workspaces";
 import { Bridge } from "../src/mcp/bridge";
 import { Profiler } from "../src/core/log";
 const output = path.resolve(process.argv[2] ?? "artifacts/agent-profile.json");
@@ -77,6 +78,36 @@ try {
     await new Promise((r) => setTimeout(r, 20));
   }
   const ref = { endpoint: "bench", path: root };
+  core.workspaceStore = new WorkspaceStore(path.join(temp, "catalog"));
+  for (let i = 0; i < 24; i++) {
+    const endpoint = {
+      id: i === 17 ? "train" : "infer",
+      name: i === 17 ? "训练机" : "推理机",
+      kind: "ssh" as const,
+      host: i === 17 ? "train-fixture" : "infer-fixture",
+      root: "/home/user",
+    };
+    await core.workspaceStore.save({
+      name: "project-" + i,
+      locations: [
+        {
+          endpoint,
+          ref: { endpoint: endpoint.id, path: "/home/user/project-" + i },
+        },
+      ],
+    });
+  }
+  const favoritesFull = await measure(() => tool("workspaces"));
+  const favoritesFiltered = await measure(() =>
+    tool("workspaces", { query: "训练机", limit: 5 }),
+  );
+  if (
+    favoritesFull.value.length !== 24 ||
+    favoritesFiltered.value.length !== 1 ||
+    favoritesFiltered.value[0].name !== "project-17"
+  )
+    throw Error("Favorite lookup mismatch");
+
   const full = [],
     small = [],
     cli = [];
@@ -134,9 +165,20 @@ try {
     if (!["completed", "failed", "cancelled"].includes(result.state))
       await new Promise((r) => setTimeout(r, 10));
   } while (!["completed", "failed", "cancelled"].includes(result.state));
+  const searchWallMs = performance.now() - start;
+  const searchCalls = calls - initial;
+  const jobFull = await measure(() => tool("job", { id: job.id }));
+  const jobCompact = await measure(() =>
+    tool("job", { id: job.id, fields: ["summary"] }),
+  );
+  const readRef = { endpoint: "bench", path: path.join(root, "extension.ts") };
+  const opened = await measure(() =>
+    tool("read", { ref: readRef, length: 256 }),
+  );
+  if (!opened.value.data) throw Error("Expected source file content");
   const search = {
-    ms: performance.now() - start,
-    calls: calls - initial,
+    ms: searchWallMs,
+    calls: searchCalls,
     state: result.state,
     matches: result.result?.entries?.length,
   };
@@ -178,7 +220,35 @@ try {
         matches: found.value.trim().split("\n").filter(Boolean).length,
       },
     },
+    workflows: {
+      crossMachineFavorite: {
+        calls: 1,
+        fullBytes: favoritesFull.bytes,
+        filteredBytes: favoritesFiltered.bytes,
+        fullMs: favoritesFull.ms,
+        filteredMs: favoritesFiltered.ms,
+      },
+      listAndReadFile: {
+        calls: 2,
+        fullBytes: full[0].bytes + opened.bytes,
+        compactBytes: small[0].bytes + opened.bytes,
+        readBytes: opened.bytes,
+        readMs: opened.ms,
+      },
+      queryTaskStatus: {
+        calls: 1,
+        fullBytes: jobFull.bytes,
+        compactBytes: jobCompact.bytes,
+        fullMs: jobFull.ms,
+        compactMs: jobCompact.ms,
+      },
+    },
     payloads: {
+      favoritesFull: favoritesFull.value,
+      favoritesFiltered: favoritesFiltered.value,
+      jobFull: jobFull.value,
+      jobCompact: jobCompact.value,
+      opened: opened.value,
       listFull: full[0].value,
       listCompact: small[0].value,
       resourcesFull: resourcesFull.value,

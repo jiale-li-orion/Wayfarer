@@ -207,6 +207,20 @@ function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchJob, setSearchJob] = useState<string>();
+  const searchRun = useRef<{ operationId: string; jobId?: string } | undefined>(
+    undefined,
+  );
+  const stopSearch = () => {
+    const jobId = searchRun.current?.jobId;
+    searchRun.current = undefined;
+    setSearchJob(undefined);
+    if (jobId)
+      void rpc("jobControl", { id: jobId, action: "cancel" }).catch(() => {});
+  };
+  const closeSearch = () => {
+    stopSearch();
+    setSearchOpen(false);
+  };
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [transfer, setTransfer] = useState<{
     sources: Ref[];
@@ -469,8 +483,12 @@ function App() {
       )
         void load(m.ref, true);
       if (m.type === "jobCount") setBusy(m.count);
-      if (m.type === "search")
-        setSearchResults((old) => [...old, ...m.entries].slice(0, 10000));
+      if (
+        m.type === "search" &&
+        m.operationId &&
+        searchRun.current?.operationId === m.operationId
+      )
+        setSearchResults((old) => [...old, ...m.entries].slice(-300));
       if (m.type === "offline")
         setBranches((old) => {
           const k = refKey(m.ref);
@@ -734,8 +752,23 @@ function App() {
     const ref = workDirectory;
     if (!ref) throw Error("先进入要搜索的目录");
     if (!query.trim()) return;
+    stopSearch();
     setSearchResults([]);
-    const j = await rpc("search", { ref, query });
+    const run = {
+      operationId: crypto.randomUUID(),
+      jobId: undefined as string | undefined,
+    };
+    searchRun.current = run;
+    const j = await rpc("search", {
+      ref,
+      query: query.trim(),
+      operationId: run.operationId,
+    });
+    if (searchRun.current !== run) {
+      void rpc("jobControl", { id: j.id, action: "cancel" }).catch(() => {});
+      return;
+    }
+    run.jobId = j.id;
     setSearchJob(j.id);
   };
   const packageInput = () => {
@@ -901,7 +934,10 @@ function App() {
         >
           <Icon name="screen-full" />
         </button>
-        <button title="按名称找文件" onClick={() => setSearchOpen((v) => !v)}>
+        <button
+          title="按名称找文件"
+          onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
+        >
           <Icon name="search" />
         </button>
         <button
@@ -1008,7 +1044,7 @@ function App() {
         <section className="floating search">
           <h2>
             按名称找文件
-            <button onClick={() => setSearchOpen(false)}>
+            <button onClick={closeSearch}>
               <Icon name="close" />
             </button>
           </h2>
@@ -1033,12 +1069,7 @@ function App() {
               搜索
             </button>
             {searchJob && (
-              <button
-                type="button"
-                onClick={() =>
-                  act("jobControl", { id: searchJob, action: "cancel" })
-                }
-              >
+              <button type="button" onClick={stopSearch}>
                 停止
               </button>
             )}
@@ -1062,7 +1093,11 @@ function App() {
               </button>
             ))}
           </div>
-          <p>{searchResults.length} 项 · 显示最近 300 项</p>
+          <p>
+            {searchResults.length === 300
+              ? "显示最近 300 项"
+              : `${searchResults.length} 项`}
+          </p>
         </section>
       )}
       {jobsOpen && (

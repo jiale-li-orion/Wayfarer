@@ -111,3 +111,49 @@ test("legacy map favorites import once and preserve existing names", async () =>
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
+
+test("windows share named SSH machines without overwriting an existing import or disconnect", async () => {
+  const { MachineStore } = await import("../src/core/machines");
+  const { Endpoints } = await import("../src/adapters/registry");
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wm-machines-"));
+  const first = new MachineStore(dir),
+    second = new MachineStore(dir);
+  const endpoints = new Endpoints(
+    path.resolve("helpers/endpoint.py"),
+    () => {},
+  );
+  try {
+    await first.prepare();
+    const train = {
+      id: "train",
+      kind: "ssh" as const,
+      host: "gpu-lab",
+      name: "Training",
+      root: "/home/user",
+    };
+    const infer = {
+      ...train,
+      id: "infer",
+      host: "serve-lab",
+      name: "Inference",
+    };
+    await Promise.all([first.save(train, true), second.save(infer)]);
+    assert.deepEqual((await second.list()).map((m) => m.id).sort(), [
+      "infer",
+      "train",
+    ]);
+    const attached = endpoints.add(train);
+    await endpoints.disconnect(train.id);
+    await second.save({ ...train, name: "训练机" });
+    await first.save(train, true);
+    const saved = (await first.list()).find((m) => m.id === "train")!;
+    assert.equal(saved.name, "训练机");
+    assert.equal(saved.host, train.host);
+    attached.config.name = saved.name;
+    assert.equal(endpoints.items.get("train"), attached);
+    assert.equal(endpoints.enabled("train"), false);
+  } finally {
+    await endpoints.dispose();
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});

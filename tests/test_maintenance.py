@@ -221,13 +221,15 @@ class SshSetupTests(unittest.TestCase):
             calls=[]
             def execute(argv,**kwargs):
                 calls.append((argv,kwargs))
+                if argv[-1]=='true':
+                    return subprocess.CompletedProcess(argv,255)
                 return subprocess.CompletedProcess(argv,0,stdout='WAYFARER_SETUP={"home":"/home/alice","python":"/usr/bin/python3"}\n')
             with mock.patch.object(pathlib.Path,'home',return_value=home),mock.patch.object(subprocess,'run',side_effect=execute):
                 result=module['setup']('alice@host:2222','wayfarer-test',home/'report.json')
             self.assertEqual(result['status'],'completed')
-            self.assertEqual(calls[0][1]['input'],'ssh-ed25519 AAAA fixture\n')
-            self.assertIn('PubkeyAuthentication=no',calls[0][0])
-            self.assertIn('BatchMode=yes',calls[1][0])
+            self.assertEqual(calls[1][1]['input'],'ssh-ed25519 AAAA fixture\n')
+            self.assertIn('PubkeyAuthentication=no',calls[1][0])
+            self.assertIn('BatchMode=yes',calls[2][0])
             self.assertIn('IdentityFile',pathlib.Path(result['sshConfig']).read_text())
             self.assertNotIn('password',pathlib.Path(result['sshConfig']).read_text().lower())
             if os.name!='nt':self.assertEqual(key.stat().st_mode & 0o777,0o600)

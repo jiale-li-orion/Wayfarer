@@ -1176,7 +1176,18 @@
     "description": "List global favorite native workspaces and their endpoint locations. Does not switch windows.",
     "inputSchema": {
       "type": "object",
-      "properties": {},
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "Filter favorites by name, path or machine before returning results."
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Maximum returned favorites. Filtered calls default to 20."
+        }
+      },
       "additionalProperties": false
     },
     "annotations": {

@@ -122,7 +122,7 @@ export function createSidebar(core: Core): vscode.Disposable {
       row.id = item.id;
       row.contextValue = item.workspaceId
         ? "workspaceMap.favorite"
-        : item.id.startsWith("endpoint:")
+        : item.id.startsWith("endpoint:") && item.icon === "remote"
           ? "workspaceMap.machine"
           : item.ref
             ? "workspaceMap.directory"
