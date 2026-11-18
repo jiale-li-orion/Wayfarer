@@ -52,16 +52,7 @@ async function runSshSetup(
           )
         )?.e;
   if (!transport) throw Error("请先添加本机或 WSL 环境");
-  const name = await vscode.window.showInputBox({
-    title: "机器名称",
-    value: target,
-    validateInput: (v) =>
-      !v.trim() || /[\r\n]/.test(v) || v.length > 80
-        ? "请输入 1–80 字符的名称"
-        : undefined,
-    ignoreFocusOut: true,
-  });
-  if (!name) return;
+  let name = target;
   const endpoint = core.endpoints.get(transport.id);
   const info = await endpoint.call("info");
   const source = await fs.readFile(helper);
@@ -157,6 +148,16 @@ async function runSshSetup(
         }
       },
     );
+    name =
+      (
+        await vscode.window.showInputBox({
+          title: "机器名称（可跳过，默认使用地址）",
+          value: target,
+          validateInput: (v) =>
+            /[\r\n]/.test(v) || v.length > 80 ? "名称最多80字符" : undefined,
+          ignoreFocusOut: true,
+        })
+      )?.trim() || target;
     const machine: EndpointConfig = {
       id,
       name: name.trim(),
