@@ -1,0 +1,213 @@
+{
+  "measurements": {
+    "windows-profile": {
+      "samples": 61,
+      "durationSeconds": 599.993,
+      "collectorOneCorePercent": 0.898447981893122,
+      "phases": {
+        "verified-resources-visible": {
+          "samples": 12,
+          "codePrivateMiBMedian": 1943.330078125,
+          "codeCpuOneCoreMedian": 15.390373883479219,
+          "availableMiBMedian": 2140.03515625
+        },
+        "verified-resources-hidden": {
+          "samples": 4,
+          "codePrivateMiBMedian": 1915.107421875,
+          "codeCpuOneCoreMedian": 13.333145364081323,
+          "availableMiBMedian": 2095.59375
+        }
+      },
+      "applications": [
+        {
+          "application": "wsl-vm",
+          "privateMiBMedian": 9577.6640625,
+          "rssMiBMedian": 4292.73046875
+        },
+        {
+          "application": "msedge.exe",
+          "privateMiBMedian": 2475.25,
+          "rssMiBMedian": 1851.1171875
+        },
+        {
+          "application": "qq.exe",
+          "privateMiBMedian": 2269.9296875,
+          "rssMiBMedian": 664.5546875
+        },
+        {
+          "application": "vscode",
+          "privateMiBMedian": 1976.8359375,
+          "rssMiBMedian": 1315.28125
+        },
+        {
+          "application": "nvidia overlay.exe",
+          "privateMiBMedian": 1093.921875,
+          "rssMiBMedian": 150.54296875
+        },
+        {
+          "application": "wechatappex.exe",
+          "privateMiBMedian": 698.4453125,
+          "rssMiBMedian": 296.3515625
+        },
+        {
+          "application": "explorer.exe",
+          "privateMiBMedian": 575.7578125,
+          "rssMiBMedian": 219.21875
+        },
+        {
+          "application": "sakuracat.exe",
+          "privateMiBMedian": 509.28515625,
+          "rssMiBMedian": 473.375
+        }
+      ]
+    },
+    "wsl-profile": {
+      "samples": 61,
+      "durationSeconds": 614.718,
+      "collectorOneCorePercent": 0.36815961237510525,
+      "phases": {
+        "verified-resources-visible": {
+          "samples": 12,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0.0,
+          "availableMiBMedian": 5711.3984375
+        },
+        "verified-resources-hidden": {
+          "samples": 5,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5727.5625
+        }
+      }
+    },
+    "controlled-windows": {
+      "samples": 61,
+      "durationSeconds": 600.003,
+      "collectorOneCorePercent": 0.8411416276251952,
+      "phases": {
+        "verified-resources-hidden": {
+          "samples": 5,
+          "codePrivateMiBMedian": 1920.66015625,
+          "codeCpuOneCoreMedian": 26.25495703231666,
+          "availableMiBMedian": 2111.19140625
+        },
+        "verified-resources-closed": {
+          "samples": 5,
+          "codePrivateMiBMedian": 2018.59765625,
+          "codeCpuOneCoreMedian": 14.530031630486382,
+          "availableMiBMedian": 2461.83203125
+        },
+        "verified-codex-sidebar-hidden": {
+          "samples": 17,
+          "codePrivateMiBMedian": 1969.52734375,
+          "codeCpuOneCoreMedian": 1.407451683336066,
+          "availableMiBMedian": 2585.83984375
+        },
+        "verified-codex-sidebar-visible": {
+          "samples": 9,
+          "codePrivateMiBMedian": 1955.05078125,
+          "codeCpuOneCoreMedian": 17.987508573830794,
+          "availableMiBMedian": 2682.609375
+        },
+        "verified-restored-editor": {
+          "samples": 4,
+          "codePrivateMiBMedian": 1937.486328125,
+          "codeCpuOneCoreMedian": 10.77033263378075,
+          "availableMiBMedian": 2733.61328125
+        }
+      },
+      "applications": [
+        {
+          "application": "wsl-vm",
+          "privateMiBMedian": 9789.49609375,
+          "rssMiBMedian": 3034.6875
+        },
+        {
+          "application": "msedge.exe",
+          "privateMiBMedian": 2549.62109375,
+          "rssMiBMedian": 1821.26171875
+        },
+        {
+          "application": "qq.exe",
+          "privateMiBMedian": 2282.91796875,
+          "rssMiBMedian": 649.96875
+        },
+        {
+          "application": "vscode",
+          "privateMiBMedian": 2072.5546875,
+          "rssMiBMedian": 1726.8515625
+        },
+        {
+          "application": "nvidia overlay.exe",
+          "privateMiBMedian": 1096.5859375,
+          "rssMiBMedian": 156.81640625
+        },
+        {
+          "application": "wechatappex.exe",
+          "privateMiBMedian": 757.15234375,
+          "rssMiBMedian": 412.8046875
+        },
+        {
+          "application": "explorer.exe",
+          "privateMiBMedian": 575.9453125,
+          "rssMiBMedian": 219.74609375
+        },
+        {
+          "application": "sakuracat.exe",
+          "privateMiBMedian": 510.15234375,
+          "rssMiBMedian": 474.2734375
+        }
+      ]
+    },
+    "controlled-wsl": {
+      "samples": 61,
+      "durationSeconds": 616.721,
+      "collectorOneCorePercent": 0.36614316425093346,
+      "phases": {
+        "verified-resources-hidden": {
+          "samples": 5,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5738.48828125
+        },
+        "verified-resources-closed": {
+          "samples": 5,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5751.265625
+        },
+        "verified-codex-sidebar-hidden": {
+          "samples": 17,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5684.40234375
+        },
+        "verified-codex-sidebar-visible": {
+          "samples": 9,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5810.97265625
+        },
+        "verified-restored-editor": {
+          "samples": 3,
+          "codePrivateMiBMedian": 0.0,
+          "codeCpuOneCoreMedian": 0,
+          "availableMiBMedian": 5783.98046875
+        }
+      }
+    }
+  },
+  "limits": [
+    "Only screenshot-confirmed phases are included.",
+    "Global application activity and Agent output changed during the run.",
+    "Private commit, RSS and PSS have distinct accounting."
+  ],
+  "excludedPhaseLabels": [
+    "resources-visible",
+    "verified-markdown-source",
+    "verified-markdown-preview-visible",
+    "file-open-check",
+    "markdown-preview-check"
+  ],
+  "prOverview": "No active PR overview instance in the current window; no checkout/review session created."
+}

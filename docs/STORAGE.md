@@ -36,7 +36,7 @@ Windows 普通删除仍进入回收站，任务日志保留其语义；永久清
 
 ## WSL 维护
 
-scripts/windows-wsl-maintenance.py 默认只写预览。显式 --execute 在 Windows 管理员终端执行：退出 WSL、确认发行版持续停止、写入指定固定 swapFile、逐项核对清单路径和挂载状态后处理交换文件。挂载状态查询失败保留文件，WSL 再次启动就停止维护。脚本只接受 Windows Temp 下 GUID 目录中的 swap.vhdx，系统盘与其他文件保持原状。启动前结束 WSL 内任务和 Agent 会话；结果记录于清单所在目录。
+独立Windows维护入口默认生成文件身份预览；显式执行时在WSL停机后取得独占句柄，核对同一文件对象并回收选定旧交换文件。现役目标存在且配置一致时支持重跑；Get-DiskImage保留为辅助诊断，身份或独占校验失败时保留文件。入口、退出码与离线步骤统一见 [WSL维护](WSL_MAINTENANCE.md)。
 
 ## 0.7.0：容量刷新与快照对比
 
