@@ -1,4 +1,4 @@
-# Workspace Map · 0.6.0
+# Workspace Map · 0.6.1
 
 训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。仓库 jiale-li-orion/Wayfarer，显示名称 Workspace Map。训练机独立工作树开发，本机安装验收，产物留 D 盘。
 
@@ -8,7 +8,7 @@
 
 任务详情可选择字段，客户端可显式关闭自己的目录游标；pip 缓存管理补齐。损坏协议立即拒绝该通道的请求并关闭所属进程。
 
-实际四端扫描、50 轮页面开关、十分钟待机与百万文件扫描已核对，数据见 PERFORMANCE.md 和 docs/performance-data/storage-20261118。源码沿 CI/Release 交付 0.6.0 VSIX、摘要和版本身份；本机日常窗口重载后启用新版本。
+实际四端扫描、50 轮页面开关、十分钟待机与百万文件扫描已核对，数据见 PERFORMANCE.md 和 docs/performance-data/storage-20261118。存储扫描 MCP 已纳入后台收据恢复，提交确认中断后返回原任务。源码沿 CI/Release 交付 0.6.1 VSIX、摘要和版本身份；本机日常窗口重载后启用新版本。
 
 ## C 盘维护
 

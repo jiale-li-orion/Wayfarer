@@ -478,53 +478,71 @@ test("one MCP client survives 50 rebinds and ten instance replacements with boun
     );
     assert.equal((await tool("connection")).pendingRequests, 0);
     await assert.rejects(fs.stat(path.join(f.target, "oversized")));
-    const originalDispatch = core.dispatch.bind(core);
-    let restart: Promise<void> | undefined;
-    core.dispatch = async (...params) => {
-      const result = await originalDispatch(...params);
-      if (params[0] === "mkdir" && params[1]?.operationId === "ack-dropped") {
-        const oldCore = core,
-          oldBridge = bridge;
-        oldBridge.stopIngress(); // Task was durable; its response is deliberately lost.
-        restart = new Promise<void>((resolve) =>
-          setTimeout(async () => {
-            await oldCore.dispose();
-            await oldBridge.dispose();
-            core = await f.open();
-            bridge = new Bridge(
-              core,
-              path.resolve("helpers"),
-              "same-name",
-              mapId,
-            );
-            await bridge.start();
-            resolve();
-          }, 0),
+    for (const method of ["mkdir", "storageScan"]) {
+      const operationId = "ack-dropped-" + method;
+      const originalDispatch = core.dispatch.bind(core);
+      let restart: Promise<void> | undefined;
+      let acceptedId: string | undefined;
+      core.dispatch = async (...params) => {
+        const result = await originalDispatch(...params);
+        if (params[0] === method && params[1]?.operationId === operationId) {
+          acceptedId = result.id;
+          const oldCore = core,
+            oldBridge = bridge;
+          oldBridge.stopIngress();
+          restart = new Promise<void>((resolve) =>
+            setTimeout(async () => {
+              await oldCore.dispose();
+              await oldBridge.dispose();
+              core = await f.open();
+              bridge = new Bridge(
+                core,
+                path.resolve("helpers"),
+                "same-name",
+                mapId,
+              );
+              await bridge.start();
+              resolve();
+            }, 0),
+          );
+        }
+        return result;
+      };
+      const recovered = await tool(method, {
+        ref: { endpoint: "target", path: f.target },
+        operationId,
+        ...(method === "mkdir" ? { name: "ack recovered" } : {}),
+      });
+      await restart;
+      assert.equal(recovered.id, acceptedId);
+      assert.equal(recovered.operationId, operationId);
+      assert.equal(
+        (await core.dispatch("operation", { operationId })).id,
+        recovered.id,
+      );
+      if (method === "mkdir") {
+        assert.equal(
+          (
+            await until(
+              () => core.jobs.details(recovered.id),
+              (j) => j.state === "completed",
+            )
+          ).state,
+          "completed",
+        );
+        assert.equal(
+          (await fs.readdir(f.target)).filter(
+            (name) => name === "ack recovered",
+          ).length,
+          1,
+        );
+      } else {
+        assert.equal(
+          core.jobs.list().filter((j) => j.operationId === operationId).length,
+          1,
         );
       }
-      return result;
-    };
-    const recovered = await tool("mkdir", {
-      ref: { endpoint: "target", path: f.target },
-      name: "ack recovered",
-      operationId: "ack-dropped",
-    });
-    await restart;
-    assert.equal(recovered.operationId, "ack-dropped");
-    assert.equal(
-      (
-        await until(
-          () => core.jobs.details(recovered.id),
-          (j) => j.state === "completed",
-        )
-      ).state,
-      "completed",
-    );
-    assert.equal(
-      (await fs.readdir(f.target)).filter((name) => name === "ack recovered")
-        .length,
-      1,
-    );
+    }
     const args = {
       ref: { endpoint: "target", path: f.target },
       name: "mcp operation",
