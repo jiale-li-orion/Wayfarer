@@ -52,9 +52,67 @@ export async function runPackage(endpoints: Endpoints, ctx: JobContext) {
     return { root, ...result };
   }
   ctx.check();
+  const env: Record<string, string> = {};
+  if (i.manager === "uv" && i.action.startsWith("project-")) {
+    const pp = pathApi(e.config);
+    const manifest = await e.call("stat", {
+      path: pp.join(i.cwd, "pyproject.toml"),
+    });
+    if (manifest.kind !== "file")
+      throw Error("选择包含 pyproject.toml 的项目根目录");
+    // Project operations never inherit an unrelated active environment.
+    const root = i.python
+      ? pp.dirname(pp.dirname(i.python))
+      : pp.join(i.cwd, ".venv");
+    if (
+      i.python &&
+      (!pp.isAbsolute(i.python) ||
+        !/[\\/](bin|Scripts)[\\/]python[^\\/]*$/i.test(i.python))
+    )
+      throw Error("选择现有虚拟环境中的 Python 解释器");
+    if (i.python) {
+      const markers: any[] = await e.call("statMany", {
+        paths: [pp.join(root, "pyvenv.cfg"), pp.join(root, "conda-meta")],
+      });
+      if (!markers.some((m) => m.kind === "file" || m.kind === "directory"))
+        throw Error("所选 Python 缺少虚拟环境标记");
+    }
+    const python =
+      i.python ??
+      pp.join(
+        root,
+        e.config.kind === "windows" ? "Scripts/python.exe" : "bin/python",
+      );
+    const s = await e.call("stat", { path: python }).catch(() => undefined);
+    if (
+      !s ||
+      !(s.kind === "file" || (s.kind === "symlink" && s.targetKind === "file"))
+    )
+      throw Error("项目 .venv 尚未就绪；本轮仅管理已有环境");
+    env.UV_PROJECT_ENVIRONMENT = root;
+    env.UV_PYTHON_DOWNLOADS = "never";
+  }
+  if (
+    i.manager === "uv" &&
+    ["list", "install", "uninstall", "update"].includes(i.action) &&
+    !i.python
+  )
+    throw Error("选择具体 Python 解释器后操作环境包");
+  if (i.node) {
+    const pp = pathApi(e.config);
+    if (!pp.isAbsolute(i.node)) throw Error("Node 运行时需要绝对路径");
+    const runtime = await e.call("stat", { path: i.node });
+    if (
+      runtime.kind !== "file" &&
+      !(runtime.kind === "symlink" && runtime.targetKind === "file")
+    )
+      throw Error("Node 运行时路径已失效");
+  }
   const { id, pid } = await e.call("execStart", {
     argv: plan.argv,
     cwd: plan.cwd,
+    env,
+    runtime: i.node,
   });
   ctx.job.checkpoint.process = { id, pid };
   await ctx.save();

@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import path from "node:path";
 import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
+import { createWorkspaceCommands } from "./workspaces";
+import { createEnvironmentView } from "./environmentView";
 import { createSidebar } from "./sidebar";
 import { createResourceView } from "./resources";
 import { Core } from "./core/core";
@@ -93,6 +95,8 @@ export async function activate(context: vscode.ExtensionContext) {
       isCaseSensitive: false,
     }),
   );
+  context.subscriptions.push(createWorkspaceCommands(context, core));
+  context.subscriptions.push(createEnvironmentView(context, core, provider));
   context.subscriptions.push(createSidebar(core));
   context.subscriptions.push(createResourceView(context, core));
   await vscode.commands.executeCommand(
@@ -202,6 +206,18 @@ export async function activate(context: vscode.ExtensionContext) {
               capabilities,
               restored: core.restored,
             };
+            break;
+          case "favoriteDirectory":
+            result = await vscode.commands.executeCommand(
+              "workspaceMap.favoriteDirectory",
+              m.args.ref,
+            );
+            break;
+          case "environmentView":
+            result = await vscode.commands.executeCommand(
+              "workspaceMap.environment",
+              [m.args.ref],
+            );
             break;
           case "open":
             await openFile(m.args.ref);

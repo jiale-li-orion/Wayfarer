@@ -6,6 +6,7 @@ export type PackageInput = {
   packages?: string[];
   executable?: string;
   python?: string;
+  node?: string;
   source?: string;
   channel?: string;
   entry?: string;
@@ -16,9 +17,18 @@ export interface Recipe {
   cwd: string;
   source: string;
   mutating: boolean;
+  env?: Record<string, string>;
+  runtime?: string;
 }
 export const capabilities: Record<string, string[]> = {
   uv: [
+    "project-add",
+    "project-remove",
+    "project-update",
+    "project-sync",
+    "python-installed",
+    "python-dir",
+    "tool-dir",
     "environments",
     "list",
     "install",
@@ -81,6 +91,7 @@ export const capabilities: Record<string, string[]> = {
 export type PackageField =
   | "packages"
   | "python"
+  | "node"
   | "executable"
   | "source"
   | "channel"
@@ -92,6 +103,12 @@ export function fieldsFor(manager: string, action: string): PackageField[] {
       ? ["entry", "cacheRoot"]
       : ["cacheRoot"];
   const fields: PackageField[] = ["executable"];
+  if (["npm", "pnpm", "bun"].includes(manager)) fields.push("node");
+  if (manager === "uv" && action.startsWith("project-")) {
+    if (action !== "project-sync") fields.unshift("packages");
+    fields.push("python");
+    return fields;
+  }
   if (
     /install|uninstall|update/.test(action) ||
     (manager === "uv" && action === "cache-clean")
@@ -119,6 +136,7 @@ export function recipe(i: PackageInput): Recipe {
   for (const key of [
     "packages",
     "python",
+    "node",
     "executable",
     "source",
     "channel",
@@ -149,7 +167,11 @@ export function recipe(i: PackageInput): Recipe {
     "tool-uninstall",
     "tool-update",
   ];
-  if (required.includes(i.action) && !packages.length)
+  if (
+    (required.includes(i.action) ||
+      ["project-add", "project-remove", "project-update"].includes(i.action)) &&
+    !packages.length
+  )
     throw Error("Select explicit packages/tools");
   let cmd =
     i.executable ??
@@ -167,7 +189,36 @@ export function recipe(i: PackageInput): Recipe {
     case "uv":
       args = (
         {
-          environments: ["python", "list"],
+          "project-add": [
+            "add",
+            "--no-sync",
+            "--no-python-downloads",
+            ...(i.python ? ["--python", i.python] : []),
+            ...packages,
+          ],
+          "project-remove": [
+            "remove",
+            "--no-sync",
+            "--no-python-downloads",
+            ...(i.python ? ["--python", i.python] : []),
+            ...packages,
+          ],
+          "project-update": [
+            "lock",
+            "--no-python-downloads",
+            ...(i.python ? ["--python", i.python] : []),
+            ...packages.flatMap((p) => ["--upgrade-package", p]),
+          ],
+          "project-sync": [
+            "sync",
+            "--locked",
+            "--no-python-downloads",
+            ...(i.python ? ["--python", i.python] : []),
+          ],
+          "python-installed": ["python", "list", "--only-installed"],
+          "python-dir": ["python", "dir"],
+          "tool-dir": ["tool", "dir"],
+          environments: ["python", "list", "--only-installed"],
           list: ["pip", "list", ...env],
           install: ["pip", "install", ...env, ...packages],
           uninstall: ["pip", "uninstall", ...env, ...packages],
@@ -338,12 +389,28 @@ export function recipe(i: PackageInput): Recipe {
       source: "选定缓存目录",
       mutating: true,
     };
+  const projectEnv =
+    i.manager === "uv" && a.startsWith("project-")
+      ? {
+          UV_PROJECT_ENVIRONMENT: i.python
+            ? i.python.replace(/[\\/](bin|Scripts)[\\/]python[^\\/]*$/i, "")
+            : i.cwd.replace(/[\\/]$/, "") +
+              (i.cwd.includes("\\") ? "\\" : "/") +
+              ".venv",
+          UV_PYTHON_DOWNLOADS: "never",
+        }
+      : undefined;
   return {
+    ...(projectEnv ? { env: projectEnv } : {}),
+    ...(i.node ? { runtime: i.node } : {}),
     argv: [cmd, ...args],
     cwd: i.cwd,
     source: i.source ?? "当前环境中管理器已配置的源",
     mutating: ![
       "environments",
+      "python-installed",
+      "python-dir",
+      "tool-dir",
       "list",
       "global-list",
       "tools",

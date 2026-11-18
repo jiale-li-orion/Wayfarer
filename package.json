@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -101,6 +101,62 @@
         "command": "workspaceMap.resources",
         "title": "Workspace Map: 查看机器资源",
         "icon": "$(pulse)"
+      },
+      {
+        "command": "workspaceMap.favoriteCurrent",
+        "title": "Workspace Map: 收藏当前工作区"
+      },
+      {
+        "command": "workspaceMap.favoriteFile",
+        "title": "Workspace Map: 收藏工作区文件"
+      },
+      {
+        "command": "workspaceMap.favoriteDirectory",
+        "title": "Workspace Map: 收藏项目目录"
+      },
+      {
+        "command": "workspaceMap.openWorkspace",
+        "title": "Workspace Map: 打开常用工作区"
+      },
+      {
+        "command": "workspaceMap.openWorkspaceNew",
+        "title": "Workspace Map: 在新窗口打开工作区"
+      },
+      {
+        "command": "workspaceMap.bindWorkspace",
+        "title": "Workspace Map: 绑定原生 Remote 入口"
+      },
+      {
+        "command": "workspaceMap.renameWorkspace",
+        "title": "Workspace Map: 重命名工作区"
+      },
+      {
+        "command": "workspaceMap.removeWorkspace",
+        "title": "Workspace Map: 移除工作区收藏"
+      },
+      {
+        "command": "workspaceMap.workspaceUp",
+        "title": "Workspace Map: 上移工作区"
+      },
+      {
+        "command": "workspaceMap.workspaceDown",
+        "title": "Workspace Map: 下移工作区"
+      },
+      {
+        "command": "workspaceMap.locateWorkspace",
+        "title": "Workspace Map: 在地图定位工作区"
+      },
+      {
+        "command": "workspaceMap.addWorkspaceFolder",
+        "title": "Workspace Map: 加入当前工作区"
+      },
+      {
+        "command": "workspaceMap.workspaceEnvironment",
+        "title": "Workspace Map: 查看工作区环境"
+      },
+      {
+        "command": "workspaceMap.environment",
+        "title": "Workspace Map: 查看项目环境"
       }
     ],
     "configuration": {
@@ -165,6 +221,65 @@
           "when": "view == workspaceMap.locations",
           "group": "navigation@2"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "workspaceMap.openWorkspaceNew",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@0"
+        },
+        {
+          "command": "workspaceMap.addWorkspaceFolder",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@1"
+        },
+        {
+          "command": "workspaceMap.locateWorkspace",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@2"
+        },
+        {
+          "command": "workspaceMap.workspaceEnvironment",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "inline@1"
+        },
+        {
+          "command": "workspaceMap.bindWorkspace",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@4"
+        },
+        {
+          "command": "workspaceMap.renameWorkspace",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@5"
+        },
+        {
+          "command": "workspaceMap.workspaceUp",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@6"
+        },
+        {
+          "command": "workspaceMap.workspaceDown",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@7"
+        },
+        {
+          "command": "workspaceMap.removeWorkspace",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favorite",
+          "group": "workspace@8"
+        },
+        {
+          "command": "workspaceMap.favoriteDirectory",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.directory",
+          "group": "workspace"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "workspaceMap.favoriteDirectory",
+          "when": "explorerResourceIsFolder",
+          "group": "workspaceMap"
+        }
       ]
     },
     "keybindings": [
@@ -221,14 +336,16 @@
     "bench:lifecycle": "tsx scripts/benchmark-lifecycle.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix && node scripts/release-assets.mjs",
     "vscode:prepublish": "npm run build",
-    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts"
+    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts tests/environments.test.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",
     "cross-spawn": "^7.0.6",
     "d3-hierarchy": "^3.1.2",
+    "jsonc-parser": "^3.3.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "smol-toml": "^1.9.1",
     "yaml": "^2.8.1"
   },
   "devDependencies": {

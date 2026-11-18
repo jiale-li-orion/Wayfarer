@@ -5,6 +5,16 @@ await mkdir("dist", { recursive: true });
 await mkdir("artifacts", { recursive: true });
 await Promise.all([
   build({
+    entryPoints: ["src/ui/environment.tsx"],
+    outfile: "dist/environment.js",
+    bundle: true,
+    platform: "browser",
+    format: "iife",
+    minify: true,
+    target: "es2022",
+    define: { "process.env.NODE_ENV": '"production"' },
+  }),
+  build({
     entryPoints: ["src/extension.ts"],
     outfile: "dist/extension.cjs",
     bundle: true,

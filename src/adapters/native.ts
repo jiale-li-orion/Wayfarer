@@ -348,6 +348,30 @@ export class NativeEndpoint implements Endpoint {
         };
         break;
       }
+      case "whichMany": {
+        const dirs = (process.env.PATH ?? "")
+          .split(path.delimiter)
+          .filter(Boolean);
+        const extensions =
+          process.platform === "win32"
+            ? (process.env.PATHEXT ?? ".EXE;.CMD;.BAT;.COM").split(";")
+            : [""];
+        r = await Promise.all(
+          a.names.slice(0, 32).map(async (name: string) => {
+            if (!/^[a-zA-Z0-9_.-]+$/.test(name)) return null;
+            for (const dir of dirs)
+              for (const ext of extensions) {
+                const target = path.resolve(dir, name + ext);
+                try {
+                  await fs.access(target, process.platform === "win32" ? 0 : 1);
+                  if ((await fs.stat(target)).isFile()) return target;
+                } catch {}
+              }
+            return null;
+          }),
+        );
+        break;
+      }
       case "which": {
         const cmd = process.platform === "win32" ? "where.exe" : "which";
         const result = await this.exec([cmd, a.name], os.homedir());
@@ -360,10 +384,26 @@ export class NativeEndpoint implements Endpoint {
           cwd: a.cwd,
           env: {
             ...process.env,
+            ...Object.fromEntries(
+              Object.entries(a.env ?? {}).filter(
+                ([k, v]) =>
+                  ["UV_PROJECT_ENVIRONMENT", "UV_PYTHON_DOWNLOADS"].includes(
+                    k,
+                  ) && typeof v === "string",
+              ),
+            ),
             ...(path.isAbsolute(a.argv[0])
               ? {
                   PATH:
                     path.dirname(a.argv[0]) +
+                    path.delimiter +
+                    (process.env.PATH ?? ""),
+                }
+              : {}),
+            ...(a.runtime
+              ? {
+                  PATH:
+                    path.dirname(a.runtime) +
                     path.delimiter +
                     (process.env.PATH ?? ""),
                 }

@@ -68,7 +68,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "cursor": {
@@ -78,7 +81,9 @@
           "type": "boolean"
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -104,11 +109,16 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -134,7 +144,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "offset": {
@@ -144,7 +157,9 @@
           "type": "number"
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -170,14 +185,20 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "content": {
           "type": "string"
         },
         "encoding": {
-          "enum": ["utf8", "base64"]
+          "enum": [
+            "utf8",
+            "base64"
+          ]
         },
         "exclusive": {
           "type": "boolean"
@@ -187,7 +208,10 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["ref", "content"],
+      "required": [
+        "ref",
+        "content"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -228,7 +252,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         }
       },
@@ -258,7 +285,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "query": {
@@ -269,7 +299,10 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["ref", "query"],
+      "required": [
+        "ref",
+        "query"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -295,7 +328,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "operationId": {
@@ -303,7 +339,9 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -331,7 +369,10 @@
                 "description": "Absolute display path on the specified endpoint"
               }
             },
-            "required": ["endpoint", "path"],
+            "required": [
+              "endpoint",
+              "path"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -347,21 +388,36 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "mode": {
-          "enum": ["copy", "move"]
+          "enum": [
+            "copy",
+            "move"
+          ]
         },
         "conflict": {
-          "enum": ["skip", "rename", "overwrite"]
+          "enum": [
+            "skip",
+            "rename",
+            "overwrite"
+          ]
         },
         "operationId": {
           "type": "string",
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["sources", "target", "mode", "conflict"],
+      "required": [
+        "sources",
+        "target",
+        "mode",
+        "conflict"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -387,7 +443,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "name": {
@@ -398,7 +457,10 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["ref", "name"],
+      "required": [
+        "ref",
+        "name"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -424,7 +486,10 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "name": {
@@ -435,7 +500,10 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["ref", "name"],
+      "required": [
+        "ref",
+        "name"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -463,7 +531,10 @@
                 "description": "Absolute display path on the specified endpoint"
               }
             },
-            "required": ["endpoint", "path"],
+            "required": [
+              "endpoint",
+              "path"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -473,7 +544,9 @@
           "description": "Stable submission token; retrying the same token returns the original task."
         }
       },
-      "required": ["refs"],
+      "required": [
+        "refs"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -516,7 +589,9 @@
           "maximum": 1000
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -535,10 +610,17 @@
           "type": "string"
         },
         "action": {
-          "enum": ["pause", "resume", "cancel"]
+          "enum": [
+            "pause",
+            "resume",
+            "cancel"
+          ]
         }
       },
-      "required": ["id", "action"],
+      "required": [
+        "id",
+        "action"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -579,7 +661,9 @@
           "type": "boolean"
         }
       },
-      "required": ["endpoint"],
+      "required": [
+        "endpoint"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -629,9 +713,18 @@
         },
         "cacheRoot": {
           "type": "string"
+        },
+        "node": {
+          "type": "string",
+          "description": "Explicit absolute Node runtime path on the endpoint"
         }
       },
-      "required": ["endpoint", "cwd", "manager", "action"],
+      "required": [
+        "endpoint",
+        "cwd",
+        "manager",
+        "action"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -685,9 +778,18 @@
         "operationId": {
           "type": "string",
           "description": "Stable submission token; retrying the same token returns the original task."
+        },
+        "node": {
+          "type": "string",
+          "description": "Explicit absolute Node runtime path on the endpoint"
         }
       },
-      "required": ["endpoint", "cwd", "manager", "action"],
+      "required": [
+        "endpoint",
+        "cwd",
+        "manager",
+        "action"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -706,7 +808,9 @@
           "type": "string"
         }
       },
-      "required": ["endpoint"],
+      "required": [
+        "endpoint"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -723,10 +827,16 @@
           "type": "string"
         },
         "action": {
-          "enum": ["connect", "disconnect"]
+          "enum": [
+            "connect",
+            "disconnect"
+          ]
         }
       },
-      "required": ["endpoint", "action"],
+      "required": [
+        "endpoint",
+        "action"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -787,14 +897,23 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "refresh": {
           "type": "boolean"
+        },
+        "environment": {
+          "type": "boolean",
+          "description": "Read bounded project declarations and environment choices on demand."
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -839,14 +958,19 @@
               "description": "Absolute display path on the specified endpoint"
             }
           },
-          "required": ["endpoint", "path"],
+          "required": [
+            "endpoint",
+            "path"
+          ],
           "additionalProperties": false
         },
         "remove": {
           "type": "boolean"
         }
       },
-      "required": ["ref"],
+      "required": [
+        "ref"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -873,9 +997,21 @@
         "operationId": {
           "type": "string",
           "description": "Stable submission token; retrying the same token returns the original task."
+        },
+        "ecosystem": {
+          "type": "string",
+          "enum": [
+            "python",
+            "node",
+            "java",
+            "android",
+            "rust"
+          ]
         }
       },
-      "required": ["endpoint"],
+      "required": [
+        "endpoint"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -909,7 +1045,9 @@
           "type": "string"
         }
       },
-      "required": ["operationId"],
+      "required": [
+        "operationId"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -928,7 +1066,9 @@
           "type": "string"
         }
       },
-      "required": ["id"],
+      "required": [
+        "id"
+      ],
       "additionalProperties": false
     },
     "annotations": {
@@ -995,6 +1135,100 @@
       "readOnlyHint": true,
       "destructiveHint": false,
       "idempotentHint": true
+    }
+  },
+  {
+    "name": "map_workspaces",
+    "description": "List global favorite native workspaces and their endpoint locations. Does not switch windows.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_workspaceSave",
+    "description": "Register a global workspace favorite. Native opening remains a user sidebar action.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Existing native file or vscode-remote URI"
+        }
+      },
+      "required": [
+        "name",
+        "uri"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_environmentSelect",
+    "description": "Save explicit absolute tool paths for this map project. Does not change editor or shell configuration.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute display path on the specified endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "choice": {
+          "type": "object",
+          "properties": {
+            "python": {
+              "type": "string"
+            },
+            "uv": {
+              "type": "string"
+            },
+            "node": {
+              "type": "string"
+            },
+            "java": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "ref",
+        "choice"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false,
+      "openWorldHint": false
     }
   }
 ]
