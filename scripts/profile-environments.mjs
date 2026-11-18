@@ -3,7 +3,7 @@ import net from "node:net";
 import { randomUUID } from "node:crypto";
 const [recordFile, output, seconds = "610"] = process.argv.slice(2);
 const record = JSON.parse(await fs.readFile(recordFile, "utf8"));
-if (!record.name.startsWith("acceptance-workspaces "))
+if (!/^acceptance-(workspaces|secondary) /.test(record.name))
   throw Error("Isolated workspace required");
 function call(method, args = {}) {
   return new Promise((resolve, reject) => {

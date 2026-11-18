@@ -104,23 +104,28 @@
       },
       {
         "command": "workspaceMap.favoriteCurrent",
-        "title": "Workspace Map: 收藏当前工作区"
+        "title": "Workspace Map: 收藏当前工作区",
+        "icon": "$(bookmark)"
       },
       {
         "command": "workspaceMap.favoriteFile",
-        "title": "Workspace Map: 收藏工作区文件"
+        "title": "Workspace Map: 收藏工作区文件",
+        "icon": "$(file-code)"
       },
       {
         "command": "workspaceMap.favoriteDirectory",
-        "title": "Workspace Map: 收藏项目目录"
+        "title": "Workspace Map: 收藏项目目录",
+        "icon": "$(bookmark)"
       },
       {
         "command": "workspaceMap.openWorkspace",
-        "title": "Workspace Map: 打开常用工作区"
+        "title": "Workspace Map: 打开常用工作区",
+        "icon": "$(folder-opened)"
       },
       {
         "command": "workspaceMap.openWorkspaceNew",
-        "title": "Workspace Map: 在新窗口打开工作区"
+        "title": "Workspace Map: 在新窗口打开工作区",
+        "icon": "$(link-external)"
       },
       {
         "command": "workspaceMap.bindWorkspace",
@@ -128,35 +133,43 @@
       },
       {
         "command": "workspaceMap.renameWorkspace",
-        "title": "Workspace Map: 重命名工作区"
+        "title": "Workspace Map: 重命名工作区",
+        "icon": "$(edit)"
       },
       {
         "command": "workspaceMap.removeWorkspace",
-        "title": "Workspace Map: 移除工作区收藏"
+        "title": "Workspace Map: 移除工作区收藏",
+        "icon": "$(close)"
       },
       {
         "command": "workspaceMap.workspaceUp",
-        "title": "Workspace Map: 上移工作区"
+        "title": "Workspace Map: 上移工作区",
+        "icon": "$(arrow-up)"
       },
       {
         "command": "workspaceMap.workspaceDown",
-        "title": "Workspace Map: 下移工作区"
+        "title": "Workspace Map: 下移工作区",
+        "icon": "$(arrow-down)"
       },
       {
         "command": "workspaceMap.locateWorkspace",
-        "title": "Workspace Map: 在地图定位工作区"
+        "title": "Workspace Map: 在地图定位工作区",
+        "icon": "$(map)"
       },
       {
         "command": "workspaceMap.addWorkspaceFolder",
-        "title": "Workspace Map: 加入当前工作区"
+        "title": "Workspace Map: 加入当前工作区",
+        "icon": "$(new-folder)"
       },
       {
         "command": "workspaceMap.workspaceEnvironment",
-        "title": "Workspace Map: 查看工作区环境"
+        "title": "Workspace Map: 查看工作区环境",
+        "icon": "$(tools)"
       },
       {
         "command": "workspaceMap.environment",
-        "title": "Workspace Map: 查看项目环境"
+        "title": "Workspace Map: 查看项目环境",
+        "icon": "$(tools)"
       }
     ],
     "configuration": {

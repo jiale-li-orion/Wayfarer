@@ -110,25 +110,6 @@ export async function connect() {
       )
     )
       throw Error("Use an isolated acceptance window");
-    const title = session.name.replaceAll("'", "''");
-    const script = `Add-Type @"
-using System;
-using System.Runtime.InteropServices;
-public class MapWindow { [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h,int n); [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }
-"@
-$p=Get-Process Code | Where-Object { $_.MainWindowTitle.Contains('${title}') } | Select-Object -First 1
-if (!$p) { throw 'Acceptance window missing' }
-[MapWindow]::ShowWindow($p.MainWindowHandle,9) | Out-Null
-[MapWindow]::SetForegroundWindow($p.MainWindowHandle) | Out-Null`;
-    await execute(
-      process.env.WM_POWERSHELL ||
-        "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
-      [
-        "-NoProfile",
-        "-EncodedCommand",
-        Buffer.from(script, "utf16le").toString("base64"),
-      ],
-    );
     await call("Page.bringToFront", {}, sid);
     await key("Escape", "Escape", 27);
     if (text === "File: New Text File") {
@@ -137,26 +118,65 @@ if (!$p) { throw 'Acceptance window missing' }
       return;
     }
     if (text === "View: Close Editor") {
+      const active = await call(
+        "Runtime.evaluate",
+        {
+          expression: "document.querySelectorAll('.tab').length>0",
+          returnByValue: true,
+        },
+        sid,
+      );
+      if (!active.result?.value) return;
       await key("w", "KeyW", 87, 2);
       await sleep(400);
       return;
     }
-    await key("P", "KeyP", 80, 10);
-    await sleep(200);
-    const palette = await call(
-      "Runtime.evaluate",
-      {
-        expression:
-          "(()=>{const i=document.querySelector('.quick-input-widget input');if(!i || i.getBoundingClientRect().width===0)throw Error('Command palette absent');i.focus();i.select()})()",
-      },
-      sid,
-    );
-    if (palette.exceptionDetails)
+    let paletteReady = false;
+    for (let attempt = 0; attempt < 3 && !paletteReady; attempt++) {
+      await key("Escape", "Escape", 27);
+      await key("P", "KeyP", 80, 10);
+      for (let wait = 0; wait < 15; wait++) {
+        const check = await call(
+          "Runtime.evaluate",
+          {
+            expression:
+              "(()=>{const i=document.querySelector('.quick-input-widget input');if(!i || i.getBoundingClientRect().width===0)return false;i.focus();i.select();return true})()",
+            returnByValue: true,
+          },
+          sid,
+        );
+        if (check.result?.value) {
+          paletteReady = true;
+          break;
+        }
+        await sleep(100);
+      }
+    }
+    if (!paletteReady)
       throw Error("Command palette not focused; no text inserted");
     await call("Input.insertText", { text: ">" + text }, sid);
-    await sleep(350);
-    await key("Enter", "Enter", 13);
-    await sleep(500);
+    let chosen;
+    for (let n = 0; n < 30; n++) {
+      const result = await call(
+        "Runtime.evaluate",
+        {
+          expression: `(()=>{const e=[...document.querySelectorAll('.quick-input-widget .monaco-list-row')].find(e=>e.textContent.includes(${JSON.stringify(text)}));if(!e)return;const r=e.getBoundingClientRect();if(r.width<1)return;return {x:r.x+r.width/2,y:r.y+r.height/2}})()`,
+          returnByValue: true,
+        },
+        sid,
+      );
+      chosen = result.result?.value;
+      if (chosen) break;
+      await sleep(100);
+    }
+    if (!chosen) throw Error("Command result unavailable: " + text);
+    for (const type of ["mousePressed", "mouseReleased"])
+      await call(
+        "Input.dispatchMouseEvent",
+        { type, ...chosen, button: "left", clickCount: 1 },
+        sid,
+      );
+    await sleep(400);
   };
   async function normalizeWindow() {
     await call("Page.bringToFront", {}, sid);

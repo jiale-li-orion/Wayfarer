@@ -1,11 +1,17 @@
 import test from "node:test";
+import { build } from "esbuild";
+import { createRequire } from "node:module";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { Core } from "../src/core/core";
 import { Profiler } from "../src/core/log";
-import { WorkspaceStore, workspaceUriKey } from "../src/core/workspaces";
+import {
+  WorkspaceStore,
+  workspaceUriKey,
+  workspaceFolderUris,
+} from "../src/core/workspaces";
 import { recipe } from "../src/packages/catalog";
 const quiet = new Profiler(() => {});
 async function fixture(run: (core: Core, dir: string) => Promise<void>) {
@@ -211,3 +217,111 @@ test("preview names the same selected uv environment as the runner", () => {
   assert.equal(plan.env?.UV_PROJECT_ENVIRONMENT, "/envs/special");
   assert(plan.argv.includes("/envs/special/bin/python"));
 });
+
+test("workspace files resolve fresh multi-root Windows and remote declarations", () => {
+  const local = workspaceFolderUris("file:///D:/work/team.code-workspace", [
+    { path: "../中文" },
+    { path: "C:\\other\\project" },
+  ]);
+  assert.equal(decodeURIComponent(new URL(local[0]).pathname), "/D:/中文");
+  assert.equal(
+    decodeURIComponent(new URL(local[1]).pathname),
+    "/C:/other/project",
+  );
+  const remote = workspaceFolderUris(
+    "vscode-remote://ssh-remote+train/home/user/team.code-workspace",
+    [{ path: "../repo" }, { path: "/data/absolute" }],
+  );
+  assert.equal(remote[0], "vscode-remote://ssh-remote+train/home/repo");
+  assert.equal(remote[1], "vscode-remote://ssh-remote+train/data/absolute");
+});
+
+test("packaged workspace parser reads JSONC through the shipped CommonJS bundle", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wm-workspace-bundle-"));
+  try {
+    const output = path.join(dir, "workspaces.cjs");
+    await build({
+      entryPoints: [path.resolve("src/core/workspaces.ts")],
+      outfile: output,
+      bundle: true,
+      platform: "node",
+      format: "cjs",
+    });
+    const bundled = createRequire(import.meta.url)(output);
+    const roots = bundled.parseWorkspaceRoots(
+      "file:///D:/team/team.code-workspace",
+      '{ // native JSONC\n "folders": [{"path":"../project"},],\n}',
+    );
+    assert.deepEqual(roots, ["file:///D:/project"]);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("legacy unscoped inventory snapshots remain visible in path details", async () =>
+  fixture(async (core, dir) => {
+    const snapshot = { stamp: 123, value: { tools: [], projects: [] } };
+    const file = path.join(dir, "state", "inspect.json");
+    await fs.writeFile(
+      file,
+      JSON.stringify({
+        projects: [],
+        snapshots: [[JSON.stringify(["inventory", "a", dir]), snapshot]],
+      }),
+    );
+    const { Inspector } = await import("../src/core/inspect");
+    const inspector = new Inspector(
+      core.endpoints,
+      path.join(dir, "state"),
+      quiet,
+    );
+    await inspector.init();
+    try {
+      const value = await inspector.detail({ endpoint: "a", path: dir });
+      assert.equal(value.inventory?.stamp, 123);
+    } finally {
+      await inspector.dispose();
+    }
+  }));
+
+test("explicit Node runtime remains in the command preview and package environment", () => {
+  const plan = recipe({
+    endpoint: "a",
+    cwd: "/project",
+    manager: "npm",
+    action: "list",
+    executable: "/tools/npm",
+    node: "/node/bin/node",
+  });
+  assert.equal(plan.runtime, "/node/bin/node");
+  assert.deepEqual(plan.argv, ["/tools/npm", "ls", "--depth=0"]);
+});
+
+test("saved environment choices restore across inspector restart and Windows drive casing", async () =>
+  fixture(async (core, dir) => {
+    const ref = { endpoint: "a", path: dir };
+    const interpreter = path.join(dir, "python-fixture");
+    await fs.writeFile(interpreter, "fixture");
+    await core.dispatch("environmentSelect", {
+      ref,
+      choice: { python: interpreter },
+    });
+    await core.inspector.dispose();
+    const { Inspector } = await import("../src/core/inspect");
+    const restored = new Inspector(
+      core.endpoints,
+      path.join(dir, "state"),
+      quiet,
+    );
+    await restored.init();
+    try {
+      const target =
+        process.platform === "win32"
+          ? { ...ref, path: ref.path[0].toUpperCase() + ref.path.slice(1) }
+          : ref;
+      const value = await restored.environment(target, true);
+      assert.equal(value.value.python.selectedPython, interpreter);
+    } finally {
+      await restored.dispose();
+    }
+  }));

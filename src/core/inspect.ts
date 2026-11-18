@@ -98,8 +98,10 @@ export class Inspector {
       const saved = JSON.parse(
         await fs.readFile(path.join(this.storage, "inspect.json"), "utf8"),
       );
-      for (const [key, value] of saved.choices ?? [])
-        this.choices.set(key, value);
+      for (const [key, value] of saved.choices ?? []) {
+        const [endpoint, path] = JSON.parse(key);
+        this.choices.set(this.choiceKey({ endpoint, path }), value);
+      }
       for (const ref of saved.projects ?? [])
         this.registered.set(refKey(ref), ref);
       for (const [key, value] of (saved.snapshots ?? []).slice(-64))
@@ -175,6 +177,7 @@ export class Inspector {
       snapshotBytes: this.cacheBytes,
       pending: this.pending.size,
       projects: this.registered.size,
+      environmentChoices: this.choices.size,
     };
   }
   projects(endpoint?: string) {
@@ -317,6 +320,14 @@ export class Inspector {
       registered: this.registered.has(refKey(ref)),
     };
   }
+  private choiceKey(ref: Ref) {
+    const config = this.endpoints.configs().find((c) => c.id === ref.endpoint);
+    const normal = config ? pathApi(config).normalize(ref.path) : ref.path;
+    return JSON.stringify([
+      ref.endpoint,
+      config?.kind === "windows" ? normal.toLowerCase() : normal,
+    ]);
+  }
   environment(ref: Ref, refresh = false) {
     return this.query(
       JSON.stringify(["environment", ref.endpoint, ref.path]),
@@ -325,7 +336,7 @@ export class Inspector {
         projectEnvironment(
           this.endpoints.get(ref.endpoint),
           ref,
-          this.choices.get(refKey(ref)),
+          this.choices.get(this.choiceKey(ref)),
         ),
     );
   }
@@ -346,7 +357,7 @@ export class Inspector {
       )
         throw Error("工具路径不是可用文件: " + value);
     }
-    this.choices.set(refKey(ref), choice);
+    this.choices.set(this.choiceKey(ref), choice);
     this.invalidate(ref.endpoint);
     this.persist();
     return this.environment(ref, true);
@@ -361,7 +372,12 @@ export class Inspector {
   async inventory(ctx: JobContext) {
     const { endpoint, cwd, refresh, ecosystem } = ctx.job.input;
     const snapshot = await this.query(
-      JSON.stringify(["inventory", endpoint, cwd ?? "", ecosystem ?? "all"]),
+      JSON.stringify([
+        "inventory",
+        endpoint,
+        cwd ?? "",
+        ...(ecosystem ? [ecosystem] : []),
+      ]),
       !!refresh,
       async () => {
         const e = this.endpoints.get(endpoint),
@@ -371,7 +387,7 @@ export class Inspector {
           await this.discovery(endpoint, cwd, !!refresh)
         ).value.map((tool: any) => {
           const choice = cwd
-            ? this.choices.get(refKey({ endpoint, path: cwd }))
+            ? this.choices.get(this.choiceKey({ endpoint, path: cwd }))
             : undefined;
           return {
             ...tool,
@@ -390,7 +406,7 @@ export class Inspector {
         if (selectedPython)
           found.push({ name: "project-python", path: selectedPython });
         const chosen = cwd
-          ? this.choices.get(refKey({ endpoint, path: cwd }))
+          ? this.choices.get(this.choiceKey({ endpoint, path: cwd }))
           : undefined;
         for (const name of ["uv", "node", "java"] as const)
           if (chosen?.[name] && !found.some((t: any) => t.name === name))
@@ -508,5 +524,6 @@ export class Inspector {
     this.weights.clear();
     this.cacheBytes = 0;
     this.registered.clear();
+    this.choices.clear();
   }
 }

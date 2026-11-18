@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { parse, type ParseError } from "jsonc-parser/lib/esm/main.js";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type { Ref, EndpointConfig } from "../shared/types";
@@ -139,4 +140,54 @@ export class WorkspaceStore {
       return items;
     });
   }
+}
+
+/** Resolve the file's current root declarations; favorite locations are connection hints, not a root snapshot. */
+export function workspaceFolderUris(
+  documentUri: string,
+  folders: { path?: string; uri?: string }[],
+) {
+  const base = new URL(documentUri);
+  return folders.map((folder) => {
+    if (folder.uri) return new URL(folder.uri).toString();
+    if (typeof folder.path !== "string")
+      throw Error("工作区目录缺少 path／uri");
+    const target = new URL(base);
+    const decoded = decodeURIComponent(base.pathname);
+    if (
+      base.protocol === "file:" &&
+      (/^\/[a-z]:\//i.test(decoded) || base.host)
+    ) {
+      const source = base.host
+        ? "\\\\" + base.host + decoded.replaceAll("/", "\\")
+        : decoded.slice(1).replaceAll("/", "\\");
+      const result = path.win32.resolve(
+        path.win32.dirname(source),
+        folder.path,
+      );
+      if (result.startsWith("\\\\")) {
+        const parts = result.slice(2).split("\\");
+        target.host = parts.shift()!;
+        target.pathname = "/" + parts.join("/");
+      } else {
+        target.host = "";
+        target.pathname = "/" + result.replaceAll("\\", "/");
+      }
+    } else
+      target.pathname = path.posix.resolve(
+        path.posix.dirname(decoded),
+        folder.path,
+      );
+    return target.toString();
+  });
+}
+
+export function parseWorkspaceRoots(uri: string, text: string) {
+  if (Buffer.byteLength(text) > 256 * 1024)
+    throw Error("工作区清单超过 256KiB；选择具体项目目录查看");
+  const errors: ParseError[] = [];
+  const data = parse(text, errors, { allowTrailingComma: true });
+  if (errors.length || !Array.isArray(data?.folders))
+    throw Error("工作区 folders 清单格式错误");
+  return workspaceFolderUris(uri, data.folders);
 }

@@ -29,42 +29,16 @@ const screenshot = async (name) => {
   );
 };
 try {
-  await live.command("Workspace Map: 查看项目环境");
-  page = await live.canvas();
-  await until(() =>
-    live.evaluate(page, '!!document.querySelector(".project-environment h3")'),
-  );
-  const text = await live.evaluate(page, "document.body.innerText");
-  assert(text.includes("Python · uv"));
-  assert(text.includes("wayfarer-fixture"));
-  assert(text.includes(">=3.11"));
-  await screenshot("01-project-environment");
-  await live.evaluate(
-    page,
-    '[...document.querySelectorAll("button")].find(e=>e.textContent==="Node").click()',
-  );
-  await until(() =>
-    live.evaluate(page, 'document.body.innerText.includes("npm@10")'),
-  );
-  await screenshot("02-node-environment");
-  await live.command("View: Close Editor");
-  assert.equal((await live.ipc("diagnostics")).environmentUi.panels, 0);
-  await live.command("Workspace Map: 收藏当前工作区");
-  await sleep(250);
-  await live.call(
-    "Input.insertText",
-    { text: "Acceptance Favorite" },
-    live.sid,
-  );
-  await live.key("Enter", "Enter", 13);
-  await until(async () =>
-    (await live.ipc("workspaces")).some(
-      (w) => w.name === "Acceptance Favorite",
-    ),
-  );
-  await live.command("Workspace Map: 显示侧边栏");
-  await screenshot("03-favorite-workspace");
-  for (let i = 0; i < 50; i++) {
+  if (process.env.WM_ENV_RESUME) {
+    Object.assign(
+      result,
+      JSON.parse(
+        await fs.readFile(path.join(output, "acceptance.json"), "utf8"),
+      ),
+    );
+    delete result.error;
+    await live.command("View: Close Editor");
+  } else {
     await live.command("Workspace Map: 查看项目环境");
     page = await live.canvas();
     await until(() =>
@@ -73,7 +47,82 @@ try {
         '!!document.querySelector(".project-environment h3")',
       ),
     );
+    const text = await live.evaluate(page, "document.body.innerText");
+    assert(text.includes("Python · uv"));
+    assert(text.includes("wayfarer-fixture"));
+    assert(text.includes(">=3.11"));
+    await screenshot("01-project-environment");
+    await live.evaluate(
+      page,
+      '[...document.querySelectorAll("button")].find(e=>e.textContent==="Node").click()',
+    );
+    await until(() =>
+      live.evaluate(page, 'document.body.innerText.includes("npm@10")'),
+    );
+    await screenshot("02-node-environment");
     await live.command("View: Close Editor");
+    assert.equal((await live.ipc("diagnostics")).environmentUi.panels, 0);
+    await live.command("Workspace Map: 收藏当前工作区");
+    await sleep(250);
+    await live.call(
+      "Input.insertText",
+      { text: "Acceptance Favorite" },
+      live.sid,
+    );
+    await live.key("Enter", "Enter", 13);
+    await until(async () =>
+      (await live.ipc("workspaces")).some(
+        (w) => w.name === "Acceptance Favorite",
+      ),
+    );
+    await live.command("Workspace Map: 显示侧边栏");
+    await screenshot("03-favorite-workspace");
+  }
+  for (
+    let i = result.cycles.length;
+    i < Number(process.env.WM_ENV_CYCLE_TARGET ?? 50);
+    i++
+  ) {
+    const point = await live.call(
+      "Runtime.evaluate",
+      {
+        expression: `(()=>{const e=[...document.querySelectorAll('.monaco-list-row')].find(e=>e.textContent.includes('当前工作区环境'));if(!e)throw Error('Environment sidebar action absent');const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()`,
+        returnByValue: true,
+      },
+      live.sid,
+    );
+    for (const type of ["mousePressed", "mouseReleased"])
+      await live.call(
+        "Input.dispatchMouseEvent",
+        { type, ...point.result.value, button: "left", clickCount: 1 },
+        live.sid,
+      );
+    page = await live.canvas();
+    await until(() =>
+      live.evaluate(
+        page,
+        '!!document.querySelector(".project-environment h3")',
+      ),
+    );
+    const close = await live.call(
+      "Runtime.evaluate",
+      {
+        expression:
+          "(()=>{const e=document.querySelector('.tab.active [class*=codicon-close]');if(!e)throw Error('Editor close action absent');const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}})()",
+        returnByValue: true,
+      },
+      live.sid,
+    );
+    for (const type of ["mouseMoved", "mousePressed", "mouseReleased"])
+      await live.call(
+        "Input.dispatchMouseEvent",
+        { type, ...close.result.value, button: "left", clickCount: 1 },
+        live.sid,
+      );
+    await until(
+      async () => (await live.ipc("diagnostics")).environmentUi.panels === 0,
+    );
+
     const d = await live.ipc("diagnostics");
     assert.equal(d.environmentUi.panels, 0);
     assert.equal(d.inspector.pending, 0);
@@ -84,7 +133,12 @@ try {
       heap: d.host.memory.heapUsed,
       agents: d.agents,
     });
+    await fs.writeFile(
+      path.join(output, "acceptance.json"),
+      JSON.stringify(result, null, 2),
+    );
   }
+  result.endpoints = [];
   const endpoints = await live.ipc("endpoints");
   for (const id of ["windows-d", "wsl-ubuntu", "train", "infer"]) {
     const e = endpoints.find((e) => e.id === id);

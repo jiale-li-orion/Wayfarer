@@ -1,8 +1,11 @@
 import * as vscode from "vscode";
-import path from "node:path";
 import { createHash } from "node:crypto";
 import type { Core } from "./core/core";
-import { WorkspaceStore, type SavedWorkspace } from "./core/workspaces";
+import {
+  WorkspaceStore,
+  parseWorkspaceRoots,
+  type SavedWorkspace,
+} from "./core/workspaces";
 import type { Ref, EndpointConfig } from "./shared/types";
 const sameConnection = (a: EndpointConfig, b: EndpointConfig) =>
   a.kind === b.kind &&
@@ -163,6 +166,26 @@ export function createWorkspaceCommands(
       newWindow ? { forceNewWindow: true } : {},
     );
   };
+  const rootsFor = async (item: SavedWorkspace): Promise<Ref[]> => {
+    let roots = resolveLocations(core, item);
+    if (item.uri) {
+      const uri = vscode.Uri.parse(item.uri);
+      if (uri.path.endsWith(".code-workspace")) {
+        const document = await vscode.workspace.openTextDocument(uri);
+        roots = [];
+        for (const target of parseWorkspaceRoots(uri.toString(), document.getText())) {
+          const ref = nativeRef(core, vscode.Uri.parse(target));
+          if (ref) roots.push(ref);
+        }
+      } else {
+        const ref = nativeRef(core, uri);
+        if (ref) roots = [ref];
+      }
+    }
+    if (!roots.length)
+      throw Error("当前地图尚未配置该工作区的文件端点；添加对应机器后查看");
+    return roots;
+  };
   const definitions: Record<string, (...args: any[]) => any> = {
     favoriteCurrent: async () => {
       const folders = vscode.workspace.workspaceFolders ?? [];
@@ -255,7 +278,7 @@ export function createWorkspaceCommands(
       change();
     },
     locateWorkspace: async (arg) => {
-      const roots = resolveLocations(core, await get(arg));
+      const roots = await rootsFor(await get(arg));
       if (!roots.length) throw Error("使用查看环境读取工作区根目录");
       await vscode.commands.executeCommand(
         "workspaceMap.openLocation",
@@ -290,34 +313,10 @@ export function createWorkspaceCommands(
         throw Error("VS Code 未接受工作区变更");
     },
     workspaceEnvironment: async (arg) => {
-      const item = await get(arg);
-      let roots = resolveLocations(core, item);
-      if (!roots.length && item.uri) {
-        const uri = vscode.Uri.parse(item.uri);
-        if (uri.path.endsWith(".code-workspace")) {
-          const document = await vscode.workspace.openTextDocument(uri);
-          // VS Code's JSONC language service owns workspace syntax; parse comments without executing content.
-          const { parse } = await import("jsonc-parser");
-          const data = parse(document.getText());
-          for (const f of data.folders ?? []) {
-            const target = f.uri
-              ? vscode.Uri.parse(f.uri)
-              : uri.scheme === "file" && path.isAbsolute(f.path)
-                ? vscode.Uri.file(f.path)
-                : path.posix.isAbsolute(f.path)
-                  ? uri.with({ path: f.path })
-                  : vscode.Uri.joinPath(uri, "..", f.path);
-            const ref = nativeRef(core, target);
-            if (ref) roots.push(ref);
-          }
-        } else {
-          const ref = nativeRef(core, uri);
-          if (ref) roots = [ref];
-        }
-      }
-      if (!roots.length)
-        throw Error("当前地图尚未配置该工作区的文件端点；添加对应机器后查看");
-      await vscode.commands.executeCommand("workspaceMap.environment", roots);
+      await vscode.commands.executeCommand(
+        "workspaceMap.environment",
+        await rootsFor(await get(arg)),
+      );
     },
   };
   const disposables = Object.entries(definitions).map(([id, run]) =>

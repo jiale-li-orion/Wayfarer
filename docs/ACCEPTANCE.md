@@ -55,3 +55,15 @@ Windows VS Code 1.146.0 独立验收窗口安装候选 VSIX，活动栏图标、
 - Windows／WSL／两台 SSH 的文件访问、双目标 8MiB 复制、逐块 SHA-256 回读，以及监控关闭／明确后台记录两种场景的目录响应通过。两轮测试目录均已删除。
 
 [资源链路与接口](SYSTEM_RESOURCES.md) · [性能与条件](../PERFORMANCE.md)
+
+## 0.5.0 常用工作区与项目环境
+
+独立 Windows 验收配置位于 D 盘，保留日常窗口和配置。Windows／WSL／训练机／推理机完成真实环境声明、工具发现及 Python 生态版本查询。推理机保持 Python 3.6.8，现有环境与业务服务沿原配置；其当前账号尚未发现 uv，界面据实返回可用工具。Windows、WSL、训练机均发现实际 uv 路径。
+
+- 51 轮真实环境页打开／关闭后，面板计数逐轮归零，Inspector pending 为零，缓存保持有界。一次命令面板时序和测试窗口定位失败已定位到验收脚本；改用等待命令结果及侧边栏／标签关闭按钮后补齐验收。
+- 原生目录加入当前工作区后显示两个根目录；切换 `.code-workspace` 后 mapId 独立，三个收藏跨工作区保留；再次点击当前工作区只聚焦，运行实例保持。
+- 打包后的 JSONC 解析问题已修复，并增加 CommonJS 打包产物回归；从收藏的已有工作区文件读取当前两个根目录通过。
+- Codex exec 与实际 dsh headless 各调用一次 `map_workspaces` 并返回收藏清单；临时覆盖配置只作用于验收进程。原有账号、模型、授权和持久 profile 保留。
+- uv 0.9.22 在隔离虚拟环境中，通过本地 wheel 完成 add → locked sync → list → 指定依赖 lock 更新 → remove → locked sync；核对声明、锁文件、实际导入和删除结果，临时环境已释放。
+
+原生 WSL／SSH 打开委托用户已有 Remote 扩展与连接配置；本轮实机验证原生 Windows 工作区切换、四端文件／环境访问和 Remote URI 解析。新窗口额外实例与原生远端 IDE 启动未在本轮低内存环境展开；其菜单调用沿公共 `vscode.openFolder` 接口。性能与待机原值见 PERFORMANCE.md。

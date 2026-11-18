@@ -46,3 +46,11 @@ MCP 扩展 `map_inspect(environment:true)`、`map_inventory(ecosystem)`，新增
 ## 验证入口
 
 `tests/environments.test.ts` 覆盖全局清单并发更新、URI 身份、声明解析、环境选择、命令配方与既有环境前置条件。`scripts/verify-uv-project.mjs` 使用隔离 wheel 和虚拟环境验证清单、锁文件、安装与移除的交接；其临时目录在结束时删除。`scripts/profile-environments.mjs` 只连接独立验收窗口，持久记录宿主资源与生命周期计数。四端实机结果和性能数据见 ACCEPTANCE.md 与 PERFORMANCE.md。
+
+## 界面
+
+![常用工作区](images/environments/03-favorite-workspace.png)
+
+![项目环境](images/environments/01-project-environment.png)
+
+![工作区文件的多根目录](images/environments/04-multi-root-environment.png)

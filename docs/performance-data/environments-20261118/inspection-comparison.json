@@ -1,0 +1,53 @@
+{
+  "scope": "same-host native fixture; counts are adapter calls, not measured network RTT",
+  "results": [
+    {
+      "version": "0.4.0",
+      "iterations": 100,
+      "coldP50": 0.9797910000000059,
+      "coldP95": 1.2063409999999806,
+      "cachedP50": 0.00167000000001849,
+      "cachedP95": 0.0020499999999969987,
+      "cpuMs": 177.013,
+      "calls": {
+        "stat": 4500,
+        "info": 100
+      },
+      "cacheAdditionalCalls": {
+        "stat": 0,
+        "info": 0
+      },
+      "inspector": {
+        "snapshots": 1,
+        "snapshotBytes": 1651,
+        "pending": 0,
+        "projects": 0
+      }
+    },
+    {
+      "version": "0.5.0",
+      "iterations": 100,
+      "coldP50": 0.6338309999999865,
+      "coldP95": 0.8256509999999935,
+      "cachedP50": 0.0017200000000343607,
+      "cachedP95": 0.0021900000000414366,
+      "cpuMs": 127.745,
+      "calls": {
+        "stat": 100,
+        "statMany": 200,
+        "info": 100
+      },
+      "cacheAdditionalCalls": {
+        "stat": 0,
+        "statMany": 0,
+        "info": 0
+      },
+      "inspector": {
+        "snapshots": 1,
+        "snapshotBytes": 1653,
+        "pending": 0,
+        "projects": 0
+      }
+    }
+  ]
+}

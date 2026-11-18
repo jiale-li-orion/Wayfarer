@@ -1,0 +1,56 @@
+{
+  "version": "0.5.0",
+  "idle": {
+    "samples": 60,
+    "seconds": 612.594,
+    "singleCoreCpuPercent": 0.03574961556920244,
+    "heapStart": 46070032,
+    "heapEnd": 46934156
+  },
+  "ui": {
+    "cycles": 51,
+    "heapFirst": 56100344,
+    "heapLast": 45790596,
+    "inspector": {
+      "snapshots": 17,
+      "snapshotBytes": 26735,
+      "pending": 0,
+      "projects": 0
+    },
+    "environmentUi": {
+      "panels": 0
+    }
+  },
+  "endpoints": [
+    {
+      "id": "windows-d",
+      "coldMs": 7.228682999999933,
+      "cacheP50": 1.197514999999953
+    },
+    {
+      "id": "wsl-ubuntu",
+      "coldMs": 6.100411000000122,
+      "cacheP50": 1.2323340000000371
+    },
+    {
+      "id": "train",
+      "coldMs": 126.48191900000029,
+      "cacheP50": 1.180301000000327
+    },
+    {
+      "id": "infer",
+      "coldMs": 79.27398099999982,
+      "cacheP50": 0.9756160000001728
+    }
+  ],
+  "native": {
+    "favoriteCount": 3,
+    "secondaryRootCount": 1,
+    "addedRootCountBeforeSwitch": 2
+  },
+  "agentClients": {
+    "codex": "map_workspaces completed",
+    "dsh": "map_workspaces completed"
+  },
+  "conditions": "Independent Windows acceptance profile on D drive; idle sample from initial 0.5 candidate, UI lifecycle and endpoint checks from subsequent candidate. Existing 0.4 Windows resource sample used a different workspace and is kept as historical context."
+}
