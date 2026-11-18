@@ -239,3 +239,17 @@ Windows 原生 Node、同一 Windows 机器、同样八次 summary 查询，查�
 真实 Windows Core 经 WSL 与两台 SSH 的四端验收覆盖中文 fixture、已移除／新增目录的快照对比、50轮容量控制器和50轮资源订阅开关。最后 monitor readers/timer/channels/pending/retiringChannels 均归零，storage channels/queries 均归零。结果位于 D:/Wayfarer-Acceptance/v070/runtime/acceptance.json。fixtures 已在 finally 删除。
 
 日常窗口采样采用每10秒一次、最长10分钟、每文件20MiB；Windows 记录物理内存和私有提交量，WSL 记录系统可用内存及前15个进程的PSS。其他进程的RSS只作为驻留观察，分组求和时保留共享页口径。采样阶段 Agent 正常输出，记录属于实际日常场景。完整前后数据留D盘，汇总随验收更新。
+
+两端各完成更新前后十分钟日常采样，每段61份，四段共244份；[汇总数据](docs/performance-data/pressure-20261118/daily-summary.json)。期间Agent持续工作，应用和浏览器有活动变化；表中整机变化用于定位压力，固定八次查询表用于比较本插件新增成本。
+
+| 日常场景指标 | 前段 | 后段 |
+| --- | ---: | ---: |
+| Windows 可用内存中位数／最低 | 1512／758 MiB | 1216／481 MiB |
+| Windows 系统提交量中位数 | 29.59 GiB | 29.59 GiB |
+| 全部 Code.exe 私有提交量中位数 | 2034 MiB | 2023 MiB |
+| WSL 可用内存中位数／最低 | 4005／3851 MiB | 3885／3008 MiB |
+| WSL swap 已用中位数 | 204.23 MiB | 204.21 MiB |
+| Windows 采样器平均单核 CPU | 0.141% | 0.247% |
+| WSL 采样器平均单核 CPU | 0.390% | 0.411% |
+
+采样器CPU包含进程清单和前15个Linux进程PSS读取，高于资源总览的实际读取范围，四段均低于2%单核预算。WSL后段末次内核oom_kill累计为0。Windows整机物理余量更紧，任务提交仍有分页支持；通过压力页定位当前进程，内存配置与现役业务由原有策略管理。本轮未对用户应用或其他项目的浏览器会话执行退出。

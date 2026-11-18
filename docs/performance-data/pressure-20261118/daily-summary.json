@@ -1,0 +1,45 @@
+{
+  "before-wsl": {
+    "samples": 61,
+    "durationSeconds": 616.011,
+    "availableMiBMedian": 4004.73046875,
+    "availableMiBMin": 3851.21875,
+    "collectorCpuMsMedian": 37.75609000000002,
+    "collectorOneCorePercentApprox": 0.3900426138494279,
+    "scope": "daily-agent-active",
+    "swapUsedMiBMedian": 204.234375
+  },
+  "before-windows-live": {
+    "samples": 61,
+    "durationSeconds": 600.0,
+    "availableMiBMedian": 1511.7578125,
+    "availableMiBMin": 758.13671875,
+    "collectorCpuMsMedian": 15.625,
+    "collectorOneCorePercentApprox": 0.140625,
+    "scope": "daily-agent-active",
+    "codePrivateMiBMedian": 2034.37890625,
+    "commitGiBMedian": 29.594993591308594
+  },
+  "after-wsl": {
+    "samples": 61,
+    "durationSeconds": 616.431,
+    "availableMiBMedian": 3885.37890625,
+    "availableMiBMin": 3008.1171875,
+    "collectorCpuMsMedian": 39.957808000000014,
+    "collectorOneCorePercentApprox": 0.41119563600792275,
+    "scope": "daily-agent-active",
+    "swapUsedMiBMedian": 204.2109375,
+    "lastKernelOomKills": 0
+  },
+  "after-windows": {
+    "samples": 61,
+    "durationSeconds": 600.01,
+    "availableMiBMedian": 1216.15234375,
+    "availableMiBMin": 481.2734375,
+    "collectorCpuMsMedian": 31.25,
+    "collectorOneCorePercentApprox": 0.24739171013816436,
+    "scope": "daily-agent-active",
+    "codePrivateMiBMedian": 2022.7109375,
+    "commitGiBMedian": 29.593856811523438
+  }
+}
