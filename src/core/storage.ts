@@ -80,6 +80,33 @@ export class StorageAnalysis {
           await this.release(native);
         }
       }
+      if (
+        config.kind === "wsl" &&
+        !value.windowsDrive &&
+        process.platform === "win32"
+      ) {
+        const drive = (process.env.SystemDrive ?? "C:")[0].toLowerCase();
+        const native = this.channel(
+          this.source(this.config("windows-" + drive)),
+        );
+        try {
+          const host = await native.call("probe", {
+            path: (process.env.SystemDrive ?? "C:") + "\\",
+          });
+          const backing = host.wsl?.find(
+            (w: any) => w.distribution === config.distro,
+          );
+          value.volumeCapacityKind = "virtual-filesystem";
+          if (backing) {
+            value.backing = backing;
+            value.physicalBudget = backing.hostVolume;
+            volume = backing.hostVolume.volume;
+            value.windowsVolume = volume;
+          }
+        } finally {
+          await this.release(native);
+        }
+      }
       const machine =
         config.kind === "windows" ||
         (config.kind === "wsl" && value.windowsVolume)
@@ -112,6 +139,7 @@ export class StorageAnalysis {
     try {
       snapshot = await source.call("begin", {
         path: ref.path,
+        volume: ctx.job.input.volume,
         ...(index === source ? { store } : {}),
       });
       while (true) {

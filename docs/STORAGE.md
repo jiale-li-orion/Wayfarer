@@ -30,7 +30,9 @@ Windows 文件身份来自实际 stat，分配空间来自 GetCompressedFileSize
 - map_job(fields?)：可选 summary/result/errors/logs；summary 查询直接读取任务元数据。
 - map_listClose(ref, cursor)：仅释放当前客户端拥有的游标。
 
-原 map_size 和省略 fields 的 map_job 保持兼容。Windows 普通删除仍进入回收站，任务日志保留其语义；永久清理与 WSL 离线维护由明确操作发起。
+原 map_size 和省略 fields 的 map_job 保持兼容。WSL 虚拟文件系统容量与 Windows 承载卷余量分别返回、分别展示；两个入口使用同一承载卷扫描锁，虚拟剩余空间不代表承载盘可继续写入的大小。快照同时保留承载关系和采样时间。
+
+Windows 普通删除仍进入回收站，任务日志保留其语义；永久清理与 WSL 离线维护由明确操作发起。
 
 ## WSL 维护
 

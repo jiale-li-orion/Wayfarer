@@ -64,7 +64,8 @@ def probe(path):
                     with winreg.OpenKey(k,winreg.EnumKey(k,i)) as sub:
                         name = winreg.QueryValueEx(sub,'DistributionName')[0]
                         base = winreg.QueryValueEx(sub,'BasePath')[0]
-                        value['wsl'].append({'distribution':name,'basePath':base,'disks':[{'path':p,'logicalBytes':os.stat(p).st_size,'allocatedBytes':allocated(p,os.stat(p))} for p in glob.glob(os.path.join(base,'*.vhdx'))]})
+                        hostdisk=shutil.disk_usage(base)
+                        value['wsl'].append({'distribution':name,'basePath':base,'hostVolume':{'volume':str(os.stat(base).st_dev),'mount':os.path.splitdrive(os.path.realpath(base))[0]+'\\','total':hostdisk.total,'available':hostdisk.free},'disks':[{'path':p,'logicalBytes':os.stat(p).st_size,'allocatedBytes':allocated(p,os.stat(p))} for p in glob.glob(os.path.join(base,'*.vhdx'))]})
         except OSError as e: value['wslError'] = str(e)
         value['swapFiles'] = []
         for p in glob.glob(os.path.join(os.environ.get('TEMP',tempfile.gettempdir()),'*','swap.vhdx')):
@@ -91,8 +92,10 @@ def resources():
     return {'rss':counters.WorkingSetSize,'peakRss':counters.PeakWorkingSetSize}
 
 class Scan:
-    def __init__(self, path, store=None):
+    def __init__(self, path, store=None, volume=None):
         self.probe = probe(path)
+        for field in ['backing','physicalBudget','volumeKey','volumeCapacityKind']:
+            if volume and field in volume:self.probe[field]=volume[field]
         self.root = self.probe['path']
         self.temp = None
         if not store:
@@ -215,7 +218,7 @@ def dispatch(method,a):
     if method=='probe':return probe(a['path'])
     if method=='begin':
         if scan:scan.close()
-        scan=Scan(a['path'],a.get('store'))
+        scan=Scan(a['path'],a.get('store'),a.get('volume'))
         return scan.summary()
     if method=='page':return scan.page()
     if method=='close':

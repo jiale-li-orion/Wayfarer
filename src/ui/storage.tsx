@@ -248,11 +248,19 @@ function App() {
       {volume && (
         <section className="volume">
           <div>
-            <span>卷容量</span>
+            <span>
+              {volume.volumeCapacityKind === "virtual-filesystem"
+                ? "WSL 虚拟容量"
+                : "卷容量"}
+            </span>
             <strong>{bytes(volume.total)}</strong>
           </div>
           <div>
-            <span>剩余空间</span>
+            <span>
+              {volume.volumeCapacityKind === "virtual-filesystem"
+                ? "虚拟文件系统余量"
+                : "剩余空间"}
+            </span>
             <strong
               className={volume.available / volume.total < 0.1 ? "warning" : ""}
             >
@@ -275,6 +283,13 @@ function App() {
             />
           </div>
         </section>
+      )}
+      {volume?.physicalBudget && (
+        <p className="physical-budget">
+          承载卷 {volume.physicalBudget.mount} 剩余{" "}
+          <strong>{bytes(volume.physicalBudget.available)}</strong>；WSL
+          新增写入受这份实际空间约束。
+        </p>
       )}
       <section className="snapshot-line">
         <label>
