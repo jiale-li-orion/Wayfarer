@@ -19,6 +19,7 @@ import {
 import { alias, assertName, pathApi } from "../shared/paths";
 import { capabilities, recipe } from "../packages/catalog";
 import { Inspector } from "./inspect";
+import { StorageAnalysis } from "./storage";
 import { SystemMonitor } from "./monitor";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
@@ -32,6 +33,7 @@ export class Core extends EventEmitter {
   readonly transfers: Transfers;
   readonly inspector: Inspector;
   readonly monitor: SystemMonitor;
+  readonly storageAnalysis: StorageAnalysis;
   private inventories = new Map<string, string>();
   view = defaultView();
   restored = false;
@@ -104,6 +106,13 @@ export class Core extends EventEmitter {
       undefined,
       (id) => this.endpoints.enabled(id),
     );
+    this.storageAnalysis = new StorageAnalysis(
+      path.join(storage, "storage-scans"),
+      path.join(path.dirname(helper), "storage.py"),
+      (id) => this.endpoints.get(id).config,
+      profile,
+      options.monitorPython,
+    );
     this.directories = new Directories(
       this.endpoints,
       profile,
@@ -116,6 +125,7 @@ export class Core extends EventEmitter {
     );
     this.inspector = new Inspector(this.endpoints, storage, profile);
     this.monitor.projects = () => this.inspector.projects();
+    this.jobs.register("storage", (c) => this.storageAnalysis.run(c));
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
     const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
       this.invalidateParent(r),
@@ -246,6 +256,7 @@ export class Core extends EventEmitter {
         "package",
         "inventory",
         "search",
+        "storageScan",
         "size",
       ].includes(method)
     ) {
@@ -282,6 +293,7 @@ export class Core extends EventEmitter {
         "delete",
         "package",
         "inventory",
+        "storageScan",
         "size",
         "search",
       ].includes(method)
@@ -330,12 +342,27 @@ export class Core extends EventEmitter {
         return this.jobs.cleanupTask(a.id);
       case "endpoints":
         return this.endpoints.configs();
+      case "storageProbe":
+        return this.storageAnalysis.probe(a.ref);
+      case "storageSnapshots":
+        return this.storageAnalysis.list();
+      case "storageScan": {
+        const volume = await this.storageAnalysis.probe(a.ref);
+        return submit("storage", { ...a, volume }, [
+          "storage-volume:" + volume.volumeKey,
+        ]);
+      }
+      case "storageResult":
+        return this.storageAnalysis.query(a);
+      case "listClose":
+        return this.directories.closeClientCursor(a.ref, a.cursor, client);
       case "systemResources":
         return this.monitor.snapshot(a);
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
         return {
+          storage: this.storageAnalysis.stats(),
           endpointLifecycle: this.endpoints.stats(),
           host: {
             pid: process.pid,
@@ -632,6 +659,28 @@ export class Core extends EventEmitter {
       case "jobs":
         return this.jobs.list();
       case "job":
+        if (a.fields?.length) {
+          const allowed = new Set(["summary", "result", "errors", "logs"]);
+          if (
+            !Array.isArray(a.fields) ||
+            a.fields.some((x: string) => !allowed.has(x))
+          )
+            throw Error("Unknown job field selection");
+          if (a.fields.length === 1 && a.fields[0] === "summary")
+            return this.jobs.selectedSummary(a.id);
+          const full = await this.jobs.details(a.id, a.offset, a.limit);
+          const out: any = { id: full.id, state: full.state };
+          if (a.fields.includes("summary"))
+            Object.assign(out, this.jobs.summary({ ...full, checkpoint: {} }));
+          if (a.fields.includes("result")) out.result = full.result;
+          if (a.fields.includes("errors")) {
+            out.error = full.error;
+            out.errorCount = full.result?.errorCount;
+            out.errors = full.result?.errors;
+          }
+          if (a.fields.includes("logs")) out.logs = full.logs;
+          return out;
+        }
         return this.jobs.details(a.id, a.offset, a.limit);
       case "jobControl":
         return this.jobs.control(a.id, a.action);
@@ -884,13 +933,17 @@ export class Core extends EventEmitter {
     this.directories.dispose();
     await this.monitor.dispose();
     try {
-      await this.jobs.dispose(() => this.endpoints.abort());
+      await this.jobs.dispose(() => {
+        this.endpoints.abort();
+        this.storageAnalysis.abort();
+      });
       this.stage = "persisting";
       await this.inspector.dispose();
       await this.persist(cache);
     } finally {
       this.stage = "helpers";
       try {
+        await this.storageAnalysis.dispose(deadline);
         await this.endpoints.dispose(deadline);
         await this.directories.drain();
       } finally {

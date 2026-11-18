@@ -69,3 +69,13 @@ Windows VS Code 1.146.0 独立验收窗口安装候选 VSIX，活动栏图标、
 原生 WSL／SSH 打开委托用户已有 Remote 扩展与连接配置；本轮实机验证原生 Windows 工作区切换、四端文件／环境访问和 Remote URI 解析。新窗口额外实例与原生远端 IDE 启动未在本轮低内存环境展开；其菜单调用沿公共 `vscode.openFolder` 接口。同窗口约 615／619 秒串行待机对照已完成，缓存与任务计数稳定；含共享宿主、renderer、GPU 进程的原值见 PERFORMANCE.md。
 
 最终补齐 Java 缓存位置与路径归属展示，Windows 实机核对 Java 页和 cache 数组通过；切换生态后版本清单按各自查询来源展示。71 项 Linux 定向检查、26 项 portable 子集及 Python 3.6 语法检查通过；PR 最终 CI 运行记录与发布制品由 GitHub 保留。
+
+## 0.6.0 存储分析
+
+实际四端扫描、中文路径、硬链接、目录下钻与分页、快照查询、50 轮页面开关及十分钟待机已执行。定向检查覆盖稀疏文件、范围外链接、权限不足、扫描期间目录变化、取消与锁释放、快照保留和窗口重建；损坏的助手输出立即终止所属通道。Windows 普通删除继续由已有回收站入口承接；本轮 C 盘回收站保持原状。
+
+Windows 清理使用实际管理器：pip purge、npm cache clean、uv cache prune；HeadlessEdge 临时目录在核对进程引用、占用和 24 小时内修改后处理。WSL 维护入口只执行过预览；正式停机和交换文件处理留在当前会话结束后的 Windows 维护时段。
+
+页面 DOM、主题变量与三个层次的 HTML 已由实际 Webview 采集。当前图形会话中 Electron Surface 截图挂起、非 Surface 截图为空白，PNG 使用 Edge headless 复绘已采集的 DOM 和主题；相关来源记录保存在 D 盘。
+
+本轮空间监测发现 Windows pagefile.sys 由 20.99 GiB 增至 29.49 GiB，修改时间对应独立窗口启动期间。Ubuntu ext4.vhdx 保持 286.09 GiB，交换文件数量保持 54。C 盘清理后曾余约 21 GiB，后因分页文件扩展回落约 11 GiB；验收窗口结束后退出，分页配置继续由系统管理。

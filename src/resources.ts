@@ -75,6 +75,11 @@ export function createResourceView(
             );
             result = true;
             break;
+          case "storage":
+            result = await vscode.commands.executeCommand(
+              "workspaceMap.storage",
+            );
+            break;
           case "snapshot":
             result = await core.monitor.snapshot(m.args);
             break;

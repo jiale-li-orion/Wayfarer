@@ -178,3 +178,7 @@ SystemMonitor 在原有 Core 下管理独立资源通道；资源页、MCP 共�
 ## 常用工作区与项目环境（0.5.0）
 
 全局 `WorkspaceStore` 承担跨窗口收藏，原生打开由 Windows UI 宿主调度；运行中的 Core／Jobs／Agent 保持地图归属。环境解析在固定项目目录读取有限声明，选择与时间戳快照归 Inspector。包修改继续经过配方预览、任务与原端点，uv 项目声明更新和已有环境同步分别执行。批量 stat／which 减少远端往返；环境视图与收藏监听沿可见生命周期释放。模块、接口及操作规则见 [项目环境说明](docs/PROJECT_ENVIRONMENTS.md)。
+
+## 存储分析（0.6.0）
+
+StorageAnalysis 复用 Jobs 的持久收据与同卷锁，采集通过独立 RemoteEndpoint 通道运行 Python 标准库扫描器。SQLite 索引把文件枚举与界面分页分开；本机直接写 globalStorage，远端通过分批目录聚合回传，工作索引随采集通道释放。Windows / Linux 的实际占盘、硬链接归属、快照保留与 MCP 接口见 docs/STORAGE.md。存储页面按需读取，窗口退出继续先等待任务 finally，再关闭所属通道。

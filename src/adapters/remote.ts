@@ -142,6 +142,13 @@ export class RemoteEndpoint implements Endpoint {
         try {
           const start = performance.now();
           const v = JSON.parse(line);
+          if (
+            !v ||
+            typeof v !== "object" ||
+            typeof v.id !== "number" ||
+            (!("result" in v) && !("error" in v))
+          )
+            throw Error("Invalid endpoint protocol frame");
           this.metrics.parseMs += performance.now() - start;
           this.metrics.receivedBytes += Buffer.byteLength(line) + 1;
           const p = this.pending.get(v.id);
@@ -157,6 +164,8 @@ export class RemoteEndpoint implements Endpoint {
           else p.resolve(v.result);
         } catch (e) {
           this.log("endpoint protocol: " + String(e));
+          fail(new TransportLost("Endpoint returned malformed protocol data"));
+          child.kill("SIGKILL");
         }
       });
       const fail = (e: Error) => {

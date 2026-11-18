@@ -1,0 +1,47 @@
+[
+  {
+    "endpoint": "windows-d",
+    "elapsed": 2.44059350399948,
+    "files": 2,
+    "logicalBytes": 16384,
+    "allocatedBytesKnown": 8192,
+    "incomplete": false,
+    "worker": {
+      "rss": 20819968,
+      "peakRss": 20819968
+    }
+  },
+  {
+    "endpoint": "wsl-ubuntu",
+    "elapsed": 2.5843142140001873,
+    "files": 1,
+    "logicalBytes": 12,
+    "allocatedBytesKnown": 4096,
+    "incomplete": false,
+    "worker": {
+      "peakRss": 19439616
+    }
+  },
+  {
+    "endpoint": "train",
+    "elapsed": 4.223568329000045,
+    "files": 5,
+    "logicalBytes": 107070,
+    "allocatedBytesKnown": 118784,
+    "incomplete": false,
+    "worker": {
+      "peakRss": 26112000
+    }
+  },
+  {
+    "endpoint": "infer",
+    "elapsed": 3.8829542490002495,
+    "files": 1,
+    "logicalBytes": 254,
+    "allocatedBytesKnown": 4096,
+    "incomplete": false,
+    "worker": {
+      "peakRss": 16044032
+    }
+  }
+]

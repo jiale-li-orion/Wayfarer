@@ -425,6 +425,10 @@ export class Jobs extends EventEmitter {
       resultFile: path.join(this.dir, j.id + ".result.json"),
     };
   }
+  async selectedSummary(id: string) {
+    const j = this.records.get(id) ?? (await this.stored(id));
+    return this.summary(j);
+  }
   async details(id: string, offset = 0, limit = 200) {
     offset = Math.max(0, Math.floor(offset));
     limit = Math.max(1, Math.min(1000, Math.floor(limit)));

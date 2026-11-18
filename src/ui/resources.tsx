@@ -291,6 +291,7 @@ function App() {
           <details className="export-menu">
             <summary>导出</summary>
             <div>
+              <button onClick={() => void act("storage")}>存储占用</button>
               <button onClick={() => void act("export", { format: "json" })}>
                 快照 JSON
               </button>
