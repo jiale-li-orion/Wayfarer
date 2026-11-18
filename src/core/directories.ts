@@ -58,6 +58,16 @@ export class Directories extends EventEmitter {
       for (const { endpoint, cursor } of owner.cursors.values())
         this.closingCursor(endpoint, cursor);
   }
+  async closeClientCursor(ref: Ref, cursor: string, client?: string) {
+    if (!client) throw Error("Agent client identity required");
+    const owner = this.owners.get(client);
+    const held = owner?.cursors.get(cursor);
+    if (!held || held.endpoint !== ref.endpoint)
+      throw Error("Cursor belongs to another client");
+    owner!.cursors.delete(cursor);
+    await this.endpoints.get(ref.endpoint).call("scanClose", { cursor });
+    return true;
+  }
   refreshConnections() {
     this.reconcile();
   }

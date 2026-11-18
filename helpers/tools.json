@@ -587,6 +587,19 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 1000
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "result",
+              "errors",
+              "logs"
+            ]
+          },
+          "description": "Omit for compatible full details. Select fields for concise replies."
         }
       },
       "required": [
@@ -1229,6 +1242,133 @@
       "readOnlyHint": false,
       "destructiveHint": false,
       "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_storageProbe",
+    "description": "Read volume capacity and Windows WSL backing/swap disk relationships on demand. Swap activity is unknown; no maintenance is performed.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path on endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        }
+      },
+      "required": [
+        "ref"
+      ]
+    }
+  },
+  {
+    "name": "map_storageSnapshots",
+    "description": "List retained storage analysis snapshots without starting endpoints.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "name": "map_storageScan",
+    "description": "Start a cancellable storage scan. Logical, allocated and shared hardlink accounting; snapshots are paged on disk. Returns a task ID.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path on endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        },
+        "operationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref"
+      ]
+    }
+  },
+  {
+    "name": "map_storageResult",
+    "description": "Page a snapshot directory breakdown and Top 100 files. Allocated blocks are attributed once per file identity inside the scan. Unknown allocation remains unknown.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "id"
+      ]
+    }
+  },
+  {
+    "name": "map_listClose",
+    "description": "Release a paged directory cursor owned by this client.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string",
+              "description": "Absolute path on endpoint"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "cursor"
+      ]
     }
   }
 ]

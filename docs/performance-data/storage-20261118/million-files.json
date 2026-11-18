@@ -1,0 +1,293 @@
+{
+  "files": 1000000,
+  "million": {
+    "id": "33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4",
+    "elapsedMs": 3298.545789,
+    "cpuMs": 92.319,
+    "peakHostRss": 81829888,
+    "directoryP50": 0.1691899999987072,
+    "directoryP95": 0.5442410000005111,
+    "job": {
+      "id": "33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4",
+      "state": "completed",
+      "kind": "storage",
+      "created": 1794990303964,
+      "updated": 1794990307224,
+      "bytes": 36900864,
+      "files": 1000000,
+      "journalVersion": 2,
+      "lifecycleVersion": 1,
+      "checkpointFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4.checkpoint.jsonl",
+      "resultFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4.result.json",
+      "result": {
+        "snapshotId": "33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4",
+        "ref": {
+          "endpoint": "fixture",
+          "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million"
+        },
+        "files": 1000000,
+        "directories": 1000,
+        "id": "1702b9c6a6b482419fab4235e2e0801f3e771d8f1341896bd534043f760408f0",
+        "parent": null,
+        "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million",
+        "logicalBytes": 0,
+        "allocatedBytesKnown": 36900864,
+        "allocationUnknownFiles": 0,
+        "hardlinkBytes": 0,
+        "errors": 0,
+        "ownFiles": 0,
+        "directoryBytesKnown": 36900864,
+        "directoryAllocationAvailable": true,
+        "externallySharedBytesKnown": 0,
+        "reclaimableUpperBoundBytes": 36900864,
+        "reclaimableBasis": "upper bound for known file and directory blocks when removing this complete tree; excludes external hardlinks; compressed/shared extents and live changes may reduce the result",
+        "incomplete": false,
+        "errorCount": 0,
+        "elapsedMs": 3249.9824050000007
+      }
+    }
+  },
+  "snapshot": {
+    "directories": 1001,
+    "resources": {
+      "peakRss": 27463680
+    },
+    "cpuMs": 2895.2476659999998
+  },
+  "legacy": {
+    "id": "6ff14750-f76a-4fff-9f42-17850325e42b",
+    "elapsedMs": 21.077360000001136,
+    "cpuMs": 24.437,
+    "peakHostRss": 82083840,
+    "directoryP50": 0.23198099999899569,
+    "directoryP95": 0.23198099999899569,
+    "job": {
+      "id": "6ff14750-f76a-4fff-9f42-17850325e42b",
+      "state": "completed",
+      "kind": "size",
+      "created": 1794990307260,
+      "updated": 1794990307278,
+      "bytes": 0,
+      "files": 1000,
+      "journalVersion": 2,
+      "lifecycleVersion": 1,
+      "checkpointFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/6ff14750-f76a-4fff-9f42-17850325e42b.checkpoint.jsonl",
+      "resultFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/6ff14750-f76a-4fff-9f42-17850325e42b.result.json",
+      "result": {
+        "bytes": 0,
+        "files": 1000,
+        "errorCount": 0,
+        "errors": [],
+        "incomplete": false
+      }
+    }
+  },
+  "indexed": {
+    "id": "34b1b8e1-68cc-4f3a-811f-e3e9376edd2c",
+    "elapsedMs": 87.0036369999998,
+    "cpuMs": 4.235,
+    "peakHostRss": 82595840,
+    "directoryP50": 0.2387399999988702,
+    "directoryP95": 0.3271310000000085,
+    "job": {
+      "id": "34b1b8e1-68cc-4f3a-811f-e3e9376edd2c",
+      "state": "completed",
+      "kind": "storage",
+      "created": 1794990307307,
+      "updated": 1794990307348,
+      "bytes": 36864,
+      "files": 1000,
+      "journalVersion": 2,
+      "lifecycleVersion": 1,
+      "checkpointFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/34b1b8e1-68cc-4f3a-811f-e3e9376edd2c.checkpoint.jsonl",
+      "resultFile": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/state/jobs/34b1b8e1-68cc-4f3a-811f-e3e9376edd2c.result.json",
+      "result": {
+        "snapshotId": "34b1b8e1-68cc-4f3a-811f-e3e9376edd2c",
+        "ref": {
+          "endpoint": "fixture",
+          "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million/0"
+        },
+        "files": 1000,
+        "directories": 0,
+        "id": "a3f4b726565526249f62ea01c98614e8a646f21ec252332aa2fe6f93f8de5740",
+        "parent": null,
+        "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million/0",
+        "logicalBytes": 0,
+        "allocatedBytesKnown": 36864,
+        "allocationUnknownFiles": 0,
+        "hardlinkBytes": 0,
+        "errors": 0,
+        "ownFiles": 1000,
+        "directoryBytesKnown": 36864,
+        "directoryAllocationAvailable": true,
+        "externallySharedBytesKnown": 0,
+        "reclaimableUpperBoundBytes": 36864,
+        "reclaimableBasis": "upper bound for known file and directory blocks when removing this complete tree; excludes external hardlinks; compressed/shared extents and live changes may reduce the result",
+        "incomplete": false,
+        "errorCount": 0,
+        "elapsedMs": 35.18623800000023
+      }
+    }
+  },
+  "storageLogs": [
+    {
+      "at": "2026-11-18T08:25:07.224Z",
+      "stage": "storage.scan",
+      "ref": {
+        "endpoint": "fixture",
+        "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million"
+      },
+      "job": "33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4",
+      "completed": true,
+      "elapsedMs": 3256.477687999999,
+      "cpuMs": 2895.2476659999998,
+      "resources": {
+        "peakRss": 27463680
+      },
+      "files": 1000000,
+      "transport": {
+        "calls": 74,
+        "failures": 0,
+        "sentBytes": 2847,
+        "receivedBytes": 1526525,
+        "serializeMs": 0.16097000000718253,
+        "parseMs": 2.392955000004804,
+        "rpcElapsedMs": 3170.532895000013,
+        "peakPending": 1,
+        "pending": 0
+      },
+      "snapshotBytes": 946176
+    },
+    {
+      "at": "2026-11-18T08:25:07.257Z",
+      "stage": "storage.query",
+      "job": "33b91d1a-bb06-4e85-a6a8-9b6ba43df5f4",
+      "elapsedMs": 22.686242999998285,
+      "responseBytes": 38125,
+      "rows": 50
+    },
+    {
+      "at": "2026-11-18T08:25:07.348Z",
+      "stage": "storage.scan",
+      "ref": {
+        "endpoint": "fixture",
+        "path": "/data/users/lijiale/tmp/wm-storage-profile-zsqfin/million/0"
+      },
+      "job": "34b1b8e1-68cc-4f3a-811f-e3e9376edd2c",
+      "completed": true,
+      "elapsedMs": 40.42486800000006,
+      "cpuMs": 3.8094969999999986,
+      "resources": {
+        "peakRss": 26198016
+      },
+      "files": 1000,
+      "transport": {
+        "calls": 3,
+        "failures": 0,
+        "sentBytes": 299,
+        "receivedBytes": 17151,
+        "serializeMs": 0.0048300000016752165,
+        "parseMs": 0.03362099999685597,
+        "rpcElapsedMs": 33.79780500000015,
+        "peakPending": 1,
+        "pending": 0
+      },
+      "snapshotBytes": 40960
+    }
+  ],
+  "quiet": {
+    "storage": {
+      "channels": 0,
+      "queries": 0
+    },
+    "endpointLifecycle": {
+      "retiring": 0
+    },
+    "host": {
+      "pid": 2661963,
+      "scope": "shared-extension-host",
+      "memory": {
+        "rss": 82604032,
+        "heapTotal": 16097280,
+        "heapUsed": 12475048,
+        "external": 4786103,
+        "arrayBuffers": 2309347
+      },
+      "cpu": {
+        "user": 190931,
+        "system": 49683
+      }
+    },
+    "transfers": {
+      "leases": 0,
+      "buffers": 0,
+      "bufferBytes": 0
+    },
+    "lifecycle": {
+      "stage": "running",
+      "clients": 0,
+      "recoveryWaiters": 0
+    },
+    "directories": {
+      "clients": 0,
+      "closingCursors": 0,
+      "pendingWatchUpdates": 0,
+      "clientCursors": 0,
+      "cachedBranches": 1,
+      "cachedEntries": 2,
+      "uiCursors": 0,
+      "pendingUiReads": 0,
+      "watches": 0,
+      "editorWatches": 0,
+      "pendingChanges": 0,
+      "polling": false,
+      "visible": true
+    },
+    "jobs": {
+      "records": 3,
+      "historyOnDisk": 3,
+      "retainedTerminal": 3,
+      "running": 0,
+      "runners": 0,
+      "submissions": 0,
+      "logWrites": 0,
+      "closing": false,
+      "heldLocks": 0,
+      "progressTimers": 0,
+      "states": {
+        "completed": 3
+      }
+    },
+    "inspector": {
+      "snapshots": 1,
+      "snapshotBytes": 102,
+      "pending": 0,
+      "projects": 0,
+      "environmentChoices": 0
+    },
+    "monitor": {
+      "readers": 0,
+      "machines": 0,
+      "historyPoints": 0,
+      "timer": false,
+      "recording": false,
+      "queuedWrites": 0,
+      "retiringChannels": 0,
+      "channels": 0,
+      "pending": 0,
+      "cached": 0
+    },
+    "endpoints": [
+      {
+        "id": "local",
+        "connected": false,
+        "enabled": true
+      },
+      {
+        "id": "fixture",
+        "connected": false,
+        "enabled": true
+      }
+    ]
+  }
+}

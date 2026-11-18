@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { createWorkspaceCommands } from "./workspaces";
 import { createEnvironmentView } from "./environmentView";
 import { createSidebar } from "./sidebar";
+import { createStorageView } from "./storageView";
 import { createResourceView } from "./resources";
 import { Core } from "./core/core";
 import { EXIT_GRACE_MS } from "./core/lifecycle";
@@ -99,6 +100,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(createEnvironmentView(context, core, provider));
   context.subscriptions.push(createSidebar(core));
   context.subscriptions.push(createResourceView(context, core));
+  context.subscriptions.push(createStorageView(context, core));
   await vscode.commands.executeCommand(
     "setContext",
     "workspaceMap.textInputFocus",
@@ -210,6 +212,12 @@ export async function activate(context: vscode.ExtensionContext) {
           case "favoriteDirectory":
             result = await vscode.commands.executeCommand(
               "workspaceMap.favoriteDirectory",
+              m.args.ref,
+            );
+            break;
+          case "storageView":
+            result = await vscode.commands.executeCommand(
+              "workspaceMap.storage",
               m.args.ref,
             );
             break;

@@ -1,0 +1,12 @@
+{
+  "elapsed": 601.8682046529993,
+  "singleCoreCpuPercent": 0.09603485351869069,
+  "initialHeap": 43516904,
+  "finalHeap": 43741832,
+  "finalRss": 70918144,
+  "finalStorage": {
+    "channels": 0,
+    "queries": 0
+  },
+  "scope": "isolated Windows shared Extension Host, storage panel closed"
+}

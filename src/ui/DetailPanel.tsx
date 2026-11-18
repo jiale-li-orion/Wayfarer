@@ -357,7 +357,7 @@ export function DetailPanel({
                 </section>
                 <section>
                   <h3>占用</h3>
-                  <button onClick={() => void start("size")}>
+                  <button onClick={() => void rpc("storageView", { ref: target }).catch((e) => onError(String(e)))}>
                     统计当前目录
                   </button>
                   {data.locations.map((item: any) => (
@@ -374,7 +374,7 @@ export function DetailPanel({
                           {item.ref.path}
                         </button>
                       </div>
-                      <button onClick={() => void start("size", item.ref)}>
+                      <button onClick={() => void rpc("storageView", { ref: item.ref }).catch((e) => onError(String(e)))}>
                         统计
                       </button>
                     </div>

@@ -42,7 +42,7 @@ export const capabilities: Record<string, string[]> = {
     "cache-prune",
     "cache-clean",
   ],
-  pip: ["environments", "list", "install", "uninstall", "update"],
+  pip: ["environments", "list", "install", "uninstall", "update", "cache-info", "cache-clean"],
   npm: [
     "list",
     "global-list",
@@ -241,6 +241,8 @@ export function recipe(i: PackageInput): Recipe {
         ...(
           {
             environments: ["--version"],
+            "cache-info": ["cache", "info"],
+            "cache-clean": ["cache", "purge"],
             list: ["list"],
             install: ["install", ...packages],
             uninstall: ["uninstall", "-y", ...packages],

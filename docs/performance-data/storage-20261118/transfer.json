@@ -1,0 +1,15 @@
+{
+  "baseline": {
+    "ms": 76.912588,
+    "bytes": 67108864
+  },
+  "concurrent": {
+    "ms": 76.85211700000002,
+    "bytes": 67108864
+  },
+  "bytesIdentical": true,
+  "end": {
+    "channels": 0,
+    "queries": 0
+  }
+}
