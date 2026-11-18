@@ -19,3 +19,7 @@ NVIDIA 通过 NVML 优先读取，Windows 核显沿 DXGI／PDH；进程名、路
 ## 维护入口
 
 `npm run typecheck`、`npm test`、`npm run test:portable`、`npm run package`。真实资源与生命周期入口为 scripts/verify-resources.mjs；导出和传输脚本在同目录，均限定独立 acceptance-resources 窗口及临时目录。当前生产配置的模型、账号、权限和 SSH 身份沿原设置，升级连接只处理本插件条目。
+
+## 共享环境评审
+
+[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)、[双端资源复核](docs/WINDOWS_WSL_RESOURCE_AUDIT.md)与[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)保留测量条件、工具覆盖和已知限制。评审建议优先验证已有实验 LSP MCP，后续开发按批准范围推进。

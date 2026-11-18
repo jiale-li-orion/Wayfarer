@@ -1,0 +1,27 @@
+{
+  "name": "workspace-map-audit",
+  "publisher": "orion-workspace",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "probe.cjs",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "workspaceMapAudit.snapshot",
+        "title": "Workspace Audit: Snapshot"
+      },
+      {
+        "command": "workspaceMapAudit.exercise",
+        "title": "Workspace Audit: Exercise"
+      }
+    ]
+  }
+}

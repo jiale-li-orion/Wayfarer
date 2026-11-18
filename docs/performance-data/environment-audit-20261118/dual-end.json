@@ -1,0 +1,873 @@
+{
+  "scenario": "Live daily window; Agent turn active, not controlled idle; consecutive samples",
+  "cpuUnit": "percent of one logical CPU; Windows machine has 12 logical CPUs",
+  "windowsMetric": "PrivateBytes: private committed memory; RSS/working set contains shared pages",
+  "linuxMetric": "PSS; WSL VM working set is not added to process PSS",
+  "runs": {
+    "windows-current": {
+      "durationSeconds": 90.00740814208984,
+      "metric": "privateBytes",
+      "processes": [
+        {
+          "pid": 20888,
+          "role": "renderer",
+          "memoryMedianMiB": 682.67,
+          "rssMedianMiB": 534.18,
+          "cpuOneCorePct": 13.35,
+          "memoryChangeMiB": -1.05
+        },
+        {
+          "pid": 2452,
+          "role": "renderer",
+          "memoryMedianMiB": 396.74,
+          "rssMedianMiB": 226.19,
+          "cpuOneCorePct": 3.663,
+          "memoryChangeMiB": 48.98
+        },
+        {
+          "pid": 25492,
+          "role": "gpu",
+          "memoryMedianMiB": 269.94,
+          "rssMedianMiB": 151.9,
+          "cpuOneCorePct": 14.356,
+          "memoryChangeMiB": -10.25
+        },
+        {
+          "pid": 13228,
+          "role": "code",
+          "memoryMedianMiB": 226.49,
+          "rssMedianMiB": 143.34,
+          "cpuOneCorePct": 1.545,
+          "memoryChangeMiB": -33.44
+        },
+        {
+          "pid": 25528,
+          "role": "code",
+          "memoryMedianMiB": 144.72,
+          "rssMedianMiB": 63.04,
+          "cpuOneCorePct": 0.104,
+          "memoryChangeMiB": -25.66
+        },
+        {
+          "pid": 34228,
+          "role": "code",
+          "memoryMedianMiB": 139.0,
+          "rssMedianMiB": 83.97,
+          "cpuOneCorePct": 0.069,
+          "memoryChangeMiB": -3.6
+        },
+        {
+          "pid": 3044,
+          "role": "code",
+          "memoryMedianMiB": 69.09,
+          "rssMedianMiB": 11.66,
+          "cpuOneCorePct": 0.035,
+          "memoryChangeMiB": -0.08
+        },
+        {
+          "pid": 24144,
+          "role": "code",
+          "memoryMedianMiB": 63.86,
+          "rssMedianMiB": 28.35,
+          "cpuOneCorePct": 0.035,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 22356,
+          "role": "code",
+          "memoryMedianMiB": 55.27,
+          "rssMedianMiB": 38.04,
+          "cpuOneCorePct": 0.017,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 27800,
+          "role": "renderer",
+          "memoryMedianMiB": 53.63,
+          "rssMedianMiB": 134.54,
+          "cpuOneCorePct": 0.035,
+          "memoryChangeMiB": 0.13
+        },
+        {
+          "pid": 1832,
+          "role": "renderer",
+          "memoryMedianMiB": 25.84,
+          "rssMedianMiB": 26.95,
+          "cpuOneCorePct": 0.017,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 4920,
+          "role": "code",
+          "memoryMedianMiB": 16.45,
+          "rssMedianMiB": 20.9,
+          "cpuOneCorePct": 0.243,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 25036,
+          "role": "code",
+          "memoryMedianMiB": 10.41,
+          "rssMedianMiB": 9.16,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 20676,
+          "role": "code",
+          "memoryMedianMiB": 9.43,
+          "rssMedianMiB": 3.92,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": -0.03
+        },
+        {
+          "pid": 29024,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.23,
+          "rssMedianMiB": 19.5,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 12152,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.23,
+          "rssMedianMiB": 18.95,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 32012,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.18,
+          "rssMedianMiB": 19.61,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 21328,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.03,
+          "rssMedianMiB": 19.47,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 34384,
+          "role": "wsl.exe",
+          "memoryMedianMiB": 2.94,
+          "rssMedianMiB": 11.75,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 36296,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.29,
+          "rssMedianMiB": 11.66,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 17292,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.29,
+          "rssMedianMiB": 11.34,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 7380,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.28,
+          "rssMedianMiB": 10.79,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 34000,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.27,
+          "rssMedianMiB": 11.6,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 15512,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.26,
+          "rssMedianMiB": 11.39,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 30440,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.66,
+          "rssMedianMiB": 8.82,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 30212,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 9.18,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 23136,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 8.45,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 32516,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 8.41,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 704,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.64,
+          "rssMedianMiB": 8.82,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 29584,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.41,
+          "rssMedianMiB": 7.95,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 13092,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.41,
+          "rssMedianMiB": 8.51,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 18132,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.4,
+          "rssMedianMiB": 8.33,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 12632,
+          "role": "wsl.exe",
+          "memoryMedianMiB": 1.29,
+          "rssMedianMiB": 6.96,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 13496,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.2,
+          "rssMedianMiB": 8.31,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 31892,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.2,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 30032,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.19,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 31684,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.19,
+          "rssMedianMiB": 6.02,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 16140,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.18,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 35544,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.17,
+          "rssMedianMiB": 6.43,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        }
+      ],
+      "sumMedianMiB": 2211.43,
+      "sumCpuOneCorePct": 33.469,
+      "groupMedianMiB": 2220.35,
+      "groupRssMedianMiB": 1752.43
+    },
+    "windows-motion": {
+      "durationSeconds": 59.71111607551575,
+      "metric": "privateBytes",
+      "processes": [
+        {
+          "pid": 20888,
+          "role": "renderer",
+          "memoryMedianMiB": 616.08,
+          "rssMedianMiB": 468.45,
+          "cpuOneCorePct": 9.002
+        },
+        {
+          "pid": 2452,
+          "role": "renderer",
+          "memoryMedianMiB": 392.73,
+          "rssMedianMiB": 224.82,
+          "cpuOneCorePct": 0.785
+        },
+        {
+          "pid": 25492,
+          "role": "gpu",
+          "memoryMedianMiB": 263.15,
+          "rssMedianMiB": 147.95,
+          "cpuOneCorePct": 13.372
+        },
+        {
+          "pid": 13228,
+          "role": "code",
+          "memoryMedianMiB": 209.21,
+          "rssMedianMiB": 131.53,
+          "cpuOneCorePct": 0.419
+        },
+        {
+          "pid": 25528,
+          "role": "code",
+          "memoryMedianMiB": 139.85,
+          "rssMedianMiB": 58.54,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 34228,
+          "role": "code",
+          "memoryMedianMiB": 136.46,
+          "rssMedianMiB": 81.73,
+          "cpuOneCorePct": 0.131
+        },
+        {
+          "pid": 3044,
+          "role": "code",
+          "memoryMedianMiB": 69.09,
+          "rssMedianMiB": 11.71,
+          "cpuOneCorePct": 0.026
+        },
+        {
+          "pid": 24144,
+          "role": "code",
+          "memoryMedianMiB": 63.86,
+          "rssMedianMiB": 29.79,
+          "cpuOneCorePct": 0.079
+        },
+        {
+          "pid": 22356,
+          "role": "code",
+          "memoryMedianMiB": 55.27,
+          "rssMedianMiB": 38.05,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 27800,
+          "role": "renderer",
+          "memoryMedianMiB": 53.23,
+          "rssMedianMiB": 133.64,
+          "cpuOneCorePct": 0.026
+        },
+        {
+          "pid": 1832,
+          "role": "renderer",
+          "memoryMedianMiB": 25.84,
+          "rssMedianMiB": 26.95,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 4920,
+          "role": "code",
+          "memoryMedianMiB": 16.45,
+          "rssMedianMiB": 20.91,
+          "cpuOneCorePct": 0.079
+        },
+        {
+          "pid": 25036,
+          "role": "code",
+          "memoryMedianMiB": 10.41,
+          "rssMedianMiB": 9.17,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 20676,
+          "role": "code",
+          "memoryMedianMiB": 9.43,
+          "rssMedianMiB": 3.92,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 29024,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.23,
+          "rssMedianMiB": 19.5,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 12152,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.23,
+          "rssMedianMiB": 18.95,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 32012,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.18,
+          "rssMedianMiB": 19.61,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 21328,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.03,
+          "rssMedianMiB": 19.47,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 34384,
+          "role": "wsl.exe",
+          "memoryMedianMiB": 2.94,
+          "rssMedianMiB": 11.75,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 36296,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.29,
+          "rssMedianMiB": 11.66,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 17292,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.29,
+          "rssMedianMiB": 11.34,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 7380,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.28,
+          "rssMedianMiB": 10.79,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 34000,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.27,
+          "rssMedianMiB": 11.6,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 15512,
+          "role": "wslhost.exe",
+          "memoryMedianMiB": 2.26,
+          "rssMedianMiB": 11.39,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 30440,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.66,
+          "rssMedianMiB": 8.82,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 30212,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 9.18,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 23136,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 8.45,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 32516,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.65,
+          "rssMedianMiB": 8.41,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 704,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.64,
+          "rssMedianMiB": 8.82,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 29584,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.41,
+          "rssMedianMiB": 7.95,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 13092,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.41,
+          "rssMedianMiB": 8.51,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 18132,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.4,
+          "rssMedianMiB": 8.33,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 12632,
+          "role": "wsl.exe",
+          "memoryMedianMiB": 1.29,
+          "rssMedianMiB": 6.96,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 13496,
+          "role": "map-helper",
+          "memoryMedianMiB": 1.2,
+          "rssMedianMiB": 8.31,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 31892,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.2,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 30032,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.19,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 31684,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.19,
+          "rssMedianMiB": 6.02,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 16140,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.18,
+          "rssMedianMiB": 6.44,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 35544,
+          "role": "conhost.exe",
+          "memoryMedianMiB": 1.17,
+          "rssMedianMiB": 6.43,
+          "cpuOneCorePct": 0.0
+        }
+      ],
+      "sumMedianMiB": 2108.95,
+      "sumCpuOneCorePct": 23.919,
+      "groupMedianMiB": 2110.1,
+      "groupRssMedianMiB": 1650.83
+    },
+    "linux-current": {
+      "durationSeconds": 95.75449109077454,
+      "metric": "PSS",
+      "processes": [
+        {
+          "pid": 449403,
+          "role": "extension-host",
+          "memoryMedianMiB": 402.09,
+          "rssMedianMiB": 447.16,
+          "cpuOneCorePct": 6.475,
+          "memoryChangeMiB": -1.57
+        },
+        {
+          "pid": 449460,
+          "role": "codex-app-server",
+          "memoryMedianMiB": 355.07,
+          "rssMedianMiB": 355.07,
+          "cpuOneCorePct": 1.232,
+          "memoryChangeMiB": -28.15
+        },
+        {
+          "pid": 449002,
+          "role": "vscode-other",
+          "memoryMedianMiB": 61.79,
+          "rssMedianMiB": 106.89,
+          "cpuOneCorePct": 0.052,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 449396,
+          "role": "vscode-other",
+          "memoryMedianMiB": 52.4,
+          "rssMedianMiB": 90.11,
+          "cpuOneCorePct": 0.188,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 449383,
+          "role": "file-watcher",
+          "memoryMedianMiB": 47.96,
+          "rssMedianMiB": 84.34,
+          "cpuOneCorePct": 0.021,
+          "memoryChangeMiB": 0.01
+        },
+        {
+          "pid": 449376,
+          "role": "vscode-other",
+          "memoryMedianMiB": 31.8,
+          "rssMedianMiB": 65.73,
+          "cpuOneCorePct": 0.063,
+          "memoryChangeMiB": 0.01
+        },
+        {
+          "pid": 449766,
+          "role": "json-server",
+          "memoryMedianMiB": 27.72,
+          "rssMedianMiB": 64.93,
+          "cpuOneCorePct": 0.01,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 450309,
+          "role": "vscode-other",
+          "memoryMedianMiB": 23.19,
+          "rssMedianMiB": 23.19,
+          "cpuOneCorePct": 0.073,
+          "memoryChangeMiB": -1.3
+        },
+        {
+          "pid": 449482,
+          "role": "vscode-other",
+          "memoryMedianMiB": 17.88,
+          "rssMedianMiB": 53.25,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 449438,
+          "role": "map-helper",
+          "memoryMedianMiB": 10.73,
+          "rssMedianMiB": 19.36,
+          "cpuOneCorePct": 0.01,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 459934,
+          "role": "map-mcp",
+          "memoryMedianMiB": 8.89,
+          "rssMedianMiB": 15.25,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 450274,
+          "role": "map-mcp",
+          "memoryMedianMiB": 7.01,
+          "rssMedianMiB": 13.23,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 450161,
+          "role": "map-mcp",
+          "memoryMedianMiB": 6.84,
+          "rssMedianMiB": 12.99,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 449448,
+          "role": "map-helper",
+          "memoryMedianMiB": 3.14,
+          "rssMedianMiB": 8.65,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 449488,
+          "role": "map-helper",
+          "memoryMedianMiB": 2.87,
+          "rssMedianMiB": 8.38,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        },
+        {
+          "pid": 448998,
+          "role": "vscode-other",
+          "memoryMedianMiB": 0.15,
+          "rssMedianMiB": 1.94,
+          "cpuOneCorePct": 0.0,
+          "memoryChangeMiB": 0.0
+        }
+      ],
+      "sumMedianMiB": 1059.53,
+      "sumCpuOneCorePct": 8.124,
+      "groupMedianMiB": 1061.24,
+      "groupRssMedianMiB": 1372.2
+    },
+    "linux-motion": {
+      "durationSeconds": 61.75569224357605,
+      "metric": "PSS",
+      "processes": [
+        {
+          "pid": 449403,
+          "role": "extension-host",
+          "memoryMedianMiB": 402.26,
+          "rssMedianMiB": 447.33,
+          "cpuOneCorePct": 6.51
+        },
+        {
+          "pid": 449460,
+          "role": "codex-app-server",
+          "memoryMedianMiB": 353.65,
+          "rssMedianMiB": 353.66,
+          "cpuOneCorePct": 1.409
+        },
+        {
+          "pid": 449002,
+          "role": "vscode-other",
+          "memoryMedianMiB": 61.82,
+          "rssMedianMiB": 106.92,
+          "cpuOneCorePct": 0.065
+        },
+        {
+          "pid": 449396,
+          "role": "vscode-other",
+          "memoryMedianMiB": 52.4,
+          "rssMedianMiB": 90.11,
+          "cpuOneCorePct": 0.065
+        },
+        {
+          "pid": 449383,
+          "role": "file-watcher",
+          "memoryMedianMiB": 48.3,
+          "rssMedianMiB": 84.69,
+          "cpuOneCorePct": 0.032
+        },
+        {
+          "pid": 449376,
+          "role": "vscode-other",
+          "memoryMedianMiB": 31.8,
+          "rssMedianMiB": 65.73,
+          "cpuOneCorePct": 0.049
+        },
+        {
+          "pid": 449766,
+          "role": "json-server",
+          "memoryMedianMiB": 27.72,
+          "rssMedianMiB": 64.93,
+          "cpuOneCorePct": 0.065
+        },
+        {
+          "pid": 450309,
+          "role": "vscode-other",
+          "memoryMedianMiB": 23.34,
+          "rssMedianMiB": 23.34,
+          "cpuOneCorePct": 0.081
+        },
+        {
+          "pid": 449482,
+          "role": "vscode-other",
+          "memoryMedianMiB": 17.88,
+          "rssMedianMiB": 53.25,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 449438,
+          "role": "map-helper",
+          "memoryMedianMiB": 10.56,
+          "rssMedianMiB": 19.36,
+          "cpuOneCorePct": 0.016
+        },
+        {
+          "pid": 459934,
+          "role": "map-mcp",
+          "memoryMedianMiB": 8.89,
+          "rssMedianMiB": 15.25,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 450274,
+          "role": "map-mcp",
+          "memoryMedianMiB": 7.01,
+          "rssMedianMiB": 13.23,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 450161,
+          "role": "map-mcp",
+          "memoryMedianMiB": 6.84,
+          "rssMedianMiB": 12.99,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 449448,
+          "role": "map-helper",
+          "memoryMedianMiB": 2.75,
+          "rssMedianMiB": 8.65,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 449488,
+          "role": "map-helper",
+          "memoryMedianMiB": 2.48,
+          "rssMedianMiB": 8.38,
+          "cpuOneCorePct": 0.0
+        },
+        {
+          "pid": 448998,
+          "role": "vscode-other",
+          "memoryMedianMiB": 0.14,
+          "rssMedianMiB": 1.94,
+          "cpuOneCorePct": 0.0
+        }
+      ],
+      "sumMedianMiB": 1057.84,
+      "sumCpuOneCorePct": 8.292,
+      "groupMedianMiB": 1057.86,
+      "groupRssMedianMiB": 1369.75
+    }
+  }
+}
