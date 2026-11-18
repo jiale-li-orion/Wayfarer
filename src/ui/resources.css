@@ -625,3 +625,18 @@ small,
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.pressure-panel {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 6px;
+  line-height: 1.8;
+}
+.machine-card .pressure-panel {
+  padding: 8px;
+  font-size: 12px;
+}
+.pressure-panel p {
+  margin: 0 0 8px;
+}

@@ -68,6 +68,8 @@ export async function activate(context: vscode.ExtensionContext) {
     pageSize: config.get<number>("pageSize"),
     transferConcurrency: config.get<number>("transferConcurrency"),
     monitorPython: config.get<string>("monitorPython") || undefined,
+    resourceRecordingDirectory:
+      config.get<string>("resourceRecordingDirectory") || undefined,
     trash: async (p) => {
       await vscode.workspace.fs.delete(vscode.Uri.file(p), {
         recursive: true,

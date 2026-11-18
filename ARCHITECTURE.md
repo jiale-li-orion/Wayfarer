@@ -182,3 +182,19 @@ SystemMonitor 在原有 Core 下管理独立资源通道；资源页、MCP 共�
 ## 存储分析（0.6.0）
 
 StorageAnalysis 复用 Jobs 的持久收据与同卷锁，采集通过独立 RemoteEndpoint 通道运行 Python 标准库扫描器。SQLite 索引把文件枚举与界面分页分开；本机直接写 globalStorage，远端通过分批目录聚合回传，工作索引随采集通道释放。Windows / Linux 的实际占盘、硬链接归属、快照保留与 MCP 接口见 docs/STORAGE.md。存储页面按需读取，窗口退出继续先等待任务 finally，再关闭所属通道。
+
+## 存储与内存压力闭环（0.7.0）
+
+```mermaid
+flowchart LR
+  Jobs[相关任务结束] --> Refresh[可见容量控制器：单在途／事件合并]
+  User[打开／刷新容量] --> Refresh
+  Refresh --> Probe[存储探测：实际卷／WSL 承载卷]
+  Snap[两份保留快照] --> SQL[SQLite 对比：分页／磁盘临时表／读取租约]
+  SQL --> View[目录变化／覆盖差异／单列卷余量]
+  Monitor[共享 SystemMonitor] --> Pressure[Windows 提交量／Linux PSI 与 OOM／承载预算]
+  Monitor --> Record[按地图记录至 D 盘：10 秒／10 分钟／20 MiB]
+  Record --> End[停止记录兴趣／等待写入／释放空闲助手]
+```
+
+存储对比和容量刷新复用 Jobs、StorageAnalysis；采样与文件数据通道保持独立。快照淘汰保留有界状态元数据。Windows 容量读取限于固定卷，WSL 承载路径来自注册信息；每台机器的采集与既有短缓存共享。页面、记录和后台任务各自持有兴趣，最后一个使用者结束后释放所属资源。

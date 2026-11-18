@@ -60,6 +60,31 @@ function App() {
       saved.directory,
     ),
     [offset, setOffset] = useState(0);
+  const [baseline, setBaseline] = useState(""),
+    [comparison, setComparison] = useState<any>(),
+    [compareOffset, setCompareOffset] = useState(0);
+  const compareRevision = useRef(0);
+  const compare = async (before: string, after: string, page = 0) => {
+    const revision = ++compareRevision.current;
+    if (!before || !after) {
+      setComparison(undefined);
+      return;
+    }
+    try {
+      const value = await rpc("storageCompare", {
+        before,
+        after,
+        offset: page,
+        limit: 50,
+      });
+      if (compareRevision.current === revision) {
+        setComparison(value);
+        setCompareOffset(page);
+      }
+    } catch (e) {
+      if (compareRevision.current === revision) setError(String(e));
+    }
+  };
   const generation = useRef(0),
     jobRef = useRef<any>(undefined);
   jobRef.current = job;
@@ -87,6 +112,10 @@ function App() {
   };
   const select = (next: any) => {
     generation.current++;
+    compareRevision.current++;
+    setBaseline("");
+    setComparison(undefined);
+    setBusy(false);
     setRef(next);
     setDraft(next.path);
     setVolume(undefined);
@@ -127,6 +156,14 @@ function App() {
       })
       .catch((e) => active && setError(String(e)));
     const notify = (v: any) => {
+      if (v.type === "capacity") {
+        setVolume(v.value);
+        return;
+      }
+      if (v.type === "capacityError") {
+        setError(v.error);
+        return;
+      }
       if (v.type === "target") {
         select(v.ref);
         return;
@@ -136,7 +173,7 @@ function App() {
         if (["completed", "cancelled", "failed"].includes(v.job.state)) {
           setId(v.job.id);
           void load(v.job.id);
-          void rpc("storageSnapshots")
+          void rpc("storageSnapshots", { includeUnavailable: true })
             .then(setSnapshots)
             .catch(() => {});
         }
@@ -152,18 +189,23 @@ function App() {
   useEffect(() => {
     if (!ref) return;
     let active = true;
-    rpc("storageProbe", { ref })
-      .then((v) => active && setVolume(v))
-      .catch((e) => active && setError(String(e)));
+    rpc("watchCapacity", { ref }).catch((e) => active && setError(String(e)));
     return () => {
       active = false;
     };
   }, [ref?.endpoint, ref?.path]);
   useEffect(() => {
+    void compare(baseline, id);
+  }, [baseline, id]);
+  useEffect(() => {
     api.setState({ ref, id, directory });
   }, [ref, id, directory]);
   const start = async () => {
     if (!ref || busy) return;
+    const revision = ++generation.current;
+    compareRevision.current++;
+    setBaseline("");
+    setComparison(undefined);
     setBusy(true);
     setError("");
     try {
@@ -173,22 +215,26 @@ function App() {
         ref: r,
         operationId: crypto.randomUUID(),
       });
+      if (revision !== generation.current) return;
       jobRef.current = task;
       setJob(task);
       setId(task.id);
       setResult(undefined);
       setDirectory(undefined);
       const latest = await rpc("job", { id: task.id, fields: ["summary"] });
+      if (revision !== generation.current) return;
       jobRef.current = latest;
       setJob(latest);
       if (["completed", "cancelled", "failed"].includes(latest.state)) {
         await load(task.id);
-        setSnapshots(await rpc("storageSnapshots"));
+        setSnapshots(
+          await rpc("storageSnapshots", { includeUnavailable: true }),
+        );
       }
     } catch (e) {
-      setError(String(e));
+      if (revision === generation.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (revision === generation.current) setBusy(false);
     }
   };
   const running = job && ["running", "queued"].includes(job.state);
@@ -208,13 +254,24 @@ function App() {
         <button
           disabled={!id || !result}
           onClick={() =>
-            void rpc("export", { id }).catch((e) => setError(String(e)))
+            void rpc("export", {
+              id,
+              before: comparison ? baseline : undefined,
+            }).catch((e) => setError(String(e)))
           }
         >
-          导出分析
+          {comparison ? "导出对比" : "导出分析"}
         </button>
       </header>
       <section className="controls">
+        <button
+          disabled={!ref}
+          onClick={() =>
+            void rpc("refreshCapacity").catch((e) => setError(String(e)))
+          }
+        >
+          刷新容量
+        </button>
         <select
           aria-label="机器与磁盘"
           value={ref?.endpoint ?? ""}
@@ -268,7 +325,9 @@ function App() {
             </strong>
           </div>
           <div>
-            <span>挂载位置</span>
+            <span>
+              挂载位置 · {new Date(volume.stamp).toLocaleTimeString()}
+            </span>
             <button className="path" onClick={() => void locate(volume.mount)}>
               {volume.mount}
             </button>
@@ -300,17 +359,24 @@ function App() {
             onChange={(e) => {
               const s = snapshots.find((x) => x.id === e.target.value);
               if (!s) return;
+              generation.current++;
+              compareRevision.current++;
+              setBusy(false);
               setRef(s.ref);
               setDraft(s.ref.path);
               setId(s.id);
               setJob(undefined);
-              void load(s.id);
+              setBaseline("");
+              setComparison(undefined);
+              if (s.available !== false) void load(s.id);
+              else setResult(undefined);
             }}
           >
             <option value="">选择快照</option>
             {snapshots.map((s) => (
               <option key={s.id} value={s.id}>
                 {new Date(s.stamp).toLocaleString()} · {s.ref.path}
+                {s.available === false ? " · 索引已淘汰" : ""}
               </option>
             ))}
           </select>
@@ -322,6 +388,132 @@ function App() {
           </span>
         )}
       </section>
+      <p className="retention">
+        保留 3 份索引，共 100 MiB；可在新扫描前导出当前分析。
+        {snapshots.find((s) => s.id === id)?.available === false && (
+          <strong>
+            {" "}
+            当前索引因
+            {snapshots.find((s) => s.id === id)?.evictionReason ===
+            "snapshot-count"
+              ? "保留数量"
+              : "空间预算"}
+            已淘汰，目录结果已释放。
+          </strong>
+        )}
+      </p>
+      {result && (
+        <section className="comparison">
+          <label>
+            对比基线{" "}
+            <select
+              aria-label="对比基线"
+              value={baseline}
+              onChange={(e) => setBaseline(e.target.value)}
+            >
+              <option value="">选择同目录的历史分析</option>
+              {snapshots
+                .filter(
+                  (s) =>
+                    s.id !== id &&
+                    s.available !== false &&
+                    s.ref.endpoint === ref?.endpoint &&
+                    s.ref.path === ref?.path,
+                )
+                .map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {new Date(s.stamp).toLocaleString()}
+                  </option>
+                ))}
+            </select>
+          </label>
+          {comparison && (
+            <>
+              <p>
+                {new Date(comparison.before.stamp).toLocaleString()} →{" "}
+                {new Date(comparison.after.stamp).toLocaleString()}
+              </p>
+              <p>
+                目录已知占盘变化：
+                {(comparison.after.rootStats?.allocatedBytesKnown ?? 0) >=
+                (comparison.before.rootStats?.allocatedBytesKnown ?? 0)
+                  ? "+"
+                  : "−"}
+                {bytes(
+                  Math.abs(
+                    (comparison.after.rootStats?.allocatedBytesKnown ?? 0) -
+                      (comparison.before.rootStats?.allocatedBytesKnown ?? 0),
+                  ),
+                )}
+              </p>
+              <p>
+                卷余量变化：
+                {comparison.volumeAvailableDelta == null
+                  ? "未知"
+                  : (comparison.volumeAvailableDelta >= 0 ? "+" : "−") +
+                    bytes(Math.abs(comparison.volumeAvailableDelta))}{" "}
+                · 按两次卷采样计算，包含其他程序的写入与释放。
+              </p>
+              {(comparison.incomplete || comparison.coverageChanged) && (
+                <p className="warning">
+                  部分目录覆盖范围有差异，以下变化仅代表已读取内容。
+                </p>
+              )}
+              <table>
+                <thead>
+                  <tr>
+                    <th>目录</th>
+                    <th>原占盘</th>
+                    <th>现占盘</th>
+                    <th>已知占盘变化</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparison.rows.map((r: any) => (
+                    <tr key={r.id}>
+                      <td>
+                        <button
+                          className="path long-path"
+                          onClick={() => void locate(r.path)}
+                        >
+                          {r.path}
+                        </button>
+                        {r.state === "added"
+                          ? " · 新增"
+                          : r.state === "removed"
+                            ? " · 已移除"
+                            : ""}
+                      </td>
+                      <td>{bytes(r.before?.allocatedBytesKnown ?? 0)}</td>
+                      <td>{bytes(r.after?.allocatedBytesKnown ?? 0)}</td>
+                      <td>
+                        {r.allocatedDelta >= 0 ? "+" : "−"}
+                        {bytes(Math.abs(r.allocatedDelta))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <footer>
+                <button
+                  disabled={!compareOffset}
+                  onClick={() =>
+                    void compare(baseline, id, Math.max(0, compareOffset - 50))
+                  }
+                >
+                  上一页
+                </button>
+                <button
+                  disabled={!comparison.hasMore}
+                  onClick={() => void compare(baseline, id, compareOffset + 50)}
+                >
+                  下一页
+                </button>
+              </footer>
+            </>
+          )}
+        </section>
+      )}
       {job && (
         <section className="progress" role="status">
           <span>

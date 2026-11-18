@@ -65,7 +65,7 @@ def probe(path):
                         name = winreg.QueryValueEx(sub,'DistributionName')[0]
                         base = winreg.QueryValueEx(sub,'BasePath')[0]
                         hostdisk=shutil.disk_usage(base)
-                        value['wsl'].append({'distribution':name,'basePath':base,'hostVolume':{'volume':str(os.stat(base).st_dev),'mount':os.path.splitdrive(os.path.realpath(base))[0]+'\\','total':hostdisk.total,'available':hostdisk.free},'disks':[{'path':p,'logicalBytes':os.stat(p).st_size,'allocatedBytes':allocated(p,os.stat(p))} for p in glob.glob(os.path.join(base,'*.vhdx'))]})
+                        value['wsl'].append({'distribution':name,'basePath':base,'hostVolume':{'stamp':int(time.time()*1000),'volume':str(os.stat(base).st_dev),'mount':os.path.splitdrive(os.path.realpath(base))[0]+'\\','total':hostdisk.total,'available':hostdisk.free},'disks':[{'path':p,'logicalBytes':os.stat(p).st_size,'allocatedBytes':allocated(p,os.stat(p))} for p in glob.glob(os.path.join(base,'*.vhdx'))]})
         except OSError as e: value['wslError'] = str(e)
         value['swapFiles'] = []
         for p in glob.glob(os.path.join(os.environ.get('TEMP',tempfile.gettempdir()),'*','swap.vhdx')):
@@ -231,6 +231,35 @@ def dispatch(method,a):
             if 'snapshot' in a:metadata(db,a['snapshot'])
         finally:db.close()
         return True
+    if method=='compare':
+        db=sqlite3.connect('file:'+a['afterStore'].replace('\\','/')+'?mode=ro',uri=True)
+        try:
+            db.execute('PRAGMA cache_size=-2048')
+            db.execute('PRAGMA temp_store=FILE')
+            db.execute('ATTACH DATABASE ? AS beforedb',('file:'+a['beforeStore'].replace('\\','/')+'?mode=ro',))
+            before=json.loads(db.execute("SELECT v FROM beforedb.meta WHERE k='snapshot'").fetchone()[0])
+            after=json.loads(db.execute("SELECT v FROM main.meta WHERE k='snapshot'").fetchone()[0])
+            if before['rootId']!=after['rootId']:raise ValueError('Select snapshots with the same root')
+            parent=a.get('directory') or after['rootId']
+            if '/' in parent or '\\' in parent:parent=key(parent)
+            offset=max(0,int(a.get('offset',0)));limit=max(1,min(200,int(a.get('limit',50))))
+            sql="""SELECT b.data,a.data,COALESCE(a.allocated,0)-COALESCE(b.allocated,0)
+              FROM (SELECT id FROM main.dirs WHERE parent=? UNION SELECT id FROM beforedb.dirs WHERE parent=?) ids
+              LEFT JOIN beforedb.dirs b ON b.id=ids.id LEFT JOIN main.dirs a ON a.id=ids.id
+              ORDER BY abs(COALESCE(a.allocated,0)-COALESCE(b.allocated,0)) DESC,COALESCE(a.path,b.path) LIMIT ? OFFSET ?"""
+            rows=[]
+            for old,new,delta in db.execute(sql,(parent,parent,limit+1,offset)):
+                b=json.loads(old) if old else None;n=json.loads(new) if new else None
+                rows.append(dict(id=(n or b)['id'],path=(n or b)['path'],before=b,after=n,allocatedDelta=delta,logicalDelta=(n or {}).get('logicalBytes',0)-(b or {}).get('logicalBytes',0),state='added' if b is None else 'removed' if n is None else 'present'))
+            def volume(v):return v.get('physicalBudget') or v
+            bv=volume(before.get('volume',{}));av=volume(after.get('volume',{}))
+            same=bv.get('volume') is not None and bv.get('volume')==av.get('volume')
+            return dict(before=before,after=after,rows=rows[:limit],offset=offset,hasMore=len(rows)>limit,
+                coverageChanged=any(before.get(k)!=after.get(k) for k in ['incomplete','errorCount','skippedLinks','finished']),
+                incomplete=bool(before.get('incomplete') or after.get('incomplete')),
+                volumeAvailableDelta=av['available']-bv['available'] if same and 'available' in av and 'available' in bv else None,
+                volumeBefore=bv,volumeAfter=av)
+        finally:db.close()
     if method=='query':
         db=sqlite3.connect('file:'+a['store'].replace('\\','/')+'?mode=ro',uri=True)
         try:

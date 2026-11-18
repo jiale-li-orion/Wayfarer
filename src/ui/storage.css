@@ -248,3 +248,13 @@ footer {
     font-size: 13px;
   }
 }
+
+.comparison {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 8px;
+}
+.retention {
+  color: var(--vscode-descriptionForeground);
+}

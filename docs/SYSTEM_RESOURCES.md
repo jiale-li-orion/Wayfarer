@@ -56,3 +56,13 @@ Windows PDH 按摘要、进程 GPU 内存和磁盘／网络分组收集，切换
 ![单机 GPU 列表](images/resources/02-machine-gpus.png)
 
 ![GPU 详情](images/resources/03-gpu-detail.png)
+
+## 0.7.0：内存压力与有界记录
+
+Windows 提交量改用 GetPerformanceInfo 的 CommitTotal／CommitLimit × PageSize，分页文件大小从固定卷上的实际文件属性取得；磁盘容量单独统计。Linux 增加 `/proc/pressure/memory`、`/proc/vmstat` 的换页／主缺页速率及内核 OOM 终止累计，cgroup 事件注明采集器当前 cgroup。零值、权限缺失与历史累计分别呈现。Windows 采集器缓存 WSL 注册路径，每次只重读承载卷余量；WSL 快照复用十秒内的 Windows 快照取得承载预算。
+
+资源页展示可用物理内存、提交量、swap、PSI、换页及 OOM 计数，并提供进程页定位。提示阈值为物理可用低于 10%、提交比例达到 85%、PSI some avg10 达到 10%、卷余量低于 5%；提示说明测量条件，进程与配置由明确操作管理。Windows 整机、WSL、单进程口径各自标记，WSL 与宿主数字分别观察。
+
+记录每台机器至多每十秒一份，十分钟或 20 MiB 自动结束。达到上限、存储滞后和写入错误均结束对应记录，撤销记录持有的采样兴趣，等待在途请求后释放助手；可见页面保留自己的订阅。`workspaceMap.resourceRecordingDirectory` 可设本机绝对路径，各地图再按存储 ID 隔离；空值沿用 globalStorage。旧记录继续可读取，JSON／CSV 增加压力字段。日常使用验收将该配置指向 D 盘。
+
+计数依据：[GetPerformanceInfo](https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getperformanceinfo)、[PERFORMANCE_INFORMATION](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information)。

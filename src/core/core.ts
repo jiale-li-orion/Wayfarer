@@ -89,6 +89,7 @@ export class Core extends EventEmitter {
       transferConcurrency?: number;
       trash?: (p: string) => Promise<void>;
       monitorPython?: string;
+      resourceRecordingDirectory?: string;
     } = {},
   ) {
     super();
@@ -105,6 +106,15 @@ export class Core extends EventEmitter {
       options.monitorPython,
       undefined,
       (id) => this.endpoints.enabled(id),
+      {
+        directory: options.resourceRecordingDirectory
+          ? path.join(
+              options.resourceRecordingDirectory,
+              path.basename(storage),
+              "resource-recordings",
+            )
+          : undefined,
+      },
     );
     this.storageAnalysis = new StorageAnalysis(
       path.join(storage, "storage-scans"),
@@ -345,13 +355,15 @@ export class Core extends EventEmitter {
       case "storageProbe":
         return this.storageAnalysis.probe(a.ref);
       case "storageSnapshots":
-        return this.storageAnalysis.list();
+        return this.storageAnalysis.list(!!a.includeUnavailable);
       case "storageScan": {
         const volume = await this.storageAnalysis.probe(a.ref);
         return submit("storage", { ...a, volume }, [
           "storage-volume:" + volume.volumeKey,
         ]);
       }
+      case "storageCompare":
+        return this.storageAnalysis.compare(a);
       case "storageResult":
         return this.storageAnalysis.query(a);
       case "listClose":

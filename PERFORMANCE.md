@@ -221,3 +221,35 @@ C 盘当时剩余约 8.3GiB，自有 C 盘验收目录约 27MiB 已删除；后�
 训练机 64 MiB 文件复制单独执行/同时扫描 2,000 个目录耗时 76.91/76.85 ms；目标字节一致，结束通道/查询均为 0。这是热缓存的端内 fixture，吞吐只对应本次条件。
 
 Windows、WSL、训练机、推理机实际读取通过；Windows 实测 16 KiB 逻辑数据由同一 8 KiB 文件的两个链接组成，范围外保留一个链接，回收上界为 0。首次实机发现并修正 Windows DirEntry 身份缺失与 stdin 编码差异。采样候选与最终交付差异为标签、目录块核算和失败协议收束；相关定向检查覆盖最终代码。原始及汇总数据见 docs/performance-data/storage-20261118，完整实机记录保存在 D:\Wayfarer-Acceptance\v060。
+
+## 0.7.0 · 存储闭环与压力采样（2026-11-18）
+
+Windows 原生 Node、同一 Windows 机器、同样八次 summary 查询，查询之间间隔 2.1 秒；每次按 MCP 单次调用路径启动并释放采集器。原始数据在 D:/Wayfarer-Acceptance/v070/profile/bench-before.json 与 bench-after.json。旧版使用 0.6.1 canonical 源码构建监控模块，新版使用本 PR；两者均在训练机构建，本机直接运行 Node，沿用现有 VS Code 窗口。
+
+| 指标 | 0.6.1 | 0.7.0 |
+| --- | ---: | ---: |
+| 查询墙钟中位数 | 475.0 ms | 484.0 ms |
+| 采集阶段中位数 | 301.0 ms | 304.9 ms |
+| 八次查询宿主 CPU 时间 | 32 ms | 32 ms |
+| 结束时宿主 JS heap | 5.70 MiB | 5.70 MiB |
+| 结束后通道／请求／计时器 | 0／0／0 | 0／0／0 |
+
+新增压力与容量字段增加约 4ms 采集时间；查询墙钟含进程启动与 GPU 探测。此表衡量相同查询的新增成本。资源收益来自隐藏释放、请求合并以及记录时长／字节上限；整机可用内存同时受用户应用和其他业务变化影响。
+
+真实 Windows Core 经 WSL 与两台 SSH 的四端验收覆盖中文 fixture、已移除／新增目录的快照对比、50轮容量控制器和50轮资源订阅开关。最后 monitor readers/timer/channels/pending/retiringChannels 均归零，storage channels/queries 均归零。结果位于 D:/Wayfarer-Acceptance/v070/runtime/acceptance.json。fixtures 已在 finally 删除。
+
+日常窗口采样采用每10秒一次、最长10分钟、每文件20MiB；Windows 记录物理内存和私有提交量，WSL 记录系统可用内存及前15个进程的PSS。其他进程的RSS只作为驻留观察，分组求和时保留共享页口径。采样阶段 Agent 正常输出，记录属于实际日常场景。完整前后数据留D盘，汇总随验收更新。
+
+两端各完成更新前后十分钟日常采样，每段61份，四段共244份；[汇总数据](docs/performance-data/pressure-20261118/daily-summary.json)。期间Agent持续工作，应用和浏览器有活动变化；表中整机变化用于定位压力，固定八次查询表用于比较本插件新增成本。
+
+| 日常场景指标 | 前段 | 后段 |
+| --- | ---: | ---: |
+| Windows 可用内存中位数／最低 | 1512／758 MiB | 1216／481 MiB |
+| Windows 系统提交量中位数 | 29.59 GiB | 29.59 GiB |
+| 全部 Code.exe 私有提交量中位数 | 2034 MiB | 2023 MiB |
+| WSL 可用内存中位数／最低 | 4005／3851 MiB | 3885／3008 MiB |
+| WSL swap 已用中位数 | 204.23 MiB | 204.21 MiB |
+| Windows 采样器平均单核 CPU | 0.141% | 0.247% |
+| WSL 采样器平均单核 CPU | 0.390% | 0.411% |
+
+采样器CPU包含进程清单和前15个Linux进程PSS读取，高于资源总览的实际读取范围，四段均低于2%单核预算。WSL后段末次内核oom_kill累计为0。Windows整机物理余量更紧，任务提交仍有分页支持；通过压力页定位当前进程，内存配置与现役业务由原有策略管理。本轮未对用户应用或其他项目的浏览器会话执行退出。
