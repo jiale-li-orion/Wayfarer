@@ -115,6 +115,7 @@ function App() {
     compareRevision.current++;
     setBaseline("");
     setComparison(undefined);
+    setBusy(false);
     setRef(next);
     setDraft(next.path);
     setVolume(undefined);
@@ -201,6 +202,10 @@ function App() {
   }, [ref, id, directory]);
   const start = async () => {
     if (!ref || busy) return;
+    const revision = ++generation.current;
+    compareRevision.current++;
+    setBaseline("");
+    setComparison(undefined);
     setBusy(true);
     setError("");
     try {
@@ -210,12 +215,14 @@ function App() {
         ref: r,
         operationId: crypto.randomUUID(),
       });
+      if (revision !== generation.current) return;
       jobRef.current = task;
       setJob(task);
       setId(task.id);
       setResult(undefined);
       setDirectory(undefined);
       const latest = await rpc("job", { id: task.id, fields: ["summary"] });
+      if (revision !== generation.current) return;
       jobRef.current = latest;
       setJob(latest);
       if (["completed", "cancelled", "failed"].includes(latest.state)) {
@@ -225,9 +232,9 @@ function App() {
         );
       }
     } catch (e) {
-      setError(String(e));
+      if (revision === generation.current) setError(String(e));
     } finally {
-      setBusy(false);
+      if (revision === generation.current) setBusy(false);
     }
   };
   const running = job && ["running", "queued"].includes(job.state);
@@ -354,6 +361,7 @@ function App() {
               if (!s) return;
               generation.current++;
               compareRevision.current++;
+              setBusy(false);
               setRef(s.ref);
               setDraft(s.ref.path);
               setId(s.id);
