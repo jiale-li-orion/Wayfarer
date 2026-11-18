@@ -578,3 +578,5 @@ summary:focus-visible {
 .inspector h2 button:first-of-type {
   margin-left: auto;
 }
+
+.scope-path { overflow-wrap: anywhere; padding: 6px 0 12px; }

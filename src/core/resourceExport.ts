@@ -37,6 +37,8 @@ const columns = [
   "sendBytesPerSecond",
   "diskTotalBytes",
   "diskAvailableBytes",
+  "memorySource",
+  "memoryStamp",
 ];
 export const csvHeader = columns.join(",") + "\r\n";
 function cell(v: any) {
@@ -81,6 +83,8 @@ export function csvRows(s: any) {
       rssBytes: p.rss,
       pssBytes: p.pss,
       privateBytes: p.privateBytes,
+      memorySource: p.memorySource,
+      memoryStamp: p.memoryStamp,
       gpuMemoryUsedBytes: p.gpuMemory,
       gpuSharedMemoryBytes: p.gpuSharedMemory,
     });
@@ -119,4 +123,31 @@ export function csvRows(s: any) {
   return rows
     .map((r) => columns.map((k) => cell(r[k])).join(",") + "\r\n")
     .join("");
+}
+
+/** Project only the requested resource section; keep the cached snapshot immutable. */
+export function compactResourceSnapshot(value: any): any {
+  if (value.machines)
+    return {
+      machines: value.machines,
+      snapshots: (value.snapshots ?? []).map((snapshot: any) =>
+        compactResourceSnapshot({ ...snapshot, section: "summary" }),
+      ),
+    };
+  const common = Object.fromEntries(
+    ["stamp", "endpoint", "machine", "name", "section", "status", "errors"]
+      .filter((k) => value[k] !== undefined)
+      .map((k) => [k, value[k]]),
+  );
+  const sections: Record<string, string[]> = {
+    summary: ["system", "physicalBudget"],
+    processes: ["processes", "total", "offset", "limit"],
+    process: ["detail", "detailStatus", "detailError"],
+    gpus: ["gpus"],
+    gpu: ["detail", "processes"],
+    io: ["io"],
+  };
+  for (const k of sections[value.section ?? "summary"] ?? [])
+    if (value[k] !== undefined) common[k] = value[k];
+  return common;
 }

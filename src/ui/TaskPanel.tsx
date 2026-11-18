@@ -128,11 +128,11 @@ export function TaskPanel({
       </article>
     ));
   return (
-    <section className="floating jobs" aria-label="后台任务">
+    <section className="floating jobs" aria-label="传输与后台任务">
       <h2>
-        后台任务
+        传输与后台任务
         <button
-          title="性能日志"
+          title="诊断日志"
           onClick={() => void rpc("command", { name: "logs" })}
         >
           <i className="codicon codicon-output" />

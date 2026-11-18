@@ -66,3 +66,9 @@ Windows 提交量改用 GetPerformanceInfo 的 CommitTotal／CommitLimit × Page
 记录每台机器至多每十秒一份，十分钟或 20 MiB 自动结束。达到上限、存储滞后和写入错误均结束对应记录，撤销记录持有的采样兴趣，等待在途请求后释放助手；可见页面保留自己的订阅。`workspaceMap.resourceRecordingDirectory` 可设本机绝对路径，各地图再按存储 ID 隔离；空值沿用 globalStorage。旧记录继续可读取，JSON／CSV 增加压力字段。日常使用验收将该配置指向 D 盘。
 
 计数依据：[GetPerformanceInfo](https://learn.microsoft.com/en-us/windows/win32/api/psapi/nf-psapi-getperformanceinfo)、[PERFORMANCE_INFORMATION](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-performance_information)。
+
+## 0.7.1：受限进程与精简读取
+
+`vmmemWSL` 的原生进程句柄可能受限。进程查询按PID合并PDH的工作集和私有提交量，缺失时再使用CIM，后者在采集器内缓存60秒。来源与实际采样时间进入进程详情、JSON和CSV；权限不足的其他字段继续保持未知。目录浏览、资源总览和空闲状态各自沿原调度运行。
+
+MCP `map_systemResources` 新增可选 `compact:true`，只交付请求的section；例如进程查询仅包含进程分页与状态，省去历史、GPU和卷元数据。默认完整响应保留。`map_list.fields` 可选择name/path/kind/size/mtime/identity/target/error；分页游标与目录缓存保留完整身份。数据投影发生在Core返回边界，资源页和其他消费者继续共用同一快照。

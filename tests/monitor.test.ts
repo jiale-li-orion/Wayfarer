@@ -5,7 +5,11 @@ import os from "node:os";
 import path from "node:path";
 import { SystemMonitor } from "../src/core/monitor";
 import { Profiler } from "../src/core/log";
-import { csvRows, csvHeader } from "../src/core/resourceExport";
+import {
+  csvRows,
+  csvHeader,
+  compactResourceSnapshot,
+} from "../src/core/resourceExport";
 import type { EndpointConfig } from "../src/shared/types";
 const endpoints: EndpointConfig[] = [
   { id: "c", name: "C", kind: "windows", root: "C:\\" },
@@ -401,4 +405,35 @@ test("recording expires at its byte or duration budget and frees hidden collecto
       await fs.rm(dir, { recursive: true, force: true });
     }
   }
+});
+
+test("compact resource replies omit unrelated sections without changing the shared snapshot", () => {
+  const snapshot = {
+    stamp: 1,
+    endpoint: "w",
+    section: "processes",
+    status: "online",
+    processes: [{ pid: 1, rss: 10 }],
+    total: 1,
+    offset: 0,
+    limit: 50,
+    history: [{ stamp: 0 }],
+    gpus: [{ id: "gpu" }],
+    system: { memory: { used: 10 } },
+    collector: { pid: 2 },
+  };
+  const small = compactResourceSnapshot(snapshot);
+  assert.deepEqual(small.processes, snapshot.processes);
+  assert.equal(small.total, 1);
+  assert.equal("history" in small, false);
+  assert.equal("gpus" in small, false);
+  assert.equal("collector" in small, false);
+  const overview = compactResourceSnapshot({
+    machines: [{ endpoint: "w" }],
+    snapshots: [snapshot],
+  });
+  assert.equal("processes" in overview.snapshots[0], false);
+  assert.deepEqual(overview.snapshots[0].system, snapshot.system);
+  assert.ok(snapshot.history.length);
+  assert.ok(JSON.stringify(small).length < JSON.stringify(snapshot).length);
 });

@@ -187,6 +187,50 @@ class ProfileTests(unittest.TestCase):
         self.assertFalse(profile.same_identity('3:9000000','3:1000000'))
         self.assertEqual(profile.linux_role('app-server --key=secret','codex'),'agent-server')
         self.assertNotIn('secret',str(groups))
+        reused=profile.group_processes([dict(pid=1,ppid=0,name='Code.exe',identity='1:900'),dict(pid=2,ppid=1,name='older.exe',identity='2:100')])
+        self.assertTrue(any(g['application']=='older.exe' for g in reused))
+
+class ResourceFallbackTests(unittest.TestCase):
+    def test_identity_and_native_counters_take_priority(self):
+        import runpy
+        monitor=runpy.run_path(str(ROOT/'helpers/monitor.py'))
+        merge=monitor['merge_restricted_memory']
+        rows=[dict(pid=4,name='vmmemWSL',identity='4:100',rss=None,privateBytes=None,access='restricted')]
+        stale=[dict(pid=4,name='vmmemWSL',identity='4:900',rss=100,privateBytes=200)]
+        merge(rows,stale,1);self.assertIsNone(rows[0]['rss'])
+        live=[dict(pid=4,name='vmmemWSL',identity='4:100',rss=100,privateBytes=200)]
+        merge(rows,live,2);self.assertEqual(rows[0]['rss'],100);self.assertEqual(rows[0]['memoryStamp'],2)
+        self.assertEqual(rows[0]['memorySource'],'Win32_Process')
+        self.assertEqual(rows[0]['access'],'partial')
+        live[0]['rss']=999;merge(rows,live,3);self.assertEqual(rows[0]['rss'],100)
+
+class SshSetupTests(unittest.TestCase):
+    def test_target_validation_and_public_key_installation(self):
+        import runpy
+        import subprocess
+        from unittest import mock
+        module=runpy.run_path(str(ROOT/'helpers/ssh_setup.py'))
+        parse=module['parse_target']
+        self.assertEqual(parse('alice@host:2222'),('alice','host',2222))
+        self.assertEqual(parse('alice@[::1]:22'),('alice','::1',22))
+        for value in ['-o@host','user@host;id','user@host:70000','user@host\nother']:
+            with self.assertRaises(ValueError):parse(value)
+        with tempfile.TemporaryDirectory() as tmp:
+            home=pathlib.Path(tmp);key=home/'.ssh/wayfarer/wayfarer-test.ed25519';key.parent.mkdir(parents=True)
+            key.write_text('fixture private key');key.with_name(key.name+'.pub').write_text('ssh-ed25519 AAAA fixture')
+            calls=[]
+            def execute(argv,**kwargs):
+                calls.append((argv,kwargs))
+                return subprocess.CompletedProcess(argv,0,stdout='WAYFARER_SETUP={"home":"/home/alice","python":"/usr/bin/python3"}\n')
+            with mock.patch.object(pathlib.Path,'home',return_value=home),mock.patch.object(subprocess,'run',side_effect=execute):
+                result=module['setup']('alice@host:2222','wayfarer-test',home/'report.json')
+            self.assertEqual(result['status'],'completed')
+            self.assertEqual(calls[0][1]['input'],'ssh-ed25519 AAAA fixture\n')
+            self.assertIn('PubkeyAuthentication=no',calls[0][0])
+            self.assertIn('BatchMode=yes',calls[1][0])
+            self.assertIn('IdentityFile',pathlib.Path(result['sshConfig']).read_text())
+            self.assertNotIn('password',pathlib.Path(result['sshConfig']).read_text().lower())
+            if os.name!='nt':self.assertEqual(key.stat().st_mode & 0o777,0o600)
 
 if __name__=='__main__':
     unittest.main()

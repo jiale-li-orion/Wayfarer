@@ -31,6 +31,9 @@ def sessions():
             if os.path.exists(value['socket']): result.append(value)
         except (OSError, ValueError, KeyError): pass
     return result
+class MapUnavailable(RuntimeError):
+    pass
+
 class Client:
     def __init__(self):
         self.lock = threading.Condition(threading.RLock())
@@ -161,7 +164,13 @@ class Client:
                 if self.watch in ready: os.read(self.watch, 65536)
             except (OSError, ValueError):
                 if not self.stopped: time.sleep(0.1)
-    def request(self, method, args, binding):
+    def unavailable(self):
+        available = [{k: s.get(k) for k in ('mapId', 'id', 'name', 'state')}
+                     for s in sessions() if s.get('state', 'running') == 'running']
+        return MapUnavailable(json.dumps(dict(code='MAP_UNAVAILABLE', mapId=self.map_id,
+            state=self.state, availableMaps=available,
+            message='Open the bound workspace, or explicitly select another map with map_bind.'), ensure_ascii=False))
+    def request(self, method, args, binding, wait_for_resume=False):
         rid = uuid.uuid4().hex
         frame = (json.dumps(dict(id=rid, method=method, args=args)) + '\n').encode()
         if len(frame) > 8 * 1024 * 1024:
@@ -169,6 +178,7 @@ class Client:
         with self.lock:
             while self.state != 'connected' and not self.stopped:
                 if binding != self.generation: raise RuntimeError('Map binding changed')
+                if not wait_for_resume: raise self.unavailable()
                 self.lock.wait()
             if self.stopped: raise RuntimeError('MCP client closed')
             if binding != self.generation: raise RuntimeError('Map binding changed')
@@ -200,7 +210,7 @@ class Client:
         while True:
             try:
                 if interrupted:
-                    original = self.request('operation', dict(operationId=args['operationId']), binding)
+                    original = self.request('operation', dict(operationId=args['operationId']), binding, wait_for_resume=True)
                     if original: return original
                 return self.request(method, args, binding)
             except ConnectionError:
@@ -226,12 +236,12 @@ def handle(message):
     try:
         if method == 'initialize':
             target = opts.map_id or opts.session
-            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.6.1'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
+            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.7.1'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
         elif method in ('ping', 'logging/setLevel'): result = {}
         elif method == 'tools/list': result = dict(tools=TOOLS)
         elif method == 'tools/call':
             name, args = params['name'], params.get('arguments', {})
-            if name == 'map_sessions': value = sessions()
+            if name == 'map_sessions': value = [{k: s.get(k) for k in ('id','mapId','state','name','created')} for s in sessions()]
             elif name == 'map_connection': value = client.status()
             elif name == 'map_bind':
                 if not args.get('mapId') and not args.get('session'): raise ValueError('Provide mapId or session')

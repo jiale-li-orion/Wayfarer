@@ -468,6 +468,22 @@ test("one MCP client survives 50 rebinds and ten instance replacements with boun
       const view = await tool("view");
       assert.equal(view.follow, false);
     }
+    const liveMap = bridge;
+    liveMap.stopIngress();
+    await core.dispose();
+    await liveMap.dispose();
+    await until(() => tool("connection"), v => v.state === "waiting");
+    const offlineStarted = Date.now();
+    await assert.rejects(tool("endpoints"), /MAP_UNAVAILABLE/);
+    assert.ok(Date.now() - offlineStarted < 1000, "offline reads must release the tool slot immediately");
+    const offlineStatus = await tool("connection");
+    assert.equal(offlineStatus.pendingRequests, 0);
+    assert.equal(offlineStatus.recoveryFlows, 1);
+    core = await f.open();
+    bridge = new Bridge(core, path.resolve("helpers"), "same-name", mapId);
+    await bridge.start();
+    await connected();
+    assert.ok((await tool("endpoints")).length > 0);
     assert.ok(notices.some((n) => n.type === "resumed"));
     await assert.rejects(
       tool("write", {
