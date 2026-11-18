@@ -89,3 +89,7 @@ macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜�
 ### 与现有 VS Code 生态协作
 
 [日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)记录实际精简与对照条件；[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)梳理现有语言服务、扩展工具、Codex 实验 LSP MCP 与 Wayfarer 的接入边界。该评审记录现有能力与后续接入边界；产品现状见 STATE.md。
+
+### 常用工作区与项目环境（0.5.0）
+
+侧边栏收藏常用工作区，点击使用 VS Code 原生打开；右键可新窗口打开、加入当前工作区、定位地图及查看环境。目录详情与常用工作区共用“项目环境”视图，多根项目分别查看。Python 默认 uv，项目清单／锁文件与环境同步分开管理；版本、依赖和占用按需查询。具体行为见 [项目环境说明](docs/PROJECT_ENVIRONMENTS.md)。

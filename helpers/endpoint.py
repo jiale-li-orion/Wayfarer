@@ -94,7 +94,9 @@ def scan_page(a):
         s['sequence']=sequence+1;s['last_sequence']=sequence;s['last_page']=result
         return result
 def run(method,a):
-    if method=='info': return dict(home=os.path.expanduser('~'),platform=sys.platform,python=sys.version.split()[0],pid=os.getpid(),paths={k:os.environ[k] for k in ('ANDROID_HOME','ANDROID_SDK_ROOT','JAVA_HOME','FLUTTER_ROOT','VIRTUAL_ENV','CONDA_PREFIX','CARGO_HOME','RUSTUP_HOME') if os.environ.get(k)})
+    if method=='whichMany':
+        return [run('which',dict(name=name)) for name in a['names'][:32]]
+    if method=='info': return dict(home=os.path.expanduser('~'),platform=sys.platform,python=sys.version.split()[0],pid=os.getpid(),paths={k:os.environ[k] for k in ('ANDROID_HOME','ANDROID_SDK_ROOT','JAVA_HOME','GRADLE_USER_HOME','FLUTTER_ROOT','VIRTUAL_ENV','CONDA_PREFIX','CARGO_HOME','RUSTUP_HOME') if os.environ.get(k)})
     if method=='watchSet':
         if WATCH_FD<0:return False
         wanted=set(a['paths'])
@@ -216,7 +218,9 @@ def run(method,a):
         argv=a['argv']
         if not isinstance(argv,list) or not argv or not all(isinstance(v,str) for v in argv): raise ValueError('argv required')
         env=os.environ.copy()
+        env.update({k:v for k,v in a.get('env',{}).items() if k in ('UV_PROJECT_ENVIRONMENT','UV_PYTHON_DOWNLOADS') and isinstance(v,str)})
         if os.path.isabs(argv[0]):env['PATH']=os.path.dirname(argv[0])+os.pathsep+env.get('PATH','')
+        if a.get('runtime'):env['PATH']=os.path.dirname(a['runtime'])+os.pathsep+env.get('PATH','')
         p=subprocess.Popen(argv,env=env,cwd=getpath(a,'cwd'),stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,start_new_session=True,bufsize=0)
         ident=uuid.uuid4().hex;rec=dict(p=p,chunks=[],bytes=0,lock=threading.Lock(),truncated=False,done=False)
         with STATE: PROCS[ident]=rec

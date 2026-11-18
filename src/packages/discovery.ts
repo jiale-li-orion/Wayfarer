@@ -18,15 +18,8 @@ export async function discover(e: Endpoint, cwd?: string) {
     "cargo",
     "winget",
   ];
-  const found = await Promise.all(
-    names.map(async (name) => {
-      try {
-        return { name, path: await e.call("which", { name }) };
-      } catch {
-        return { name, path: null };
-      }
-    }),
-  );
+  const paths: (string | null)[] = await e.call("whichMany", { names });
+  const found = names.map((name, i) => ({ name, path: paths[i] }));
   const available = found.filter((x) => x.path);
   const info = await e.call("info"),
     pp = pathApi(e.config),

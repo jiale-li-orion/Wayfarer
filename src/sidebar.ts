@@ -1,3 +1,4 @@
+import { watch, type FSWatcher } from "node:fs";
 import * as vscode from "vscode";
 import type { Core } from "./core/core";
 import type { Ref } from "./shared/types";
@@ -10,12 +11,19 @@ type Item = {
   description?: string;
   command?: string;
   ref?: Ref;
+  workspaceId?: string;
 };
 
 /** Native navigation only: the editor canvas owns directory reads and watches. */
 export function createSidebar(core: Core): vscode.Disposable {
   const changes = new vscode.EventEmitter<Item | undefined>();
   const groups: Item[] = [
+    {
+      id: "workspaces",
+      label: "常用工作区",
+      icon: "root-folder",
+      group: "workspaces",
+    },
     {
       id: "machines",
       label: "机器",
@@ -26,6 +34,9 @@ export function createSidebar(core: Core): vscode.Disposable {
     { id: "actions", label: "常用操作", icon: "tools", group: "actions" },
   ];
   const actions = [
+    ["favoriteCurrent", "收藏当前工作区", "add"],
+    ["favoriteFile", "收藏工作区文件", "file-code"],
+    ["environment", "当前工作区环境", "tools"],
     ["open", "打开地图", "map"],
     ["home", "全部机器", "home"],
     ["search", "搜索当前子树", "search"],
@@ -39,8 +50,17 @@ export function createSidebar(core: Core): vscode.Disposable {
   ];
   const provider: vscode.TreeDataProvider<Item> = {
     onDidChangeTreeData: changes.event,
-    getChildren(item) {
+    async getChildren(item) {
       if (!item) return groups;
+      if (item.group === "workspaces")
+        return ((await core.workspaceStore?.list()) ?? []).map((w) => ({
+          id: "workspace:" + w.id,
+          workspaceId: w.id,
+          label: w.name,
+          icon: "root-folder",
+          description: w.locations[0]?.endpoint.name ?? w.uri,
+          command: "workspaceMap.openWorkspace",
+        }));
       if (item.group === "machines")
         return core.endpoints.configs().map((e) => ({
           id: "endpoint:" + e.id,
@@ -81,6 +101,11 @@ export function createSidebar(core: Core): vscode.Disposable {
           : vscode.TreeItemCollapsibleState.None,
       );
       row.id = item.id;
+      row.contextValue = item.workspaceId
+        ? "workspaceMap.favorite"
+        : item.ref
+          ? "workspaceMap.directory"
+          : undefined;
       row.iconPath = new vscode.ThemeIcon(item.icon);
       row.description = item.description;
       row.tooltip = item.ref
@@ -90,7 +115,11 @@ export function createSidebar(core: Core): vscode.Disposable {
         row.command = {
           command: item.ref ? "workspaceMap.openLocation" : item.command!,
           title: item.label,
-          arguments: item.ref ? [item.ref] : [],
+          arguments: item.workspaceId
+            ? [item.workspaceId]
+            : item.ref
+              ? [item.ref]
+              : [],
         };
       return row;
     },
@@ -100,12 +129,31 @@ export function createSidebar(core: Core): vscode.Disposable {
   });
   let dirty = false;
   const update = (event: { type: string }) => {
-    if (!["endpoints", "bookmarks"].includes(event.type)) return;
+    if (!["endpoints", "bookmarks", "workspaces"].includes(event.type)) return;
     if (tree.visible) changes.fire(undefined);
     else dirty = true;
   };
   core.on("event", update);
+  let watcher: FSWatcher | undefined;
+  const syncWatch = () => {
+    watcher?.close();
+    watcher = undefined;
+    if (tree.visible && core.workspaceStore) {
+      try {
+        watcher = watch(core.workspaceStore.directory, (_event, name) => {
+          if (name?.toString() === "workspaces.json") changes.fire(undefined);
+        });
+      } catch {}
+      changes.fire(undefined);
+    }
+  };
+  core.workspaceUiStats = () => ({
+    catalogWatchers: watcher ? 1 : 0,
+    visible: tree.visible,
+  });
+  syncWatch();
   const visible = tree.onDidChangeVisibility(() => {
+    syncWatch();
     if (tree.visible && dirty) {
       dirty = false;
       changes.fire(undefined);
@@ -113,6 +161,8 @@ export function createSidebar(core: Core): vscode.Disposable {
   });
   return {
     dispose() {
+      core.workspaceUiStats = undefined;
+      watcher?.close();
       core.off("event", update);
       visible.dispose();
       tree.dispose();

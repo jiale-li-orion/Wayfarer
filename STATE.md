@@ -1,25 +1,23 @@
-# Workspace Map · 0.4.0
+# Workspace Map · 0.5.0
 
-训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像与 VSIX：`/home/orion/agent-system-learning/workspace-map`。仓库为 `jiale-li-orion/Wayfarer`，插件显示名称 Workspace Map。开发在训练机独立 worktree，本机安装验收。
+训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像：`/home/orion/agent-system-learning/workspace-map`。仓库 `jiale-li-orion/Wayfarer`，显示名称 Workspace Map。开发使用训练机独立 worktree，本机负责安装与实机验收；验收产物位于 D:\Wayfarer-Acceptance，构建与依赖安装留在训练机。
 
 ## 当前功能与归属
 
-Windows UI Extension Host 持有 Core；目录地图、原生侧边栏、文件编辑器与 MCP 共用文件／任务核心。0.4.0 新增「常用操作 → 机器资源」，四端摘要、进程分页、GPU、磁盘／网络及对象详情按需展开。资源采样拥有独立通道，页面隐藏释放订阅，明确开始的记录持续到停止或地图退出；历史记录支持重开窗口后导出。
+常用工作区在 globalStorage 共享收藏，原生打开由 Windows UI 宿主调度；地图、任务与 Agent 继续归各自 mapId。收藏支持目录／工作区文件、原生打开、加入当前工作区、地图定位、环境查看、重命名及排序。SSH 原生入口显式绑定既有 Remote 配置。
 
-NVIDIA 通过 NVML 优先读取，Windows 核显沿 DXGI／PDH；进程名、路径、权限与指标口径保留实际语义。只读 map_systemResources 与界面共享快照，map_resources 保留助手资源职责。源码链路、分组采样与接口见 docs/SYSTEM_RESOURCES.md，整体系统关系见 ARCHITECTURE.md。
+项目环境按根目录查看声明、解释器、工具版本、依赖与占用。Python 默认 uv；清单／锁文件修改与已有环境同步分开执行，明确选择的解释器与 Node 运行时只影响 Wayfarer 操作。Java 缓存位置与统计结果标明路径、来源和时间。版本查询与统计均按需，面板关闭释放订阅，后台任务独立执行。
 
-0.3.0 的稳定 mapId、operationId 收据、传输暂停原因与续传检查点继续使用。Agent 重连交接视图和任务；旧实例按归属释放资源。资源查看、记录、上传导出和采集器退出分别管理，文件任务沿原 Endpoint／Jobs 通道运行。
+固定项目标记、工具路径批量读取；快照有界、同请求合并、修改后失效。收藏监听随侧边栏可见性释放，诊断包含环境面板与收藏监听计数。文件、传输、恢复、机器资源及原账号配置沿原核心。详见 ARCHITECTURE.md 与 docs/PROJECT_ENVIRONMENTS.md。
 
 ## 验证与交付
 
-58 项定向检查、13 项跨平台子集通过；GitHub CI 同时执行 Linux／Windows。实机覆盖 Windows、WSL、训练机 8 张 GPU、推理机 1 张 GPU、实际 Codex／dsh MCP 调用。四端采样与隐藏待机各超过 10 分钟，50 轮真实页签切换后计数归零；原生 JSON／CSV 保存、重开窗口后的 259 条历史导出、双端 8MiB 传输与 SHA-256 回读通过。
+71 项检查、类型检查及 Python 3.6 助手语法检查通过。Windows／WSL／两台 SSH 的环境与工具读取、51 轮环境页面打开／关闭、实际 Codex／dsh MCP 查询、原生多根添加／工作区切换／收藏保留／当前工作区聚焦通过。工作区文件 JSONC 解析按 CommonJS 打包产物和实机双重验证。uv 隔离 wheel 的增删、锁定更新、同步、导入与移除验证通过。原生远端 IDE 与额外新窗口的实机覆盖边界见 docs/ACCEPTANCE.md。
 
-资源和响应实测见 PERFORMANCE.md，覆盖与边界见 docs/ACCEPTANCE.md。三级截图已纳入 docs/SYSTEM_RESOURCES.md。PR #6 交付 0.4.0，沿既有 CI／Release 生成 VSIX、SHA-256 与提交元数据；完成后清理独立开发工作树。
+相同原生目录冷查询适配器调用 46→4，p50 0.980→0.634ms；缓存保持零端点访问。同一独立窗口约 615／619 秒待机，0.4／0.5 共享扩展宿主单核 CPU 0.0229%／0.0808%，结束 heapUsed 42.17／42.47MiB，pending 和运行任务均为零。进程工作集、私有提交量及测量条件分别保留，见 PERFORMANCE.md 与 docs/performance-data/environments-20261118。
+
+PR #5 环境评审已解决冲突并合入 main f07f41f，临时工作树与分支已清理。PR #7 交付本轮，沿 CI／Release 发布 v0.5.0、VSIX、SHA-256 与源码身份。Windows 日常窗口通过重载启用安装的新版本；MCP 继续绑定原稳定 mapId。
 
 ## 维护入口
 
-`npm run typecheck`、`npm test`、`npm run test:portable`、`npm run package`。真实资源与生命周期入口为 scripts/verify-resources.mjs；导出和传输脚本在同目录，均限定独立 acceptance-resources 窗口及临时目录。当前生产配置的模型、账号、权限和 SSH 身份沿原设置，升级连接只处理本插件条目。
-
-## 共享环境评审
-
-[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)、[双端资源复核](docs/WINDOWS_WSL_RESOURCE_AUDIT.md)与[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)保留测量条件、工具覆盖和已知限制。评审建议优先验证已有实验 LSP MCP，后续开发按批准范围推进。
+`npm run typecheck`、`npm test`、`npm run test:portable`、`npm run package`。环境与工作区验收脚本为 scripts/verify-environments-live.mjs、verify-uv-project.mjs、profile-environments.mjs；真实文件与软件修改使用独立 fixture。交付后同步主仓库、本机镜像并清理开发工作树，最终证据与发布文件留在 D 盘。

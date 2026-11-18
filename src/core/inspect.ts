@@ -6,6 +6,7 @@ import { pathApi } from "../shared/paths";
 import type { Endpoints } from "../adapters/registry";
 import type { JobContext } from "./jobs";
 import type { Profiler } from "./log";
+import { projectEnvironment, type EnvironmentChoice } from "./environment";
 import { discover } from "../packages/discovery";
 
 const markers: Record<string, string> = {
@@ -83,6 +84,7 @@ export class Inspector {
   }
   private pending = new Map<string, Promise<Snapshot>>();
   private registered = new Map<string, Ref>();
+  private choices = new Map<string, EnvironmentChoice>();
   private generation = 0;
   private writes = Promise.resolve();
   private closed = false;
@@ -96,6 +98,10 @@ export class Inspector {
       const saved = JSON.parse(
         await fs.readFile(path.join(this.storage, "inspect.json"), "utf8"),
       );
+      for (const [key, value] of saved.choices ?? []) {
+        const [endpoint, path] = JSON.parse(key);
+        this.choices.set(this.choiceKey({ endpoint, path }), value);
+      }
       for (const ref of saved.projects ?? [])
         this.registered.set(refKey(ref), ref);
       for (const [key, value] of (saved.snapshots ?? []).slice(-64))
@@ -114,6 +120,7 @@ export class Inspector {
         this.writeQueued = false;
         const data = JSON.stringify({
           projects: [...this.registered.values()],
+          choices: [...this.choices],
           snapshots: [...this.cache],
         });
         const file = path.join(this.storage, "inspect.json");
@@ -144,12 +151,16 @@ export class Inspector {
         }
         return result;
       })
-      .finally(() => this.pending.delete(key));
+      .finally(() => {
+        if (this.pending.get(key) === promise) this.pending.delete(key);
+      });
     this.pending.set(key, promise);
     return promise;
   }
   invalidate(endpoint: string) {
     this.generation++;
+    for (const key of this.pending.keys())
+      if (JSON.parse(key)[1] === endpoint) this.pending.delete(key);
     const before = this.cache.size;
     for (const key of this.cache.keys())
       if (JSON.parse(key)[1] === endpoint) this.evict(key);
@@ -166,6 +177,7 @@ export class Inspector {
       snapshotBytes: this.cacheBytes,
       pending: this.pending.size,
       projects: this.registered.size,
+      environmentChoices: this.choices.size,
     };
   }
   projects(endpoint?: string) {
@@ -200,30 +212,24 @@ export class Inspector {
           const pp = pathApi(e.config);
           // Fixed set of immediate child names. Manifest content and secrets stay unread.
           const names = Object.keys(markers);
-          for (let i = 0; i < names.length; i += 8) {
-            const found = await Promise.all(
-              names.slice(i, i + 8).map(async (name) => {
-                const target = pp.join(ref.path, name);
-                try {
-                  const item = await e.call("stat", { path: target });
-                  return {
+          const found: any[] = await e.call("statMany", {
+            paths: names.map((name) => pp.join(ref.path, name)),
+          });
+          value.markers = names.flatMap((name, i) =>
+            found[i]?.kind
+              ? [
+                  {
                     name,
                     tag: markers[name],
-                    ref: { endpoint: ref.endpoint, path: target },
-                    kind: item.kind,
-                  };
-                } catch (error: any) {
-                  if (
-                    ["ENOENT", 2].includes(error.code) ||
-                    error.type === "FileNotFoundError"
-                  )
-                    return undefined;
-                  return { name, error: String(error) };
-                }
-              }),
-            );
-            value.markers.push(...found.filter(Boolean));
-          }
+                    ref: {
+                      endpoint: ref.endpoint,
+                      path: pp.join(ref.path, name),
+                    },
+                    kind: found[i].kind,
+                  },
+                ]
+              : [],
+          );
           value.tags = [
             ...new Set(value.markers.map((m: any) => m.tag).filter(Boolean)),
           ];
@@ -232,7 +238,13 @@ export class Inspector {
             ["uv 缓存", pp.join(info.home, ".cache", "uv")],
             ["pip 缓存", pp.join(info.home, ".cache", "pip")],
             ["npm 缓存", pp.join(info.home, ".npm")],
-            ["Gradle 缓存", pp.join(info.home, ".gradle", "caches")],
+            [
+              "Gradle 缓存",
+              pp.join(
+                info.paths?.GRADLE_USER_HOME ?? pp.join(info.home, ".gradle"),
+                "caches",
+              ),
+            ],
             ["Maven 仓库", pp.join(info.home, ".m2", "repository")],
             ["Cargo", pp.join(info.home, ".cargo")],
             [
@@ -279,16 +291,28 @@ export class Inspector {
               ],
               ["npm 缓存", pp.join(info.home, "AppData", "Local", "npm-cache")],
             );
-          for (const [label, target] of candidates) {
-            try {
-              const s = await e.call("stat", { path: target });
-              value.locations.push({
-                label,
-                ref: { endpoint: ref.endpoint, path: target },
-                kind: s.kind,
-              });
-            } catch {}
-          }
+          const locations = [
+            ...new Map(
+              candidates.map(([label, target]) => [
+                target,
+                [label, target] as [string, string],
+              ]),
+            ).values(),
+          ];
+          const foundLocations: any[] = await e.call("statMany", {
+            paths: locations.map(([, target]) => target),
+          });
+          value.locations = locations.flatMap(([label, target], i) =>
+            foundLocations[i]?.kind
+              ? [
+                  {
+                    label,
+                    ref: { endpoint: ref.endpoint, path: target },
+                    kind: foundLocations[i].kind,
+                  },
+                ]
+              : [],
+          );
         }
         return value;
       },
@@ -302,6 +326,48 @@ export class Inspector {
       registered: this.registered.has(refKey(ref)),
     };
   }
+  private choiceKey(ref: Ref) {
+    const config = this.endpoints.configs().find((c) => c.id === ref.endpoint);
+    const normal = config ? pathApi(config).normalize(ref.path) : ref.path;
+    return JSON.stringify([
+      ref.endpoint,
+      config?.kind === "windows" ? normal.toLowerCase() : normal,
+    ]);
+  }
+  environment(ref: Ref, refresh = false) {
+    return this.query(
+      JSON.stringify(["environment", ref.endpoint, ref.path]),
+      refresh,
+      () =>
+        projectEnvironment(
+          this.endpoints.get(ref.endpoint),
+          ref,
+          this.choices.get(this.choiceKey(ref)),
+        ),
+    );
+  }
+  async selectEnvironment(ref: Ref, choice: EnvironmentChoice) {
+    const e = this.endpoints.get(ref.endpoint),
+      pp = pathApi(e.config);
+    for (const [key, value] of Object.entries(choice)) {
+      if (
+        !["python", "uv", "node", "java"].includes(key) ||
+        typeof value !== "string" ||
+        !pp.isAbsolute(value)
+      )
+        throw Error("选择端点上的绝对工具路径");
+      const entry = await e.call("stat", { path: value });
+      if (
+        entry.kind !== "file" &&
+        !(entry.kind === "symlink" && entry.targetKind === "file")
+      )
+        throw Error("工具路径不是可用文件: " + value);
+    }
+    this.choices.set(this.choiceKey(ref), choice);
+    this.invalidate(ref.endpoint);
+    this.persist();
+    return this.environment(ref, true);
+  }
   discovery(endpoint: string, cwd?: string, refresh = false) {
     return this.query(
       JSON.stringify(["discovery", endpoint, cwd ?? ""]),
@@ -310,17 +376,76 @@ export class Inspector {
     );
   }
   async inventory(ctx: JobContext) {
-    const { endpoint, cwd, refresh } = ctx.job.input;
+    const { endpoint, cwd, refresh, ecosystem } = ctx.job.input;
     const snapshot = await this.query(
-      JSON.stringify(["inventory", endpoint, cwd ?? ""]),
+      JSON.stringify([
+        "inventory",
+        endpoint,
+        cwd ?? "",
+        ...(ecosystem ? [ecosystem] : []),
+      ]),
       !!refresh,
       async () => {
         const e = this.endpoints.get(endpoint),
           info = await e.call("info");
         ctx.check();
-        const found = (await this.discovery(endpoint, cwd, !!refresh)).value;
+        const found = (
+          await this.discovery(endpoint, cwd, !!refresh)
+        ).value.map((tool: any) => {
+          const choice = cwd
+            ? this.choices.get(this.choiceKey({ endpoint, path: cwd }))
+            : undefined;
+          return {
+            ...tool,
+            path:
+              choice?.[tool.name as keyof EnvironmentChoice] ??
+              (tool.name === "python3" || tool.name === "python"
+                ? choice?.python
+                : undefined) ??
+              tool.path,
+          };
+        });
+        const declared = cwd
+          ? await this.environment({ endpoint, path: cwd }, !!refresh)
+          : undefined;
+        const selectedPython = declared?.value.python.selectedPython;
+        if (selectedPython)
+          found.push({ name: "project-python", path: selectedPython });
+        const chosen = cwd
+          ? this.choices.get(this.choiceKey({ endpoint, path: cwd }))
+          : undefined;
+        for (const name of ["uv", "node", "java"] as const)
+          if (chosen?.[name] && !found.some((t: any) => t.name === name))
+            found.push({ name, path: chosen[name] });
         const tools = [];
-        for (const tool of found) {
+        for (const tool of found.filter(
+          (t: any) =>
+            !ecosystem ||
+            (
+              {
+                python: [
+                  "project-python",
+                  "uv",
+                  "python",
+                  "python3",
+                  ".venv/bin/python",
+                  ".venv/Scripts/python.exe",
+                ],
+                node: ["node", "npm", "pnpm", "bun"],
+                java: [
+                  "java",
+                  "gradle",
+                  "mvn",
+                  "gradlew",
+                  "gradlew.bat",
+                  "mvnw",
+                  "mvnw.cmd",
+                ],
+                android: ["sdkmanager", "flutter"],
+                rust: ["rustup", "cargo"],
+              } as Record<string, string[]>
+            )[ecosystem]?.includes(t.name),
+        )) {
           ctx.check();
           ctx.progress({ progress: tool.name });
           const started = performance.now();
@@ -370,7 +495,9 @@ export class Inspector {
           ctx.progress({ files: tools.length });
         }
         const projects = [];
-        for (const ref of this.projects(endpoint)) {
+        for (const ref of cwd
+          ? [{ endpoint, path: cwd }]
+          : this.projects(endpoint)) {
           ctx.check();
           try {
             const { stamp, value, registered } = await this.detail(
@@ -382,7 +509,16 @@ export class Inspector {
             projects.push({ ref, error: String(error) });
           }
         }
-        return { endpoint, cwd, info, tools, projects };
+        return {
+          endpoint,
+          cwd,
+          info,
+          tools,
+          projects,
+          environment: cwd
+            ? await this.environment({ endpoint, path: cwd }, !!refresh)
+            : undefined,
+        };
       },
     );
     return snapshot;
@@ -394,5 +530,6 @@ export class Inspector {
     this.weights.clear();
     this.cacheBytes = 0;
     this.registered.clear();
+    this.choices.clear();
   }
 }

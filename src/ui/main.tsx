@@ -223,6 +223,7 @@ function App() {
     action: "list",
     packages: "",
     python: "",
+    node: "",
     executable: "",
     source: "",
     channel: "",
@@ -1222,6 +1223,7 @@ function App() {
                       action: caps[e.target.value][0],
                       executable: "",
                       python: "",
+                      node: "",
                       packages: "",
                       source: "",
                       channel: "",
@@ -1257,6 +1259,7 @@ function App() {
                     {
                       packages: "包名 / 工具链（空格分隔）",
                       python: "Python 解释器",
+                      node: "Node 运行时",
                       executable: "管理器可执行文件",
                       source: "包来源",
                       channel: "Flutter 渠道",

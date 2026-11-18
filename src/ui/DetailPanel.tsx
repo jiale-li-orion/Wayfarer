@@ -228,6 +228,26 @@ export function DetailPanel({
                   </button>
                 </section>
                 <section>
+                  <button
+                    onClick={() =>
+                      void rpc("favoriteDirectory", { ref: target }).catch(
+                        (e) => setFailure(String(e)),
+                      )
+                    }
+                  >
+                    加入常用工作区
+                  </button>
+                  <button
+                    onClick={() =>
+                      void rpc("environmentView", { ref: target }).catch((e) =>
+                        setFailure(String(e)),
+                      )
+                    }
+                  >
+                    查看项目环境
+                  </button>
+                </section>
+                <section>
                   <h3>工具清单</h3>
                   <div className="actions">
                     <button onClick={() => void start("inventory")}>

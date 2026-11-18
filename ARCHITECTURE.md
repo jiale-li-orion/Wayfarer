@@ -174,3 +174,7 @@ stateDiagram-v2
 ## 四端系统资源（0.4.0）
 
 SystemMonitor 在原有 Core 下管理独立资源通道；资源页、MCP 共享机器快照，记录拥有独立订阅生命周期。Windows 多盘符合并，Python stdio 采集器通过 NVML、WinAPI／DXGI／PDH 或 /proc 读取资源。采集与目录控制／传输数据通道分离，页面隐藏释放其采集兴趣；明确记录与活动任务各自保留。完整链路、指标口径和只读 API 见 [SYSTEM_RESOURCES](docs/SYSTEM_RESOURCES.md)。
+
+## 常用工作区与项目环境（0.5.0）
+
+全局 `WorkspaceStore` 承担跨窗口收藏，原生打开由 Windows UI 宿主调度；运行中的 Core／Jobs／Agent 保持地图归属。环境解析在固定项目目录读取有限声明，选择与时间戳快照归 Inspector。包修改继续经过配方预览、任务与原端点，uv 项目声明更新和已有环境同步分别执行。批量 stat／which 减少远端往返；环境视图与收藏监听沿可见生命周期释放。模块、接口及操作规则见 [项目环境说明](docs/PROJECT_ENVIRONMENTS.md)。

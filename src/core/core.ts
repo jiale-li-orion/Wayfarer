@@ -23,6 +23,9 @@ import { SystemMonitor } from "./monitor";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
   agentStats?: () => any;
+  workspaceUiStats?: () => any;
+  environmentUiStats?: () => any;
+  workspaceStore?: import("./workspaces").WorkspaceStore;
   readonly endpoints: Endpoints;
   readonly directories: Directories;
   readonly jobs: Jobs;
@@ -120,7 +123,13 @@ export class Core extends EventEmitter {
     this.jobs.register("transfer", (c) => transfers.run(c));
     this.jobs.registerCleanup("transfer", (j) => transfers.cleanup(j));
     this.jobs.on("recover", (id) => this.recover(id));
-    this.jobs.register("package", (c) => runPackage(this.endpoints, c));
+    this.jobs.register("package", async (c) => {
+      try {
+        return await runPackage(this.endpoints, c);
+      } finally {
+        this.inspector.invalidate(c.job.input.endpoint);
+      }
+    });
     this.jobs.register("search", (c) => this.scan(c, "search"));
     this.jobs.register("size", async (c) => {
       const result = await this.scan(c, "size");
@@ -344,6 +353,8 @@ export class Core extends EventEmitter {
           directories: this.directories.stats(),
           jobs: this.jobs.stats(),
           inspector: this.inspector.stats(),
+          workspaceUi: this.workspaceUiStats?.(),
+          environmentUi: this.environmentUiStats?.(),
           monitor: this.monitor.stats(),
           endpoints: [...this.endpoints.items.values()].map((e) => ({
             id: e.config.id,
@@ -573,7 +584,19 @@ export class Core extends EventEmitter {
       case "size":
         return submit(method, a);
       case "inspect":
-        return this.inspector.detail(a.ref, !!a.refresh);
+        return a.environment
+          ? this.inspector.environment(a.ref, !!a.refresh)
+          : this.inspector.detail(a.ref, !!a.refresh);
+      case "workspaces":
+        return this.workspaceStore?.list() ?? [];
+      case "workspaceSave": {
+        if (!this.workspaceStore) throw Error("Workspace catalog unavailable");
+        const values = await this.workspaceStore.save(a);
+        this.emit("event", { type: "workspaces" });
+        return values;
+      }
+      case "environmentSelect":
+        return this.inspector.selectEnvironment(a.ref, a.choice);
       case "projects":
         return this.inspector.projects(a.endpoint);
       case "registerProject": {
@@ -589,7 +612,11 @@ export class Core extends EventEmitter {
         return projects;
       }
       case "inventory": {
-        const key = JSON.stringify([a.endpoint, a.cwd ?? ""]);
+        const key = JSON.stringify([
+          a.endpoint,
+          a.cwd ?? "",
+          a.ecosystem ?? "all",
+        ]);
         const previous = this.inventories.get(key);
         if (previous && !identity) {
           const job = this.jobs.records.get(previous);
