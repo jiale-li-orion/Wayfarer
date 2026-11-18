@@ -1,4 +1,5 @@
-import fs from "node:fs/promises";
+import fs, { type FileHandle } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { RemoteEndpoint } from "../adapters/remote";
 import type { EndpointConfig, Ref } from "../shared/types";
@@ -99,6 +100,8 @@ export class StorageAnalysis {
     const config = this.config(ref.endpoint);
     await fs.mkdir(this.directory, { recursive: true, mode: 0o700 });
     const store = this.db(ctx.job.id);
+    if (this.readLeases.has(ctx.job.id))
+      throw Error("Snapshot is being read; start a fresh scan");
     for (const suffix of ["", "-journal", "-wal", "-shm"])
       await fs.rm(store + suffix, { force: true });
     const source = this.channel(this.source(config));
@@ -212,6 +215,55 @@ export class StorageAnalysis {
       const n = this.readLeases.get(a.id)! - 1;
       if (n) this.readLeases.set(a.id, n);
       else this.readLeases.delete(a.id);
+      await this.prune();
+    }
+  }
+  async exportTo(id: string, output: string) {
+    this.db(id);
+    if (
+      path.resolve(output).startsWith(path.resolve(this.directory) + path.sep)
+    )
+      throw Error("Choose an export location outside the snapshot index");
+    this.readLeases.set(id, (this.readLeases.get(id) ?? 0) + 1);
+    const partial = output + ".workspace-map-" + randomUUID() + ".partial";
+    let file: FileHandle | undefined;
+    let owned = false;
+    try {
+      file = await fs.open(partial, "wx", 0o600);
+      owned = true;
+      let offset = 0,
+        first = true;
+      while (true) {
+        const page = await this.query({
+          id,
+          directory: "*",
+          offset,
+          limit: 200,
+        });
+        if (offset === 0)
+          await file.write(
+            '{"snapshot":' +
+              JSON.stringify(page.snapshot) +
+              ',"directories":[\n',
+          );
+        for (const row of page.rows) {
+          await file.write((first ? "" : ",\n") + JSON.stringify(row));
+          first = false;
+        }
+        if (!page.hasMore) break;
+        offset += page.rows.length;
+      }
+      await file.write("\n]}\n");
+      await file.close();
+      file = undefined;
+      await fs.rename(partial, output);
+      return { path: output, bytes: (await fs.stat(output)).size };
+    } finally {
+      await file?.close();
+      if (owned) await fs.rm(partial, { force: true });
+      const count = this.readLeases.get(id)! - 1;
+      if (count) this.readLeases.set(id, count);
+      else this.readLeases.delete(id);
       await this.prune();
     }
   }

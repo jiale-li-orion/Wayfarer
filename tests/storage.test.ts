@@ -264,3 +264,23 @@ test("a changed directory is reported while the scanner preserves a partial obse
     await f.done();
   }
 });
+
+test("snapshot export includes every directory page and preserves an existing target on failure", async () => {
+  const f = await fixture();
+  try {
+    for (let i = 0; i < 225; i++) await fs.mkdir(path.join(f.root, String(i)));
+    const j = await f.core.dispatch("storageScan", { ref: f.ref });
+    await finish(f.core, j.id);
+    const target = path.join(f.dir, "export.json");
+    await f.core.storageAnalysis.exportTo(j.id, target);
+    const data = JSON.parse(await fs.readFile(target, "utf8"));
+    assert.equal(data.directories.length, 226);
+    await fs.writeFile(target, "retained");
+    await assert.rejects(f.core.storageAnalysis.exportTo("missing", target));
+    assert.equal(await fs.readFile(target, "utf8"), "retained");
+    assert(!(await fs.readdir(f.dir)).some((x) => x.endsWith(".partial")));
+    assert.equal(f.core.storageAnalysis.stats().queries, 0);
+  } finally {
+    await f.done();
+  }
+});

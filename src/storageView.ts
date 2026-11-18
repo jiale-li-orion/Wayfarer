@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
-import fs from "node:fs/promises";
 import path from "node:path";
 import type { Core } from "./core/core";
 import type { Ref } from "./shared/types";
@@ -78,35 +77,7 @@ export function createStorageView(
           if (!uri) result = false;
           else {
             if (uri.scheme !== "file") throw Error("请选择本机导出位置");
-            const file = await fs.open(uri.fsPath, "w");
-            try {
-              let offset = 0,
-                first = true;
-              while (true) {
-                const page = await core.storageAnalysis.query({
-                  id: m.args.id,
-                  directory: "*",
-                  offset,
-                  limit: 200,
-                });
-                if (first)
-                  await file.write(
-                    '{"snapshot":' +
-                      JSON.stringify(page.snapshot) +
-                      ',"directories":[\n',
-                  );
-                for (const row of page.rows) {
-                  await file.write((first ? "" : ",\n") + JSON.stringify(row));
-                  first = false;
-                }
-                if (!page.hasMore) break;
-                offset += page.rows.length;
-              }
-              await file.write("\n]}\n");
-              result = { path: uri.fsPath };
-            } finally {
-              await file.close();
-            }
+            result = await core.storageAnalysis.exportTo(m.args.id, uri.fsPath);
           }
         } else if (
           [
