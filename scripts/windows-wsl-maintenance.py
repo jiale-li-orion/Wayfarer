@@ -44,7 +44,7 @@ def canonical(path):
     text = str(path)
     if text.startswith("\\\\?\\"):
         text = text[4:]
-    return os.path.normcase(os.path.abspath(text))
+    return os.path.normcase(os.path.realpath(os.path.abspath(text)))
 
 
 class Scope:

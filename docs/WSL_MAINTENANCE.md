@@ -4,7 +4,7 @@
 
 ## 预览与执行
 
-在Windows使用实际原生Python运行预览，传 --manifest 原清单、--swap-file 现役交换文件、--prepare swap-files-ready.json。预览记录卷／文件ID、长度、100ns修改时间和解析路径，验证独占句柄后关闭，保留源文件。准备清单同时记录原生Python路径，启动入口沿用这一执行环境。Get-DiskImage以单个PowerShell进程批量查询，完整记录HRESULT、类型和错误文字，作为辅助诊断。
+在Windows使用实际原生Python运行预览，传 --manifest 原清单、--swap-file 现役交换文件、--prepare swap-files-ready.json。预览记录卷／文件ID、长度、100ns修改时间和解析路径，支持Windows短文件名与完整路径映射，文件ID继续按原值核对。验证独占句柄后关闭，保留源文件。准备清单同时记录原生Python路径，启动入口沿用这一执行环境。Get-DiskImage以单个PowerShell进程批量查询，完整记录HRESULT、类型和错误文字，作为辅助诊断。
 
 结束WSL任务、Agent会话及相关窗口后，从Windows双击维护cmd。启动器读取准备清单，提升权限、等待Python进程并传递真实退出状态。执行识别已经存在且配置一致的目标交换文件，保留该文件与所有其他WSL设置；配置存在歧义或目标归属不一致时报告失败。
 

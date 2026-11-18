@@ -112,10 +112,20 @@ class MaintenanceTests(unittest.TestCase):
     @unittest.skipUnless(os.name=='nt','Native Windows file handle contract')
     def test_native_exclusive_handle_delete_and_busy_file(self):
         p=self.file();plan=self.plan([p],m.WinFile)
-        self.assertEqual(plan['candidates'][0]['state'],'ready')
+        self.assertEqual(plan['candidates'][0]['state'],'ready',str(plan))
         with m.WinFile(p):
             busy=self.plan([p],m.WinFile)
             self.assertEqual(busy['candidates'][0]['state'],'retained')
+        import ctypes
+        buf=ctypes.create_unicode_buffer(32768)
+        short=ctypes.windll.kernel32.GetShortPathNameW
+        short.argtypes=[ctypes.c_wchar_p,ctypes.c_wchar_p,ctypes.c_ulong]
+        if short(str(self.root),buf,len(buf)) and buf.value!=str(self.root):
+            short_root=pathlib.Path(buf.value)
+            short_path=short_root/p.parent.name/p.name
+            short_scope=m.Scope(short_root,self.scope.fixed_swap)
+            short_plan=m.preview([dict(path=str(short_path))],short_scope,m.WinFile)
+            self.assertEqual(short_plan['candidates'][0]['state'],'ready',str(short_plan))
         report=m.execute(plan,self.scope,Wsl(),m.WinFile)
         self.assertEqual(report['outcome'],'completed');self.assertFalse(p.exists())
     @unittest.skipUnless(os.name=='nt','Native Windows reparse and shared-file contract')
@@ -143,7 +153,7 @@ class MaintenanceTests(unittest.TestCase):
         real_scope=m.Scope
         with mock.patch.dict(os.environ,{'USERPROFILE':str(self.root)}), mock.patch.object(m,'Scope',lambda temp,swap:real_scope(self.root,swap)), mock.patch.object(m,'Wsl',lambda:control), mock.patch.object(m.ctypes.windll.shell32,'IsUserAnAdmin',return_value=1):
             code=m.main(['--manifest',str(manifest),'--swap-file',str(target),'--execute'])
-        self.assertEqual(code,0);self.assertFalse(p.exists());self.assertEqual(target.read_bytes(),b'current preserved')
+        self.assertEqual(code,0,(self.root/'wsl-maintenance-result.json').read_text(encoding='utf8'));self.assertFalse(p.exists());self.assertEqual(target.read_bytes(),b'current preserved')
         self.assertEqual((self.root/'.wslconfig').read_bytes(),text.encode('utf8'))
         self.assertEqual(json.loads((self.root/'wsl-maintenance-result.json').read_text(encoding='utf8'))['outcome'],'completed')
         bad=self.root/'invalid.json';bad.write_text('{broken',encoding='utf8')
