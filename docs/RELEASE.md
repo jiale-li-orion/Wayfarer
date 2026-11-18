@@ -45,3 +45,7 @@ Get-FileHash '.\workspace-map.vsix' -Algorithm SHA256
 取消任务会清理登记的私有暂存。cleanupPending 列出清理失败项，任务面板“清理任务暂存”和 MCP `map_jobCleanup` 使用同一入口。回退到 0.2.0 时先结束或主动暂停传输；0.3.0 沿用 v2 分片与元数据结构，0.2.0 将恢复任务显示为可继续。升级到 0.3.0 后按 pauseReason 恢复。
 
 旧版助手按原临时会话方式继续工作。重新执行接入命令后，生成的内容哈希目录对应新版助手，开始使用稳定地图绑定、客户端游标回收和自动恢复；旧助手的分页接口保留兼容。
+
+## 0.7.0 升级
+
+沿用地图 ID、任务 journal、目录索引及现有 SSH 配置。新增 `workspaceMap.resourceRecordingDirectory` 指定本机记录根目录，每个地图独立子目录；默认 globalStorage。记录有十分钟／20 MiB 上限，历史 globalStorage 记录仍可选择读取。MCP 新增只读 storageCompare；更新接入助手沿原内容哈希与稳定 mapId 机制，原有授权保留。

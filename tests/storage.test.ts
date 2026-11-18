@@ -188,6 +188,12 @@ test("retention removes old snapshots and reload queries the disk index", async 
     const kept = await f.core.storageAnalysis.list();
     assert.equal(kept.length, 3);
     assert(!kept.some((x) => x.id === ids[0]));
+    const history = await f.core.dispatch("storageSnapshots", {
+      includeUnavailable: true,
+    });
+    const expired = history.find((x: any) => x.id === ids[0]);
+    assert.equal(expired.available, false);
+    assert.equal(expired.evictionReason, "snapshot-count");
     await assert.rejects(
       f.core.dispatch("storageResult", { id: ids[0] }),
       /expired/,
@@ -280,6 +286,83 @@ test("snapshot export includes every directory page and preserves an existing ta
     assert.equal(await fs.readFile(target, "utf8"), "retained");
     assert(!(await fs.readdir(f.dir)).some((x) => x.endsWith(".partial")));
     assert.equal(f.core.storageAnalysis.stats().queries, 0);
+  } finally {
+    await f.done();
+  }
+});
+
+test("snapshot comparison pages added and removed directories, keeps coverage and rejects another root", async () => {
+  const f = await fixture();
+  try {
+    await fs.mkdir(path.join(f.root, "old"));
+    await fs.writeFile(path.join(f.root, "old", "x"), Buffer.alloc(8192, 3));
+    const a = await f.core.dispatch("storageScan", { ref: f.ref });
+    assert.equal((await finish(f.core, a.id)).state, "completed");
+    await fs.rm(path.join(f.root, "old"), { recursive: true });
+    await fs.mkdir(path.join(f.root, "new"));
+    await fs.writeFile(path.join(f.root, "new", "x"), Buffer.alloc(16384, 4));
+    const b = await f.core.dispatch("storageScan", { ref: f.ref });
+    assert.equal((await finish(f.core, b.id)).state, "completed");
+    const page = await f.core.dispatch("storageCompare", {
+      before: a.id,
+      after: b.id,
+      limit: 1,
+    });
+    assert.equal(page.rows.length, 1);
+    assert(page.hasMore);
+    const next = await f.core.dispatch("storageCompare", {
+      before: a.id,
+      after: b.id,
+      limit: 1,
+      offset: 1,
+    });
+    const all = [...page.rows, ...next.rows];
+    assert.deepEqual(all.map((v: any) => v.state).sort(), ["added", "removed"]);
+    assert.equal(
+      all.reduce((n: number, v: any) => n + v.logicalDelta, 0),
+      8192,
+    );
+    assert.equal(page.incomplete, false);
+    const output=path.join(f.dir,"comparison.json");
+    await f.core.storageAnalysis.exportTo(b.id,output,a.id);
+    const exported=JSON.parse(await fs.readFile(output,"utf8"));
+    assert.equal(exported.directories.length,2);
+    assert.equal(exported.comparison.before.root, f.root);
+
+    const other = await f.core.dispatch("storageScan", {
+      ref: { ...f.ref, path: path.join(f.root, "new") },
+    });
+    await finish(f.core, other.id);
+    await assert.rejects(
+      f.core.dispatch("storageCompare", { before: b.id, after: other.id }),
+      /same endpoint and scan root/,
+    );
+    assert.equal(f.core.storageAnalysis.stats().channels, 0);
+    assert.equal(f.core.storageAnalysis.stats().queries, 0);
+  } finally {
+    await f.done();
+  }
+});
+
+test("oversized snapshot retains a bounded tombstone explaining budget eviction", async () => {
+  const f = await fixture();
+  try {
+    const j = await f.core.dispatch("storageScan", { ref: f.ref });
+    await finish(f.core, j.id);
+    const file = path.join(f.dir, "state", "storage-scans", j.id + ".json");
+    const meta = JSON.parse(await fs.readFile(file, "utf8"));
+    meta.bytes = 101 * 2 ** 20;
+    await fs.writeFile(file, JSON.stringify(meta));
+    await f.core.dispatch("storageResult", { id: j.id });
+    assert.equal((await f.core.dispatch("storageSnapshots")).length, 0);
+    const history = await f.core.dispatch("storageSnapshots", {
+      includeUnavailable: true,
+    });
+    assert.equal(history[0].evictionReason, "snapshot-over-budget");
+    await assert.rejects(
+      f.core.dispatch("storageResult", { id: j.id }),
+      /expired/,
+    );
   } finally {
     await f.done();
   }

@@ -196,6 +196,7 @@ export class StorageAnalysis {
               ref,
               stamp: Date.now(),
               finished: completed,
+              available: true,
               bytes: data.size,
             }),
           );
@@ -222,8 +223,16 @@ export class StorageAnalysis {
     limit?: number;
   }) {
     const store = this.db(a.id);
-    await fs.access(store).catch(() => {
-      throw Error("Snapshot expired or unavailable; start a new scan");
+    await fs.access(store).catch(async () => {
+      const row = await fs
+        .readFile(path.join(this.directory, a.id + ".json"), "utf8")
+        .then(JSON.parse)
+        .catch(() => undefined);
+      throw Error(
+        "Snapshot expired or unavailable: " +
+          (row?.evictionReason ?? "missing-index") +
+          ". Retention keeps three snapshots within 100 MiB; export retained results before another scan.",
+      );
     });
     this.readLeases.set(a.id, (this.readLeases.get(a.id) ?? 0) + 1);
     let c: RemoteEndpoint | undefined;
@@ -246,13 +255,59 @@ export class StorageAnalysis {
       await this.prune();
     }
   }
-  async exportTo(id: string, output: string) {
+  async compare(a: {
+    before: string;
+    after: string;
+    directory?: string;
+    offset?: number;
+    limit?: number;
+  }) {
+    const rows = await this.list();
+    const before = rows.find((r) => r.id === a.before),
+      after = rows.find((r) => r.id === a.after);
+    if (!before || !after)
+      throw Error("Comparison requires two retained snapshots");
+    const config = this.config(before.ref.endpoint);
+    const normalized = (v: string) => {
+      const p = pathApi(config).resolve(v);
+      return config.kind === "windows" ? p.toLowerCase() : p;
+    };
+    if (
+      before.ref.endpoint !== after.ref.endpoint ||
+      normalized(before.ref.path) !== normalized(after.ref.path)
+    )
+      throw Error("Comparison requires the same endpoint and scan root");
+    const ids = [...new Set([a.before, a.after])];
+    for (const id of ids)
+      this.readLeases.set(id, (this.readLeases.get(id) ?? 0) + 1);
+    const c = this.channel();
+    try {
+      return await c.call("compare", {
+        ...a,
+        beforeStore: this.db(a.before),
+        afterStore: this.db(a.after),
+      });
+    } finally {
+      await this.release(c);
+      for (const id of ids) {
+        const n = this.readLeases.get(id)! - 1;
+        if (n) this.readLeases.set(id, n);
+        else this.readLeases.delete(id);
+      }
+      await this.prune();
+    }
+  }
+  async exportTo(id: string, output: string, before?: string) {
     this.db(id);
     if (
       path.resolve(output).startsWith(path.resolve(this.directory) + path.sep)
     )
       throw Error("Choose an export location outside the snapshot index");
-    this.readLeases.set(id, (this.readLeases.get(id) ?? 0) + 1);
+    const pinned = [...new Set(before ? [before, id] : [id])];
+    for (const key of pinned) {
+      this.db(key);
+      this.readLeases.set(key, (this.readLeases.get(key) ?? 0) + 1);
+    }
     const partial = output + ".workspace-map-" + randomUUID() + ".partial";
     let file: FileHandle | undefined;
     let owned = false;
@@ -262,16 +317,19 @@ export class StorageAnalysis {
       let offset = 0,
         first = true;
       while (true) {
-        const page = await this.query({
-          id,
-          directory: "*",
-          offset,
-          limit: 200,
-        });
+        const page = before
+          ? await this.compare({ before, after: id, offset, limit: 200 })
+          : await this.query({
+              id,
+              directory: "*",
+              offset,
+              limit: 200,
+            });
         if (offset === 0)
           await file.write(
-            '{"snapshot":' +
-              JSON.stringify(page.snapshot) +
+            (before
+              ? '{"comparison":' + JSON.stringify({ ...page, rows: undefined })
+              : '{"snapshot":' + JSON.stringify(page.snapshot)) +
               ',"directories":[\n',
           );
         for (const row of page.rows) {
@@ -289,13 +347,15 @@ export class StorageAnalysis {
     } finally {
       await file?.close();
       if (owned) await fs.rm(partial, { force: true });
-      const count = this.readLeases.get(id)! - 1;
-      if (count) this.readLeases.set(id, count);
-      else this.readLeases.delete(id);
+      for (const key of pinned) {
+        const count = this.readLeases.get(key)! - 1;
+        if (count) this.readLeases.set(key, count);
+        else this.readLeases.delete(key);
+      }
       await this.prune();
     }
   }
-  async list() {
+  async list(includeUnavailable = false) {
     const rows: any[] = [];
     for (const f of await fs
       .readdir(this.directory)
@@ -307,14 +367,24 @@ export class StorageAnalysis {
           );
         } catch {}
       }
-    return rows.sort((a, b) => b.stamp - a.stamp);
+    return rows
+      .filter((r) => includeUnavailable || r.available !== false)
+      .sort((a, b) => b.stamp - a.stamp);
   }
   private prune() {
     const work = this.pruning.then(async () => {
-      const rows = await this.list();
+      const rows = await this.list(true);
       let count = 0,
         bytes = 0;
+      let tombstones = 0;
       for (const row of rows) {
+        if (row.available === false) {
+          if (++tombstones > 12)
+            await fs.rm(path.join(this.directory, row.id + ".json"), {
+              force: true,
+            });
+          continue;
+        }
         const keep = count < 3 && bytes + row.bytes <= 100 * 2 ** 20;
         if (keep) {
           count++;
@@ -323,9 +393,25 @@ export class StorageAnalysis {
         if (keep || this.readLeases.has(row.id)) continue;
         for (const suffix of ["", "-journal", "-wal", "-shm"])
           await fs.rm(this.db(row.id) + suffix, { force: true });
-        await fs.rm(path.join(this.directory, row.id + ".json"), {
-          force: true,
-        });
+        await fs.writeFile(
+          path.join(this.directory, row.id + ".json"),
+          JSON.stringify({
+            ...row,
+            available: false,
+            evictionReason:
+              row.bytes > 100 * 2 ** 20
+                ? "snapshot-over-budget"
+                : count >= 3
+                  ? "snapshot-count"
+                  : "snapshot-budget",
+            evictedAt: Date.now(),
+          }),
+        );
+        tombstones++;
+        if (tombstones > 12)
+          await fs.rm(path.join(this.directory, row.id + ".json"), {
+            force: true,
+          });
       }
     });
     this.pruning = work.catch((error) =>

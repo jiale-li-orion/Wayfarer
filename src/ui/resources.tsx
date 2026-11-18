@@ -1,3 +1,4 @@
+import { pressureSignals } from "../shared/pressure";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./resources.css";
@@ -110,6 +111,83 @@ function Trend({ values, max }: { values: (number | null)[]; max?: number }) {
     </svg>
   );
 }
+function Pressure({
+  sample,
+  compact = false,
+  onProcesses,
+}: {
+  sample: any;
+  compact?: boolean;
+  onProcesses?: () => void;
+}) {
+  const m = sample?.system?.memory,
+    p = sample?.system?.pressure,
+    warnings = pressureSignals(sample);
+  if (!m) return null;
+  return (
+    <section className="pressure-panel">
+      {warnings.length > 0 && (
+        <p className="inline-error">{warnings.join(" · ")}</p>
+      )}
+      <div>
+        可用内存 <strong>{bytes(m.available)}</strong>
+        {m.commitLimit != null && (
+          <>
+            {" "}
+            · 系统提交量{" "}
+            <strong>
+              {bytes(m.commitUsed)} / {bytes(m.commitLimit)}
+            </strong>
+          </>
+        )}
+        {m.swapTotal != null && (
+          <>
+            {" "}
+            · Swap{" "}
+            <strong>
+              {bytes(m.swapUsed)} / {bytes(m.swapTotal)}
+            </strong>
+          </>
+        )}
+      </div>
+      {!compact && (
+        <>
+          {m.pagefileBytes != null && (
+            <div>
+              分页文件大小 {bytes(m.pagefileBytes)} ·
+              提交量包含物理内存及分页支持。
+            </div>
+          )}
+          {p && (
+            <div>
+              内存等待 PSI（近 10 秒）{percent(p.memory?.some?.avg10)} ·
+              全部阻塞 {percent(p.memory?.full?.avg10)}
+              <br />
+              换入／换出 {number(p.paging?.swapInPagesPerSecond)} /{" "}
+              {number(p.paging?.swapOutPagesPerSecond)} 页/秒 · 主缺页{" "}
+              {number(p.paging?.majorFaultsPerSecond)} 次/秒
+              <br />
+              内核 OOM 终止 {number(p.paging?.oomKills)}
+              （本次启动累计）；当前采集器 cgroup OOM{" "}
+              {number(p.cgroup?.events?.oom)} / 终止{" "}
+              {number(p.cgroup?.events?.oom_kill)}
+            </div>
+          )}
+          {sample.physicalBudget && (
+            <div>
+              WSL 承载卷 {sample.physicalBudget.mount} 余量{" "}
+              {bytes(sample.physicalBudget.available)} ·{" "}
+              {at(sample.physicalBudget.stamp)}
+            </div>
+          )}
+          {warnings.length > 0 && onProcesses && (
+            <button onClick={onProcesses}>查看内存占用进程</button>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
 function App() {
   const saved = api.getState() ?? {};
   const [machines, setMachines] = useState<any[]>([]),
@@ -175,6 +253,7 @@ function App() {
     mounted.current = true;
     const listen = (m: any) => {
       if (m.type === "sample") accept(m.value);
+      if (m.type === "recordingStopped") setRecording(false);
       if (m.type === "recordingError") {
         setFailure(m.error);
         setRecording(false);
@@ -314,7 +393,7 @@ function App() {
       {recording && (
         <div className="record-banner">
           <span className="live-dot" />
-          正在记录四端资源，可切换页面继续操作。
+          正在记录资源 · 每 10 秒 · 十分钟或 20 MiB 自动结束。
         </div>
       )}
       {!endpoint ? (
@@ -372,6 +451,7 @@ function App() {
                     </strong>
                   </div>
                   <Meter value={mem?.used} max={mem?.total} label="已用内存" />
+                  <Pressure sample={s} compact />
                   <div className="machine-metric gpu-summary">
                     <span>GPU</span>
                     <strong>
@@ -455,6 +535,13 @@ function App() {
               </span>
             </div>
           </div>
+          <Pressure
+            sample={summary}
+            onProcesses={() => {
+              setTab("processes");
+              setSort("rss");
+            }}
+          />
           <nav className="resource-tabs" aria-label="资源类别">
             {[
               ["processes", "进程"],

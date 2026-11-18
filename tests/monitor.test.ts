@@ -346,3 +346,59 @@ test("explicit disconnect takes precedence over a fresh resource cache", async (
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
+
+test("recording expires at its byte or duration budget and frees hidden collectors", async () => {
+  for (const budget of [{ durationMs: 50 }, { maxBytes: 1 }]) {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wm-bounded-record-"));
+    let live = 0;
+    const monitor = new SystemMonitor(
+      () => [endpoints[0]],
+      "unused",
+      dir,
+      new Profiler(() => {}),
+      undefined,
+      () => {
+        live++;
+        let closed = false;
+        return {
+          async call<T>() {
+            return {
+              stamp: Date.now(),
+              system: { memory: { total: 2, used: 1 } },
+              gpus: [],
+            } as T;
+          },
+          async dispose() {
+            if (!closed) {
+              closed = true;
+              live--;
+            }
+          },
+          abort() {},
+        };
+      },
+      () => true,
+      { ...budget, directory: path.join(dir, "separate-volume") },
+    );
+    const reasons: string[] = [];
+    monitor.on("recordingStopped", (v) => reasons.push(v.reason));
+    try {
+      const rec = await monitor.startRecording();
+      await pause(120);
+      assert.equal(monitor.stats().recording, false);
+      assert.equal(monitor.stats().timer, false);
+      assert.equal(live, 0);
+      assert(reasons.includes("maxBytes" in budget ? "size" : "duration"));
+      assert(
+        (await fs.stat(rec.file)).size <=
+          ("maxBytes" in budget ? budget.maxBytes! : 20 * 2 ** 20),
+      );
+      const input = await monitor.readRecording(rec.file);
+      input.lines.close();
+      input.stream.destroy();
+    } finally {
+      await monitor.dispose();
+      await fs.rm(dir, { recursive: true, force: true });
+    }
+  }
+});

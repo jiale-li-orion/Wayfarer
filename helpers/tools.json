@@ -1277,7 +1277,11 @@
     "description": "List retained storage analysis snapshots without starting endpoints.",
     "inputSchema": {
       "type": "object",
-      "properties": {},
+      "properties": {
+        "includeUnavailable": {
+          "type": "boolean"
+        }
+      },
       "required": []
     }
   },
@@ -1369,6 +1373,43 @@
         "ref",
         "cursor"
       ]
+    }
+  },
+  {
+    "name": "map_storageCompare",
+    "description": "Compare two retained snapshots from the same endpoint and scan root. Paged directory changes, coverage and separately measured volume free-space change.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string"
+        },
+        "directory": {
+          "type": "string"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "required": [
+        "before",
+        "after"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "openWorldHint": false
     }
   }
 ]

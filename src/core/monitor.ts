@@ -46,7 +46,16 @@ export class SystemMonitor extends EventEmitter {
   private timer?: NodeJS.Timeout;
   private disposed = false;
   private retiring = new Set<Promise<void>>();
-  private recording?: { file: string; count: number };
+  private recording?: {
+    file: string;
+    count: number;
+    bytes: number;
+    started: number;
+    deadline: number;
+    last: Map<string, number>;
+  };
+  private recordingTimer?: NodeJS.Timeout;
+  private recordingStart?: Promise<any>;
   private writes = Promise.resolve();
   private queuedWrites = 0;
   private sweep = 0;
@@ -61,6 +70,11 @@ export class SystemMonitor extends EventEmitter {
         profile.record("monitor.transport", { message }),
       ),
     private enabled: (endpoint: string) => boolean = () => true,
+    private recordingOptions: {
+      directory?: string;
+      durationMs?: number;
+      maxBytes?: number;
+    } = {},
   ) {
     super();
   }
@@ -193,7 +207,14 @@ export class SystemMonitor extends EventEmitter {
         snapshots: machines
           .map((m) => this.states.get(m.id)?.last)
           .filter(Boolean),
-        recording: this.recording,
+        recording: this.recording
+          ? {
+              file: this.recording.file,
+              count: this.recording.count,
+              bytes: this.recording.bytes,
+              deadline: this.recording.deadline,
+            }
+          : undefined,
         stats: this.stats(),
       };
     }
@@ -243,6 +264,28 @@ export class SystemMonitor extends EventEmitter {
         if (!this.enabled(machine.endpoint))
           throw Error("Endpoint explicitly disconnected");
         const afterTransport = s.channel.transportStats?.();
+        if (machine.kind === "wsl") {
+          const host = this.machines().find((m) => m.kind === "windows");
+          if (host) {
+            const known = this.states.get(host.id)?.last;
+            const windows =
+              known && Date.now() - known.stamp < 10000
+                ? known
+                : await this.snapshot({
+                    endpoint: host.endpoint,
+                    section: "summary",
+                  });
+            const budget = windows.system?.storage?.wsl?.find(
+              (v: any) => v.distribution === machine.config.distro,
+            );
+            if (budget)
+              raw.physicalBudget = {
+                ...budget,
+                stamp: windows.stamp,
+                scope: "windows-backing-volume",
+              };
+          }
+        }
         if (raw._baseline) s.baseline = raw._baseline;
         delete raw._baseline;
         if (raw.detail?.cwd) {
@@ -361,51 +404,101 @@ export class SystemMonitor extends EventEmitter {
       await closing;
     }
   }
-  async startRecording() {
+  startRecording() {
+    if (this.recordingStart) return this.recordingStart;
+    this.recordingStart = this.beginRecording().finally(() => {
+      this.recordingStart = undefined;
+    });
+    return this.recordingStart;
+  }
+  recordingDirectory() {
+    return (
+      this.recordingOptions.directory ??
+      path.join(this.storage, "resource-recordings")
+    );
+  }
+  private async beginRecording() {
     if (this.disposed) throw Error("Resource monitor closed");
     if (this.recording) return this.recording;
-    await fs.mkdir(path.join(this.storage, "resource-recordings"), {
+    const directory = this.recordingDirectory();
+    if (!path.isAbsolute(directory))
+      throw Error("Recording directory must be absolute");
+    await fs.mkdir(directory, {
       recursive: true,
     });
     const file = path.join(
-      this.storage,
-      "resource-recordings",
+      directory,
       Date.now() + "-" + randomUUID() + ".jsonl",
     );
     await fs.writeFile(file, "", { mode: 0o600 });
-    this.recording = { file, count: 0 };
+    if (this.disposed) {
+      await fs.rm(file, { force: true });
+      throw Error("Resource monitor closed");
+    }
+    const started = Date.now();
+    this.recording = {
+      file,
+      count: 0,
+      bytes: 0,
+      started,
+      deadline:
+        started + Math.min(600000, this.recordingOptions.durationMs ?? 600000),
+      last: new Map(),
+    };
+    this.recordingTimer = setTimeout(
+      () => void this.stopRecording("duration"),
+      this.recording.deadline - started,
+    );
+    this.recordingTimer.unref();
     this.schedule();
     void this.tick();
     return this.recording;
   }
-  async stopRecording() {
+  async stopRecording(reason = "user") {
+    if (this.recordingStart) await this.recordingStart;
     const result = this.recording;
     this.recording = undefined;
+    clearTimeout(this.recordingTimer);
+    this.recordingTimer = undefined;
     this.watch("__recording__", undefined);
+    if (result) this.emit("recordingStopped", { file: result.file, reason });
     await this.writes;
     return result;
   }
   private record(value: Sample) {
     const rec = this.recording;
     if (!rec) return;
-    if (this.queuedWrites >= 32) {
-      this.recording = undefined;
-      this.watch("__recording__");
-      this.emit("recordingError", "Recording storage is falling behind");
+    const key = String(value.machine ?? value.endpoint);
+    if (Date.now() - (rec.last.get(key) ?? 0) < 10000) return;
+    const { history, ...data } = value;
+    const line = JSON.stringify(data) + "\n";
+    const bytes = Buffer.byteLength(line);
+    if (
+      rec.bytes + bytes >
+      Math.min(20 * 2 ** 20, this.recordingOptions.maxBytes ?? 20 * 2 ** 20)
+    ) {
+      void this.stopRecording("size");
       return;
     }
-    const { history, ...data } = value;
+    if (this.queuedWrites >= 32) {
+      void this.stopRecording("backpressure");
+      this.emit("recordingError", "记录写入滞后，已结束本次录制");
+      return;
+    }
+    rec.bytes += bytes;
+    rec.last.set(key, Date.now());
     this.queuedWrites++;
     this.writes = this.writes
-      .then(() => fs.appendFile(rec.file, JSON.stringify(data) + "\n"))
+      .then(() => fs.appendFile(rec.file, line))
       .then(
         () => {
           rec.count++;
         },
         (error) => {
-          this.recording = undefined;
-          this.watch("__recording__");
-          this.emit("recordingError", String(error));
+          if (this.recording === rec) {
+            void this.stopRecording("write-error");
+            this.emit("recordingError", String(error));
+          }
         },
       )
       .finally(() => {
@@ -415,8 +508,13 @@ export class SystemMonitor extends EventEmitter {
   async readRecording(file: string) {
     await this.writes;
     // Callers can only export files created in this map's recording directory.
-    const root = path.join(this.storage, "resource-recordings");
-    if (path.dirname(file) !== root) throw Error("Unknown recording");
+    const root = this.recordingDirectory();
+    if (
+      ![root, path.join(this.storage, "resource-recordings")].includes(
+        path.dirname(file),
+      )
+    )
+      throw Error("Unknown recording");
     const readline = await import("node:readline");
     const size = (await fs.stat(file)).size;
     const stream = (await import("node:fs")).createReadStream(file, {
@@ -450,9 +548,12 @@ export class SystemMonitor extends EventEmitter {
   async dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    await this.recordingStart?.catch(() => {});
     if (this.timer) clearInterval(this.timer);
     this.timer = undefined;
     this.readers.clear();
+    clearTimeout(this.recordingTimer);
+    this.recordingTimer = undefined;
     this.recording = undefined;
     await Promise.all([...this.states.values()].map((s) => this.release(s)));
     await Promise.all([...this.states.values()].map((s) => s.chain));

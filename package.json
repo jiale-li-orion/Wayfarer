@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -201,6 +201,11 @@
           "type": "string",
           "default": "",
           "description": "Local resource collector Python executable (standard library only). Empty uses python on Windows or python3 on Linux."
+        },
+        "workspaceMap.resourceRecordingDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Absolute native path for bounded resource recordings. Empty uses this map globalStorage. Recordings stop at 10 minutes or 20 MiB."
         }
       }
     },
@@ -354,7 +359,7 @@
     "bench:lifecycle": "tsx scripts/benchmark-lifecycle.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix && node scripts/release-assets.mjs",
     "vscode:prepublish": "npm run build",
-    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts tests/environments.test.ts tests/storage.test.ts tests/storage-protocol.test.ts"
+    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts tests/environments.test.ts tests/storage.test.ts tests/storage-protocol.test.ts tests/pressure.test.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",

@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import os from "node:os";
 import type { Core } from "./core/core";
 import { pathApi } from "./shared/paths";
 import { csvRows, csvHeader } from "./core/resourceExport";
@@ -25,6 +24,12 @@ export function createResourceView(
     if (panel?.visible)
       void panel.webview.postMessage({ type: "recordingError", error });
   };
+  const recordingStopped = (value: any) => {
+    recordingFile = value.file;
+    if (ready && panel?.visible)
+      void panel.webview.postMessage({ type: "recordingStopped", ...value });
+  };
+  core.monitor.on("recordingStopped", recordingStopped);
   core.monitor.on("sample", sample);
   core.monitor.on("recordingError", recordingError);
   const open = () => {
@@ -124,7 +129,7 @@ export function createResourceView(
                 const files = await vscode.window.showOpenDialog({
                   title: "选择此地图的资源记录",
                   defaultUri: vscode.Uri.file(
-                    path.join(core.storage, "resource-recordings"),
+                    core.monitor.recordingDirectory(),
                   ),
                   canSelectFiles: true,
                   canSelectFolders: false,
@@ -151,7 +156,7 @@ export function createResourceView(
               title: "导出资源记录",
               defaultUri: vscode.Uri.file(
                 path.join(
-                  os.homedir(),
+                  core.monitor.recordingDirectory(),
                   "workspace-resources-" +
                     new Date().toISOString().replace(/[:.]/g, "-") +
                     "." +
@@ -235,6 +240,7 @@ export function createResourceView(
       command.dispose();
       core.monitor.watch(owner, undefined);
       core.monitor.off("sample", sample);
+      core.monitor.off("recordingStopped", recordingStopped);
       core.monitor.off("recordingError", recordingError);
       panel?.dispose();
     },

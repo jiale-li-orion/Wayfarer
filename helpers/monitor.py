@@ -75,6 +75,12 @@ if WIN:
             ]
         ]
 
+    class PerformanceInfo(ctypes.Structure):
+        _fields_ = [("cb",W.DWORD)] + [(k,ctypes.c_size_t) for k in ["commit","limit","peak","physical","available","cache","kernel","paged","nonpaged","pageSize"]] + [(k,W.DWORD) for k in ["handles","processes","threads"]]
+
+    PS.GetPerformanceInfo.argtypes = [ctypes.POINTER(PerformanceInfo),W.DWORD]
+    PS.GetPerformanceInfo.restype = W.BOOL
+
     class ProcessEntry(ctypes.Structure):
         _fields_ = [
             ("size", W.DWORD),
@@ -236,6 +242,50 @@ if WIN:
             K.CloseHandle(snapshot)
         return rows
 
+    WSL_BACKING = None
+
+    def windows_capacity():
+        global WSL_BACKING
+        volumes = []
+        mask = K.GetLogicalDrives()
+        for i in range(26):
+            if mask & (1 << i):
+                root = chr(65+i) + ":\\"
+                # Removable/network media can block; inspect fixed disks only.
+                if K.GetDriveTypeW(ctypes.c_wchar_p(root)) != 3:
+                    continue
+                try:
+                    d = shutil.disk_usage(root)
+                    page = os.path.join(root, "pagefile.sys")
+                    try:
+                        pagebytes=os.stat(page).st_size
+                    except FileNotFoundError:
+                        pagebytes=0
+                    except OSError:
+                        pagebytes=None
+                    volumes.append(dict(path=root,total=d.total,available=d.free,pagefileBytes=pagebytes))
+                except OSError:
+                    pass
+        if WSL_BACKING is None:
+            WSL_BACKING = []
+            try:
+                import winreg
+                with winreg.OpenKey(winreg.HKEY_CURRENT_USER,r"Software\Microsoft\Windows\CurrentVersion\Lxss") as k:
+                    for i in range(winreg.QueryInfoKey(k)[0]):
+                        with winreg.OpenKey(k,winreg.EnumKey(k,i)) as sub:
+                            WSL_BACKING.append((winreg.QueryValueEx(sub,"DistributionName")[0],winreg.QueryValueEx(sub,"BasePath")[0]))
+            except OSError:
+                pass
+        wsl = []
+        for name, base in WSL_BACKING:
+            try:
+                d = shutil.disk_usage(base)
+                wsl.append(dict(distribution=name,total=d.total,available=d.free,
+                    mount=os.path.splitdrive(base)[0]+"\\"))
+            except OSError:
+                pass
+        return dict(volumes=volumes,wsl=wsl)
+
     def windows_summary(now):
         m = Memory()
         m.length = ctypes.sizeof(m)
@@ -251,15 +301,21 @@ if WIN:
             if old and len(old) > 2 and now - old[2] <= 30 and total > old[0]
             else None
         )
+        capacity = windows_capacity()
+        perf = PerformanceInfo(); perf.cb=ctypes.sizeof(perf)
+        have_perf = PS.GetPerformanceInfo(ctypes.byref(perf),perf.cb)
         return dict(
+            storage=capacity,
             cpuPercent=cpu,
             logicalCpus=os.cpu_count(),
             memory=dict(
                 total=m.total,
                 available=m.available,
                 used=m.total - m.available,
-                commitUsed=m.pageTotal - m.pageFree,
-                commitLimit=m.pageTotal,
+                commitUsed=perf.commit*perf.pageSize if have_perf else None,
+                commitLimit=perf.limit*perf.pageSize if have_perf else None,
+                pagefileBytes=sum(v["pagefileBytes"] for v in capacity["volumes"]) if all(v["pagefileBytes"] is not None for v in capacity["volumes"]) else None,
+                scope="windows-system",
             ),
         )
 
@@ -462,6 +518,37 @@ else:
                 pass
         return rows
 
+    def linux_pressure(now):
+        psi = None
+        try:
+            psi = {}
+            for line in text("/proc/pressure/memory").splitlines():
+                words=line.split()
+                psi[words[0]]={k:float(v) for k,v in (w.split("=") for w in words[1:])}
+        except (OSError, ValueError):
+            psi = None
+        paging = None
+        try:
+            vm = dict((v[0],int(v[1])) for v in (l.split() for l in text("/proc/vmstat").splitlines()) if len(v)==2)
+            paging = dict(swapInPages=vm.get("pswpin"),swapOutPages=vm.get("pswpout"),majorFaults=vm.get("pgmajfault"),oomKills=vm.get("oom_kill"),scope="kernel-since-boot")
+            for source,target in [("pswpin","swapInPagesPerSecond"),("pswpout","swapOutPagesPerSecond"),("pgmajfault","majorFaultsPerSecond")]:
+                paging[target]=rate("vm:"+source,vm[source],now) if source in vm else None
+        except (OSError, ValueError):
+            pass
+        cg = None
+        try:
+            relative = next(l.split(":",2)[2] for l in text("/proc/self/cgroup").splitlines() if l.startswith("0::"))
+            root = os.path.normpath("/sys/fs/cgroup/"+relative.lstrip("/"))
+            if os.path.commonpath([root,"/sys/fs/cgroup"]) != "/sys/fs/cgroup":
+                raise ValueError("Cgroup path outside mount")
+            cg=dict(path=relative,scope="collector-cgroup",events=dict((v[0],int(v[1])) for v in (l.split() for l in text(root+"/memory.events").splitlines()) if len(v)==2))
+            for name in ["memory.current","memory.max"]:
+                val=text(root+"/"+name).strip()
+                cg[name]=None if val=="max" else int(val)
+        except (OSError, ValueError, StopIteration):
+            pass
+        return dict(memory=psi,paging=paging,cgroup=cg)
+
     def linux_summary(now):
         v = [int(x) for x in text("/proc/stat").splitlines()[0].split()[1:9]]
         total = sum(v)
@@ -485,10 +572,12 @@ else:
             ),
             logicalCpus=os.cpu_count(),
             load=os.getloadavg(),
+            pressure=linux_pressure(now),
             memory=dict(
                 total=mem["MemTotal"],
                 available=available,
                 used=mem["MemTotal"] - available,
+                scope="linux-system",
                 swapTotal=mem.get("SwapTotal"),
                 swapUsed=mem.get("SwapTotal", 0) - mem.get("SwapFree", 0),
             ),
@@ -1124,7 +1213,8 @@ def stop(*args):
 def main():
     signal.signal(signal.SIGTERM, stop)
     try:
-        for line in sys.stdin:
+        for raw in sys.stdin.buffer:
+            line = raw.decode("utf-8")
             msg = {}
             try:
                 msg = json.loads(line)

@@ -1,17 +1,15 @@
-# Workspace Map · 0.6.1
+# Workspace Map · 0.7.0
 
 训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。仓库 jiale-li-orion/Wayfarer，显示名称 Workspace Map。训练机独立工作树开发，本机安装验收，产物留 D 盘。
 
 ## 本轮
 
-存储占用页面复用侧边栏、资源页和目录详情入口。后台扫描使用独立 Python 通道与 SQLite 目录索引，按卷串行、全局至多两个；逻辑大小、实际分配和硬链接共享分别展示。Windows 关联 WSL 承载 VHD 与交换文件，WSL /mnt 入口与 Windows 按卷关联。界面与 MCP 共享结果、分页、下钻、取消与快照保留，原 size 保持兼容。接口、口径及生命周期见 docs/STORAGE.md 与 ARCHITECTURE.md。
+先完成存储整理闭环，再追踪 Windows／WSL CPU 与内存。容量刷新按可见性和相关任务事件合并；同目录快照对比使用 SQLite 分页，展示覆盖差异并支持导出。三份／100 MiB 预算保留，淘汰原因以有界元数据交付。
 
-任务详情可选择字段，客户端可显式关闭自己的目录游标；pip 缓存管理补齐。损坏协议立即拒绝该通道的请求并关闭所属进程。
+共享资源采样增加 Windows 系统提交量、分页文件大小、Linux PSI／换页／OOM 和 WSL 承载预算。记录每机器十秒一份，默认十分钟／20 MiB 自动结束，支持本机独立记录根目录并按地图隔离；隐藏后最后一个使用者退出即释放助手。接口与生命周期见 docs/STORAGE.md、docs/SYSTEM_RESOURCES.md；架构沿 ARCHITECTURE.md。
 
-实际四端扫描、50 轮页面开关、十分钟待机与百万文件扫描已核对，数据见 PERFORMANCE.md 和 docs/performance-data/storage-20261118。存储扫描 MCP 已纳入后台收据恢复，提交确认中断后返回原任务。源码沿 CI/Release 交付 0.6.1 VSIX、摘要和版本身份；本机日常窗口重载后启用新版本。
+## 维护与交付
 
-## C 盘维护
+交换文件重新核对为 54 份约 75.5 GiB，F 盘约 47 GiB 余量。当前普通权限下 5 份显示未挂载、49 份查询拒绝访问；Windows 管理员离线维护入口会在 WSL 停止后逐项核验。维护入口和清单位于 D:/Wayfarer-Acceptance/storage-audit-20261118。当前 WSL／Agent 会话继续运行，交换文件处理和重启验证由离线时段承接。回收站、业务资料、环境、模型和系统 VHD 保留；WSL 10 GiB 与系统分页策略沿用。
 
-已整理实际管理器缓存与确认结束的 HeadlessEdge 临时目录；回收站、用户资料、模型、SDK 和项目环境保留。scripts/windows-wsl-maintenance.py 默认预览，Windows 执行入口及当前清单位于 D:\Wayfarer-Acceptance\storage-audit-20261118。WSL 仍运行，正式离线维护留到当前任务和 Agent 会话结束后，固定交换文件目标为 F:\WSL\swap.vhdx。
-
-维护命令：npm run typecheck、npm test、npm run test:portable、npm run package。实机图形捕获差异与覆盖边界见 docs/ACCEPTANCE.md。交付后同步两个主仓库并清理开发工作树。
+交付核对：npm run typecheck、npm test、npm run test:portable、Python 3.6 语法、Windows／WSL 实测、同场景采样。结果归 PERFORMANCE.md 与 docs/ACCEPTANCE.md，原始记录留 D 盘。交付后同步两个主仓库并清理开发工作树。
