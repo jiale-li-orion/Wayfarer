@@ -1,19 +1,23 @@
-# Workspace Map · 0.5.0 开发验收
+# Workspace Map · 0.5.0
 
-训练机主仓库 `/data/users/lijiale/projects/agent-system-learning/workspace-map`；独立工作树 `/data/users/lijiale/worktrees/workspace-map-0.5.0`，分支 `feat/workspaces-environments`。本机镜像用于安装验收。Windows 验收资料位于 D:\Wayfarer-Acceptance，构建与依赖安装均在训练机。
+训练机主仓库：`/data/users/lijiale/projects/agent-system-learning/workspace-map`；本机镜像：`/home/orion/agent-system-learning/workspace-map`。仓库 `jiale-li-orion/Wayfarer`，显示名称 Workspace Map。开发使用训练机独立 worktree，本机负责安装与实机验收；验收产物位于 D:\Wayfarer-Acceptance，构建与依赖安装留在训练机。
 
-## 当前行为
+## 当前功能与归属
 
-常用工作区使用 globalStorage 全局收藏，原生打开由 Windows UI 宿主调用；地图、任务与 Agent 继续按 mapId 归属。项目环境页从常用工作区和目录详情进入，多根目录独立切换。Inspector 解析有限声明和明确执行选择，真实版本、安装清单、缓存与占用按需查询。Python 默认 uv；项目声明和锁文件变更与环境同步分开执行，现有虚拟环境为操作目标。
+常用工作区在 globalStorage 共享收藏，原生打开由 Windows UI 宿主调度；地图、任务与 Agent 继续归各自 mapId。收藏支持目录／工作区文件、原生打开、加入当前工作区、地图定位、环境查看、重命名及排序。SSH 原生入口显式绑定既有 Remote 配置。
 
-共享文件、任务、恢复、机器资源链路继续沿原 Core；工作区收藏与面板分别释放监听／订阅。固定项目标记和工具路径改为批量查询。具体关系见 ARCHITECTURE.md 与 docs/PROJECT_ENVIRONMENTS.md。
+项目环境按根目录查看声明、解释器、工具版本、依赖与占用。Python 默认 uv；清单／锁文件修改与已有环境同步分开执行，明确选择的解释器与 Node 运行时只影响 Wayfarer 操作。Java 缓存位置与统计结果标明路径、来源和时间。版本查询与统计均按需，面板关闭释放订阅，后台任务独立执行。
 
-## 当前验证与剩余
+固定项目标记、工具路径批量读取；快照有界、同请求合并、修改后失效。收藏监听随侧边栏可见性释放，诊断包含环境面板与收藏监听计数。文件、传输、恢复、机器资源及原账号配置沿原核心。详见 ARCHITECTURE.md 与 docs/PROJECT_ENVIRONMENTS.md。
 
-65 项检查和类型检查通过，uv 0.9.22 隔离 wheel 的添加、同步、更新、移除通过。100 次同机本地冷查询：0.4.0 每次 46 次适配器调用，0.5.0 为 4 次；中位耗时 0.980→0.634ms。缓存查询保持零适配器访问。Windows D 盘独立验收窗口正在完成待机、页面与四端查询验收，正式发布记录在完成后补入。
+## 验证与交付
 
-用户补充：PR #5 冲突需解决并合并。已完成三份文档冲突处理，双平台 CI 通过，合入 main `f07f41f`；分支和临时工作树已清理。C 盘曾接近满盘，本轮自有 C 盘验收目录 27MiB 已删除，端点异常小日志留存 D 盘；WSL 虚拟盘约 286GiB，昨晚增长原因仍待独立排查。
+71 项检查、类型检查及 Python 3.6 助手语法检查通过。Windows／WSL／两台 SSH 的环境与工具读取、51 轮环境页面打开／关闭、实际 Codex／dsh MCP 查询、原生多根添加／工作区切换／收藏保留／当前工作区聚焦通过。工作区文件 JSONC 解析按 CommonJS 打包产物和实机双重验证。uv 隔离 wheel 的增删、锁定更新、同步、导入与移除验证通过。原生远端 IDE 与额外新窗口的实机覆盖边界见 docs/ACCEPTANCE.md。
 
-## 下一步
+相同原生目录冷查询适配器调用 46→4，p50 0.980→0.634ms；缓存保持零端点访问。同一独立窗口约 615／619 秒待机，0.4／0.5 共享扩展宿主单核 CPU 0.0229%／0.0808%，结束 heapUsed 42.17／42.47MiB，pending 和运行任务均为零。进程工作集、私有提交量及测量条件分别保留，见 PERFORMANCE.md 与 docs/performance-data/environments-20261118。
 
-完成 Windows／WSL／两台 SSH 的环境读取、原生收藏入口、50 轮页面资源回收及 MCP 回归；记录 CPU／内存与截图，核对依赖和构建，再提交单一 PR、交付 VSIX。交付后同步镜像并清理独立工作树。
+PR #5 环境评审已解决冲突并合入 main f07f41f，临时工作树与分支已清理。PR #7 交付本轮，沿 CI／Release 发布 v0.5.0、VSIX、SHA-256 与源码身份。Windows 日常窗口通过重载启用安装的新版本；MCP 继续绑定原稳定 mapId。
+
+## 维护入口
+
+`npm run typecheck`、`npm test`、`npm run test:portable`、`npm run package`。环境与工作区验收脚本为 scripts/verify-environments-live.mjs、verify-uv-project.mjs、profile-environments.mjs；真实文件与软件修改使用独立 fixture。交付后同步主仓库、本机镜像并清理开发工作树，最终证据与发布文件留在 D 盘。

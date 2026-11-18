@@ -106,8 +106,25 @@ export async function projectEnvironment(
       : []),
   ].filter(Boolean) as string[];
   const unique = [...new Set(candidates)];
+  const caches = [
+    {
+      manager: "gradle",
+      path: pp.join(
+        info.paths?.GRADLE_USER_HOME ?? pp.join(info.home, ".gradle"),
+        "caches",
+      ),
+      source: info.paths?.GRADLE_USER_HOME ? "GRADLE_USER_HOME" : "默认位置",
+    },
+    {
+      manager: "maven",
+      path: pp.join(info.home, ".m2", "repository"),
+      source: "默认位置",
+    },
+  ];
   const envStats: any[] = unique.length
-    ? await e.call("statMany", { paths: unique })
+    ? await e.call("statMany", {
+        paths: [...unique, ...caches.map((c) => c.path)],
+      })
     : [];
   const interpreters = unique.flatMap((p, i) => {
     const s = envStats[i];
@@ -219,6 +236,9 @@ export async function projectEnvironment(
       javaHome: info.paths?.JAVA_HOME,
       selectedJava: choice.java,
       wrappers,
+      caches: caches.filter((_, i) =>
+        ["directory", "symlink"].includes(envStats[unique.length + i]?.kind),
+      ),
       manifests: [
         "pom.xml",
         "build.gradle",

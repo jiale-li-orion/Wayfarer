@@ -72,8 +72,10 @@ export function EnvironmentPanel({
           .then((j) => {
             if (g !== generation.current) return;
             setJob(j);
-            if (kind === "inventory") setInventory(j.result);
-            if (kind === "size") setUsage(j.result);
+            if (kind === "inventory")
+              setInventory({ ...j.result, ecosystem: j.input?.ecosystem });
+            if (kind === "size")
+              setUsage({ ...j.result, ref: j.input?.ref, stamp: j.updated });
             if (kind === "package") void load(true);
           })
           .catch((e) => setFailure(String(e)));
@@ -98,8 +100,14 @@ export function EnvironmentPanel({
       if (["completed", "failed", "cancelled"].includes(full.state)) {
         watched.current.delete(j.id);
         setJob(full);
-        if (kind === "inventory") setInventory(full.result);
-        if (kind === "size") setUsage(full.result);
+        if (kind === "inventory")
+          setInventory({ ...full.result, ecosystem: full.input?.ecosystem });
+        if (kind === "size")
+          setUsage({
+            ...full.result,
+            ref: full.input?.ref,
+            stamp: full.updated,
+          });
         if (kind === "package") void load(true);
       }
     } catch (e) {
@@ -162,6 +170,9 @@ export function EnvironmentPanel({
             "python-installed",
             "python-dir",
             "tools",
+            "tool-install",
+            "tool-uninstall",
+            "tool-update",
             "tool-dir",
             "cache-info",
             "cache-prune",
@@ -174,6 +185,9 @@ export function EnvironmentPanel({
             "python-installed",
             "python-dir",
             "tools",
+            "tool-install",
+            "tool-uninstall",
+            "tool-update",
             "tool-dir",
             "cache-info",
             "cache-prune",
@@ -206,6 +220,9 @@ export function EnvironmentPanel({
     update: "更新指定条目",
     "python-installed": "已安装 Python",
     tools: "uv 工具清单",
+    "tool-install": "安装 uv 工具",
+    "tool-uninstall": "卸载 uv 工具",
+    "tool-update": "更新 uv 工具",
     "tool-dir": "查询 uv 工具目录",
     "python-dir": "查询 uv Python 目录",
     "cache-info": "查询缓存位置",
@@ -377,6 +394,18 @@ export function EnvironmentPanel({
             <section>
               <h3>JDK 与构建</h3>
               {env.java.javaHome && link(env.java.javaHome)}
+              {env.java.caches?.map((cache: any) => (
+                <div key={cache.path}>
+                  {cache.manager} · {cache.source} {link(cache.path)}{" "}
+                  <button
+                    onClick={() =>
+                      void run("size", { ref: { ...target, path: cache.path } })
+                    }
+                  >
+                    统计占用
+                  </button>
+                </div>
+              ))}
               {env.java.wrappers.map((p: string) => (
                 <div key={p}>{link(p, true)}</div>
               ))}
@@ -427,7 +456,7 @@ export function EnvironmentPanel({
             >
               查询当前生态工具版本
             </button>
-            {inventory?.value && (
+            {inventory?.value && inventory.ecosystem === ecosystem && (
               <>
                 <p>{new Date(inventory.stamp).toLocaleString()}</p>
                 {inventory.value.tools.map((t: any) => (
@@ -484,7 +513,7 @@ export function EnvironmentPanel({
                 ))}
               </select>
             </label>
-            {/[a-z]-(add|remove|update)$|^(install|uninstall|update)$/.test(
+            {/^(tool-)?(install|uninstall|update)$|^project-(add|remove|update)$/.test(
               selectedAction,
             ) && (
               <label>
@@ -527,10 +556,16 @@ export function EnvironmentPanel({
             )}
           </section>
           <section>
-            <h3>项目占用</h3>
+            <h3>占用</h3>
             <button onClick={() => void run("size", { ref: target })}>
               统计当前项目
             </button>
+            {usage?.ref && (
+              <p>
+                {link(usage.ref.path)} ·{" "}
+                {new Date(usage.stamp).toLocaleString()}
+              </p>
+            )}
             {usage && (
               <p>
                 {usage.files ?? 0} 个文件 ·{" "}
@@ -541,6 +576,12 @@ export function EnvironmentPanel({
           {job && (
             <section role="status">
               <h3>任务 · {job.state}</h3>
+              {job.kind === "size" && (
+                <p>
+                  {job.files ?? 0} 个文件 ·{" "}
+                  {((job.bytes ?? 0) / 1048576).toFixed(1)} MiB
+                </p>
+              )}
               <p>{job.progress ?? job.error}</p>
               {["running", "queued"].includes(job.state) && (
                 <button

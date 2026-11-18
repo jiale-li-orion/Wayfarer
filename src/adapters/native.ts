@@ -145,6 +145,7 @@ export class NativeEndpoint implements Endpoint {
               "ANDROID_HOME",
               "ANDROID_SDK_ROOT",
               "JAVA_HOME",
+              "GRADLE_USER_HOME",
               "FLUTTER_ROOT",
               "VIRTUAL_ENV",
               "CONDA_PREFIX",

@@ -325,3 +325,25 @@ test("saved environment choices restore across inspector restart and Windows dri
       await restored.dispose();
     }
   }));
+
+test("project environment exposes existing Gradle cache from its declared home", async () =>
+  fixture(async (core, dir) => {
+    const root = path.join(dir, "gradle-home");
+    await fs.mkdir(path.join(root, "caches"), { recursive: true });
+    const endpoint = core.endpoints.get("a"),
+      original = endpoint.call.bind(endpoint);
+    endpoint.call = async (method, args) => {
+      const value: any = await original(method, args);
+      return method === "info"
+        ? { ...value, paths: { ...value.paths, GRADLE_USER_HOME: root } }
+        : value;
+    };
+    const data = await core.dispatch("inspect", {
+      ref: { endpoint: "a", path: dir },
+      environment: true,
+    });
+    assert.equal(
+      data.value.java.caches.find((c: any) => c.manager === "gradle").path,
+      path.join(root, "caches"),
+    );
+  }));

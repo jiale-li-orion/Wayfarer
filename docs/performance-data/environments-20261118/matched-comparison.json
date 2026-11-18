@@ -1,0 +1,99 @@
+{
+  "scope": "Same isolated Windows profile and native workspace, serial version reloads; no environment panel open; shared extension-host values include VS Code built-ins. 0.5 resource candidate precedes on-demand Java cache display additions.",
+  "versions": [
+    {
+      "version": "0.4.0",
+      "samples": 61,
+      "seconds": 614.932,
+      "singleCoreCpuPercent": 0.02292936454762478,
+      "heapStart": 43335600,
+      "heapEnd": 44218440,
+      "rssEnd": 197390336,
+      "inspector": {
+        "snapshots": 2,
+        "snapshotBytes": 1291,
+        "pending": 0,
+        "projects": 0
+      },
+      "environmentUi": null,
+      "processRoles": [
+        {
+          "role": "browser",
+          "workingSet": 102551552,
+          "privateCommit": 109068288,
+          "cpuPercent": 0.18192585314778162,
+          "cpuSecondsMeasured": 278.879
+        },
+        {
+          "role": "renderer",
+          "workingSet": 257228800,
+          "privateCommit": 260534272,
+          "cpuPercent": 0.24427906009416345,
+          "cpuSecondsMeasured": 278.879
+        },
+        {
+          "role": "GPU",
+          "workingSet": 71446528,
+          "privateCommit": 137576448,
+          "cpuPercent": 0.13829008279576444,
+          "cpuSecondsMeasured": 278.879
+        },
+        {
+          "role": "extension-host",
+          "workingSet": 197398528,
+          "privateCommit": 135962624,
+          "cpuPercent": 0.027517310374750352,
+          "cpuSecondsMeasured": 278.879
+        }
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "samples": 61,
+      "seconds": 618.624,
+      "singleCoreCpuPercent": 0.08082453962342231,
+      "heapStart": 45367612,
+      "heapEnd": 44528476,
+      "rssEnd": 193966080,
+      "inspector": {
+        "snapshots": 2,
+        "snapshotBytes": 1291,
+        "pending": 0,
+        "projects": 0
+      },
+      "environmentUi": {
+        "panels": 0
+      },
+      "processRoles": [
+        {
+          "role": "browser",
+          "workingSet": 84320256,
+          "privateCommit": 102563840,
+          "cpuPercent": 0.09429696883978281,
+          "cpuSecondsMeasured": 947.426
+        },
+        {
+          "role": "renderer",
+          "workingSet": 233402368,
+          "privateCommit": 251432960,
+          "cpuPercent": 0.09321414020725734,
+          "cpuSecondsMeasured": 947.426
+        },
+        {
+          "role": "GPU",
+          "workingSet": 57962496,
+          "privateCommit": 153485312,
+          "cpuPercent": 0.005435464089016053,
+          "cpuSecondsMeasured": 947.426
+        },
+        {
+          "role": "extension-host",
+          "workingSet": 171528192,
+          "privateCommit": 136757248,
+          "cpuPercent": 0.02665231902016621,
+          "cpuSecondsMeasured": 947.426
+        }
+      ]
+    }
+  ]
+}

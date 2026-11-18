@@ -66,4 +66,6 @@ Windows VS Code 1.146.0 独立验收窗口安装候选 VSIX，活动栏图标、
 - Codex exec 与实际 dsh headless 各调用一次 `map_workspaces` 并返回收藏清单；临时覆盖配置只作用于验收进程。原有账号、模型、授权和持久 profile 保留。
 - uv 0.9.22 在隔离虚拟环境中，通过本地 wheel 完成 add → locked sync → list → 指定依赖 lock 更新 → remove → locked sync；核对声明、锁文件、实际导入和删除结果，临时环境已释放。
 
-原生 WSL／SSH 打开委托用户已有 Remote 扩展与连接配置；本轮实机验证原生 Windows 工作区切换、四端文件／环境访问和 Remote URI 解析。新窗口额外实例与原生远端 IDE 启动未在本轮低内存环境展开；其菜单调用沿公共 `vscode.openFolder` 接口。性能与待机原值见 PERFORMANCE.md。
+原生 WSL／SSH 打开委托用户已有 Remote 扩展与连接配置；本轮实机验证原生 Windows 工作区切换、四端文件／环境访问和 Remote URI 解析。新窗口额外实例与原生远端 IDE 启动未在本轮低内存环境展开；其菜单调用沿公共 `vscode.openFolder` 接口。同窗口约 615／619 秒串行待机对照已完成，缓存与任务计数稳定；含共享宿主、renderer、GPU 进程的原值见 PERFORMANCE.md。
+
+最终补齐 Java 缓存位置与路径归属展示，Windows 实机核对 Java 页和 cache 数组通过；切换生态后版本清单按各自查询来源展示。71 项 Linux 定向检查、25 项 portable 子集及 Python 3.6 语法检查通过；PR 最终 CI 运行记录与发布制品由 GitHub 保留。

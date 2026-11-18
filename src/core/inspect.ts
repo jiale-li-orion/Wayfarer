@@ -238,7 +238,13 @@ export class Inspector {
             ["uv 缓存", pp.join(info.home, ".cache", "uv")],
             ["pip 缓存", pp.join(info.home, ".cache", "pip")],
             ["npm 缓存", pp.join(info.home, ".npm")],
-            ["Gradle 缓存", pp.join(info.home, ".gradle", "caches")],
+            [
+              "Gradle 缓存",
+              pp.join(
+                info.paths?.GRADLE_USER_HOME ?? pp.join(info.home, ".gradle"),
+                "caches",
+              ),
+            ],
             ["Maven 仓库", pp.join(info.home, ".m2", "repository")],
             ["Cargo", pp.join(info.home, ".cargo")],
             [
