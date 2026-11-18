@@ -56,59 +56,73 @@ async function runSshSetup(
   const endpoint = core.endpoints.get(transport.id);
   const info = await endpoint.call("info");
   const source = await fs.readFile(helper);
-  const revision = createHash("sha256")
-    .update(source)
-    .digest("hex")
-    .slice(0, 16);
   const folder = path.posix.join(
     info.home,
     ".local/share/workspace-map/ssh-setup",
   );
-  const script = path.posix.join(folder, revision + ".py");
-  const id = "wayfarer-" + randomUUID();
-  const run = path.posix.join(folder, id);
+  const parts = /^([^@]+)@(\[[^\]]+\]|[^:]+)(?::([0-9]+))?$/.exec(target)!;
+  const identity = JSON.stringify([
+    transport.distro ?? transport.id,
+    parts[1],
+    parts[2].toLowerCase(),
+    Number(parts[3] ?? 22),
+  ]);
+  const id =
+    "wayfarer-" +
+    createHash("sha256").update(identity).digest("hex").slice(0, 32);
+  const existing = core.endpoints.items.get(id);
+  if (existing) {
+    void vscode.window.showInformationMessage(
+      "已保存该机器 · " + existing.config.name,
+    );
+    return existing.config;
+  }
+  const run = path.posix.join(folder, randomUUID());
   const resultPath = path.posix.join(run, "result.json");
-  await endpoint.call("mkdir", { path: run });
-  await endpoint.call("write", {
-    path: script,
-    data: source.toString("base64"),
-    offset: 0,
-    truncate: true,
-  });
-  const args = [
-    "-u",
-    script,
-    "--target",
-    target,
-    "--alias",
-    id,
-    "--result",
-    resultPath,
-  ];
-  const terminal = vscode.window.createTerminal({
-    name: "首次登录 · " + name,
-    isTransient: true,
-    shellPath:
-      process.platform === "win32" && transport.kind === "wsl"
-        ? "wsl.exe"
-        : (transport.python ?? "python3"),
-    shellArgs:
-      process.platform === "win32" && transport.kind === "wsl"
-        ? [
-            "-d",
-            transport.distro!,
-            "--exec",
-            transport.python ?? "python3",
-            ...args,
-          ]
-        : args,
-  });
-  let closed = false;
-  const closing = vscode.window.onDidCloseTerminal((t) => {
-    if (t === terminal) closed = true;
-  });
-  terminal.show();
+  const script = path.posix.join(run, "setup.py");
+  let terminal: vscode.Terminal | undefined;
+  let closing: vscode.Disposable | undefined;
   try {
+    await endpoint.call("mkdir", { path: run });
+    await endpoint.call("write", {
+      path: script,
+      data: source.toString("base64"),
+      offset: 0,
+      truncate: true,
+    });
+    const args = [
+      "-u",
+      script,
+      "--target",
+      target,
+      "--alias",
+      id,
+      "--result",
+      resultPath,
+    ];
+    const setupTerminal = (terminal = vscode.window.createTerminal({
+      name: "首次登录 · " + name,
+      isTransient: true,
+      shellPath:
+        process.platform === "win32" && transport.kind === "wsl"
+          ? "wsl.exe"
+          : (transport.python ?? "python3"),
+      shellArgs:
+        process.platform === "win32" && transport.kind === "wsl"
+          ? [
+              "-d",
+              transport.distro!,
+              "--exec",
+              transport.python ?? "python3",
+              ...args,
+            ]
+          : args,
+    }));
+    let closed = false;
+    closing = vscode.window.onDidCloseTerminal((t) => {
+      if (t === setupTerminal) closed = true;
+    });
+    setupTerminal.show();
     const result = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
@@ -116,7 +130,9 @@ async function runSshSetup(
         cancellable: true,
       },
       async (_p, token) => {
-        const cancel = token.onCancellationRequested(() => terminal.dispose());
+        const cancel = token.onCancellationRequested(() =>
+          setupTerminal.dispose(),
+        );
         try {
           for (;;) {
             if (token.isCancellationRequested) throw Error("已取消添加机器");
@@ -177,8 +193,8 @@ async function runSshSetup(
     );
     return machine;
   } finally {
-    closing.dispose();
-    terminal.dispose();
+    closing?.dispose();
+    terminal?.dispose();
     await endpoint
       .call("delete", { path: run, recursive: true })
       .catch(() => {});

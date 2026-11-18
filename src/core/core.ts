@@ -659,8 +659,31 @@ export class Core extends EventEmitter {
         return a.environment
           ? this.inspector.environment(a.ref, !!a.refresh)
           : this.inspector.detail(a.ref, !!a.refresh);
-      case "workspaces":
-        return this.workspaceStore?.list() ?? [];
+      case "workspaces": {
+        const items = (await this.workspaceStore?.list()) ?? [];
+        const query = String(a.query ?? "")
+          .trim()
+          .toLowerCase();
+        const matching = query
+          ? items.filter((item) =>
+              [
+                item.name,
+                item.uri,
+                ...item.locations.flatMap(({ ref, endpoint }) => [
+                  ref.path,
+                  endpoint.id,
+                  endpoint.name,
+                  endpoint.host,
+                ]),
+              ].some((value) => value?.toLowerCase().includes(query)),
+            )
+          : items;
+        if (a.limit === undefined && !query) return matching;
+        const limit = Number(a.limit ?? 20);
+        if (!Number.isInteger(limit) || limit < 1 || limit > 100)
+          throw Error("Select a workspace limit from 1 to 100");
+        return matching.slice(0, limit);
+      }
       case "workspaceSave": {
         if (!this.workspaceStore) throw Error("Workspace catalog unavailable");
         const values = await this.workspaceStore.save(a);
@@ -932,6 +955,7 @@ export class Core extends EventEmitter {
           this.emit("event", {
             type: "search",
             jobId: c.job.id,
+            operationId: c.job.operationId,
             entries: p.entries.map((x: any) => ({
               ...x,
               endpoint: ref.endpoint,

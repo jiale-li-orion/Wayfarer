@@ -51,6 +51,8 @@ with tempfile.TemporaryDirectory(prefix="wm-ssh-terminal-") as directory:
                         if done.stdout:channel.sendall(done.stdout)
                         if done.stderr:channel.sendall_stderr(done.stderr)
                         channel.send_exit_status(done.returncode)
+                    elif command == 'true':
+                        channel.send_exit_status(0)
                     elif 'WAYFARER_SETUP=' in command:
                         channel.sendall(('WAYFARER_SETUP='+json.dumps({'home':str(remote),'python':sys.executable})+'\n').encode())
                         channel.send_exit_status(0)
@@ -101,6 +103,12 @@ with mock.patch.object(pathlib.Path,'home',return_value=home),mock.patch.object(
         assert confirmed and password and 'password' in auth and 'publickey' in auth
         assert b'fixture-only-pass' not in output,'Password echoed into terminal output'
         assert pathlib.Path(value['keyPath']).stat().st_mode & 0o777 == 0o600
+        # A second invocation models interruption after the public key reached the server.
+        retry=subprocess.run(process.args,stdin=subprocess.DEVNULL,capture_output=True,timeout=15)
+        assert retry.returncode==0,retry.stderr.decode(errors='replace')
+        assert auth.count('password')==1 and auth.count('publickey')>=2
+        assert len([line for line in (remote/'.ssh/authorized_keys').read_text().splitlines() if line.strip()])==1
+
         print(json.dumps({'status':'passed','hostConfirmation':confirmed,'passwordPrompt':password,'keyAuthentication':True,'passwordEchoed':False,'credentialScope':'isolated temporary directory'}))
     finally:
         if process.poll() is None:os.killpg(process.pid,signal.SIGTERM);process.wait(timeout=3)

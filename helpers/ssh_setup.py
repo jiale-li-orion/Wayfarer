@@ -61,23 +61,52 @@ def setup(target, alias, result_path):
     if not re.fullmatch(r'wayfarer-[a-z0-9-]+', alias): raise ValueError('Invalid connection identifier')
     base = pathlib.Path.home() / '.ssh' / 'wayfarer'
     private_dir(base)
+    if os.name == 'posix':
+        import fcntl
+        lock_path = base / (alias + '.lock')
+        fd = os.open(str(lock_path), os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(fd, 'r+') as lock:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                raise RuntimeError('This machine is being set up in another window')
+            return install_key(target, user, host, port, alias, base)
+    return install_key(target, user, host, port, alias, base)
+
+
+def install_key(target, user, host, port, alias, base):
     key = base / (alias + '.ed25519')
     if key.is_symlink() or key.with_name(key.name + '.pub').is_symlink(): raise ValueError('Key path is a link')
-    if not key.exists():
+    had_key = key.exists()
+    if not had_key:
         subprocess.run(['ssh-keygen', '-q', '-t', 'ed25519', '-N', '', '-C', alias, '-f', str(key)], check=True)
     os.chmod(str(key), 0o600)
-    public = key.with_name(key.name + '.pub').read_text().strip()
+    public_path = key.with_name(key.name + '.pub')
+    if not public_path.exists():
+        derived = subprocess.check_output(['ssh-keygen', '-y', '-f', str(key)], universal_newlines=True).strip()
+        write_private(public_path, ' '.join(derived.split()[:2]) + ' ' + alias + '\n')
+    public = public_path.read_text().strip()
     if not public.startswith('ssh-ed25519 ') or '\n' in public: raise ValueError('Unexpected public key')
-    common = ['ssh', '-T', '-p', str(port), '-l', user, '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=ask']
-    print('Confirm the host fingerprint, then enter the account password in this terminal.', flush=True)
-    print('Installing a dedicated public key for this connection.', flush=True)
-    # SSH reads password and host confirmation from /dev/tty, while stdin carries only the public key.
-    subprocess.run(common + ['-o', 'NumberOfPasswordPrompts=1', '-o', 'PubkeyAuthentication=no',
-        '-o', 'PreferredAuthentications=password,keyboard-interactive', host, INSTALL],
-        input=public+'\n', universal_newlines=True, check=True)
-    print('Checking password-free login and Python...', flush=True)
-    check = subprocess.run(common + ['-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes', '-i', str(key), host, VERIFY],
-                           stdout=subprocess.PIPE, universal_newlines=True, check=True)
+    common = ['ssh', '-F', '/dev/null', '-T', '-p', str(port), '-l', user,
+              '-o', 'ConnectTimeout=10', '-o', 'StrictHostKeyChecking=ask',
+              '-o', 'ServerAliveInterval=15', '-o', 'ServerAliveCountMax=2']
+    key_only = common + ['-o', 'BatchMode=yes', '-o', 'IdentitiesOnly=yes', '-o', 'IdentityAgent=none',
+                         '-o', 'PreferredAuthentications=publickey', '-i', str(key)]
+    check = None
+    if had_key:
+        probe = subprocess.run(key_only + [host, 'true'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if probe.returncode == 0:
+            print('Resuming with the existing dedicated key.', flush=True)
+            check = subprocess.run(key_only + [host, VERIFY], stdout=subprocess.PIPE, universal_newlines=True, check=True)
+    if check is None:
+        print('Confirm the host fingerprint, then enter the account password in this terminal.', flush=True)
+        print('Installing a dedicated public key for this connection.', flush=True)
+        # SSH reads confirmation and password from its TTY; stdin carries only the public key.
+        subprocess.run(common + ['-o', 'NumberOfPasswordPrompts=1', '-o', 'PubkeyAuthentication=no',
+            '-o', 'PreferredAuthentications=password,keyboard-interactive', host, INSTALL],
+            input=public+'\n', universal_newlines=True, check=True)
+        print('Checking password-free login and Python...', flush=True)
+        check = subprocess.run(key_only + [host, VERIFY], stdout=subprocess.PIPE, universal_newlines=True, check=True)
     info = next((json.loads(line.split('=', 1)[1]) for line in check.stdout.splitlines() if line.startswith('WAYFARER_SETUP=')), None)
     if not info or not str(info.get('home', '')).startswith('/') or not str(info.get('python', '')).startswith('/'):
         raise RuntimeError('Remote login succeeded; a POSIX Python 3 environment is required')
