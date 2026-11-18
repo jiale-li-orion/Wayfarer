@@ -187,6 +187,8 @@ class ProfileTests(unittest.TestCase):
         self.assertFalse(profile.same_identity('3:9000000','3:1000000'))
         self.assertEqual(profile.linux_role('app-server --key=secret','codex'),'agent-server')
         self.assertNotIn('secret',str(groups))
+        reused=profile.group_processes([dict(pid=1,ppid=0,name='Code.exe',identity='1:900'),dict(pid=2,ppid=1,name='older.exe',identity='2:100')])
+        self.assertTrue(any(g['application']=='older.exe' for g in reused))
 
 class ResourceFallbackTests(unittest.TestCase):
     def test_identity_and_native_counters_take_priority(self):

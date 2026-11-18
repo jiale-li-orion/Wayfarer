@@ -56,7 +56,11 @@ def group_processes(rows):
         vscode = root['name'].lower() in ('code.exe','code')
         while root.get('ppid') in parents and root['pid'] not in visited:
             visited.add(root['pid'])
-            root = parents[root['ppid']]
+            parent = parents[root['ppid']]
+            try:
+                if int(parent['identity'].split(':')[1]) > int(root['identity'].split(':')[1]): break
+            except (KeyError, ValueError, IndexError): pass
+            root = parent
             vscode = vscode or root['name'].lower() in ('code.exe','code')
         application = 'vscode' if vscode else 'wsl-vm' if role == 'wsl-vm' else 'agent' if role in ('agent-server','dsh-agent') else p['name'].lower()
         key = application + ':' + role
