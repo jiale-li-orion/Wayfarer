@@ -772,6 +772,17 @@ function App() {
                           ["工作集 / RSS", bytes(details.rss)],
                           ["PSS", bytes(details.pss)],
                           ["私有提交量", bytes(details.privateBytes)],
+                          ["内存来源", details.memorySource ?? "进程接口"],
+                          ...(details.memoryStamp
+                            ? [
+                                [
+                                  "内存采样时间",
+                                  new Date(
+                                    details.memoryStamp,
+                                  ).toLocaleTimeString(),
+                                ],
+                              ]
+                            : []),
                           ["线程", details.threads],
                           ["句柄 / 文件描述符", details.handles],
                           ["GPU 显存", bytes(details.gpuMemory)],

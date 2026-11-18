@@ -1,0 +1,93 @@
+{
+  "scope": "Warm same-machine source subtree; filename operations. Native metadata and CLI name/type outputs have different richness.",
+  "list": {
+    "entries": 14,
+    "full": {
+      "medianMs": 0.4498609999999985,
+      "bytes": 4576
+    },
+    "compact": {
+      "medianMs": 0.26239000000001056,
+      "bytes": 622
+    },
+    "cliFind": {
+      "medianMs": 1.357512000000014,
+      "bytes": 168
+    }
+  },
+  "resources": {
+    "full": {
+      "medianMs": 0.37806000000000495,
+      "bytes": 8788
+    },
+    "compact": {
+      "medianMs": 0.310799999999972,
+      "bytes": 3876
+    }
+  },
+  "search": {
+    "mcp": {
+      "ms": 13.415976999999998,
+      "calls": 3,
+      "state": "completed",
+      "matches": 4
+    },
+    "cli": {
+      "ms": 2.2725919999999746,
+      "matches": 4
+    }
+  },
+  "tokenization": {
+    "encoding": "o200k_base",
+    "packageVersion": "0.14.0",
+    "counts": {
+      "listFull": 1339,
+      "listCompact": 157,
+      "resourcesFull": 3016,
+      "resourcesCompact": 1272
+    },
+    "scope": "Reference response-body tokens, excluding tool schemas, input and full conversation; actual model tokenizer may differ."
+  },
+  "root": "repository src subtree",
+  "nativeCounters": {
+    "beforeCimOneCorePercent": 3.223421209757539,
+    "afterNativeOneCorePercent": 0.7289733550824552,
+    "samples": 13,
+    "wallSeconds": 60.01591099999996,
+    "afterChildCpuSeconds": 0.0
+  },
+  "cleanup": {
+    "containersRemoved": 15,
+    "runningContainersRemoved": 10,
+    "volumes": "preserved",
+    "beforeSingleSample": {
+      "windowsAvailableMiB": 1228.2890625,
+      "wslUsedMiB": 3773.7265625
+    },
+    "afterTenMinutes": {
+      "windows-after": {
+        "samples": 61,
+        "availableMiBMedian": 3382.23046875,
+        "usedMiBMedian": 12597.4765625,
+        "availableMiBLast": 2566.515625,
+        "collectorSingleCorePercent": 0.8463471137740519
+      },
+      "wsl-after": {
+        "samples": 61,
+        "availableMiBMedian": 8138.0625,
+        "usedMiBMedian": 1808.68359375,
+        "availableMiBLast": 8127.92578125,
+        "collectorSingleCorePercent": 0.1520314807505366
+      }
+    },
+    "scope": "Normal active window; before is one sample, after is 61 samples; other application activity varies."
+  },
+  "sshAcceptance": {
+    "realOpenSshAndTty": true,
+    "hostConfirmation": true,
+    "passwordPrompt": true,
+    "keyAuthentication": true,
+    "passwordEchoed": false,
+    "server": "isolated loopback fixture"
+  }
+}

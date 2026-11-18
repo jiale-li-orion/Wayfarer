@@ -109,6 +109,39 @@ export class WorkspaceStore {
       ];
     });
   }
+  /** Import legacy map locations without renaming or duplicating an existing favorite. */
+  importLocation(input: {
+    name: string;
+    uri?: string;
+    locations: SavedWorkspace["locations"];
+  }) {
+    return this.mutate((items) => {
+      const location = input.locations[0];
+      const same = items.some((item) =>
+        input.uri && item.uri
+          ? workspaceUriKey(item.uri) === workspaceUriKey(input.uri)
+          : item.locations.some(
+              (old) =>
+                old.ref.path === location.ref.path &&
+                old.endpoint.kind === location.endpoint.kind &&
+                old.endpoint.host === location.endpoint.host &&
+                old.endpoint.distro === location.endpoint.distro &&
+                old.endpoint.sshConfig === location.endpoint.sshConfig,
+            ),
+      );
+      return same
+        ? items
+        : [
+            ...items,
+            {
+              ...input,
+              id: randomUUID(),
+              created: Date.now(),
+              updated: Date.now(),
+            },
+          ];
+    });
+  }
   update(
     id: string,
     changes: {

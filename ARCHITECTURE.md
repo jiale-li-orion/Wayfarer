@@ -204,3 +204,28 @@ flowchart LR
 Windows离线入口独立于Extension Host、MCP与文件传输任务：原清单 → 只读身份预览 → 准备清单 → WSL停机 → 独占句柄复核／删除 → 独立运行报告。清单绑定实际文件身份；预览、执行和重跑保留各自状态。F盘现役交换文件与系统VHD在范围之外。操作语义、退出码和验收见 docs/WSL_MAINTENANCE.md。
 
 scripts/profile-pressure.py 复用监控助手的系统和进程计数，按平台与角色归组。Windows每60秒查询一次CIM角色信息，核对进程创建身份后关联原生内存计数；原始命令行留在识别进程内。Linux对至多200个选中进程按需读取PSS，输出覆盖计数。WSL虚拟机工作集／提交量与Linux进程PSS分别记录，避免重复相加。采样默认十分钟、十秒一份、每文件20MiB，阶段标记帮助区分页面操作与稳定观察。
+
+## 0.7.1：连接入口、观测与 Agent 输出
+
+```mermaid
+flowchart LR
+  Wizard[添加机器：地址／名称] --> TTY[WSL／本机 OpenSSH 终端]
+  TTY --> Public[追加账号专用公钥]
+  Public --> Verify[免密／Python 验证]
+  Verify --> Config[命名 Endpoint＋独立 SSH 配置]
+  Map[旧地图书签] --> Migration[幂等迁移]
+  Migration --> Catalog[共享 WorkspaceStore 收藏]
+  Agent[MCP 查询] --> State{地图连接状态}
+  State -->|离线| Unavailable[MAP_UNAVAILABLE＋可选地图]
+  State -->|已连接| Core
+  Core --> Projection[可选目录字段／资源精简投影]
+  Win[Windows 进程接口] --> Restricted[受限 VM 进程]
+  Restricted --> PDH[原生 PDH 进程计数器]
+  PDH -->|字段仍缺失| CIM[CIM 按需查询／60秒缓存]
+```
+
+收藏保持一个共享目录；旧字段作为迁移输入，画布与侧边栏共用原生收藏命令。SSH创建只在当前向导期间拥有终端和报告读取，凭证存入所选运行环境；密码由OpenSSH直接从TTY读取。
+
+普通MCP请求在地图离线／恢复中及时返回状态，单个恢复线程继续等待同一mapId；已提交任务确认中断后的收据查询保持原恢复语义。目录字段与资源投影在缓存读取后生成新对象，目录分页和共享资源缓存保持完整。
+
+Windows受限VM进程优先用已有PDH模块按PID匹配工作集／私有提交量；字段缺失再查询CIM，标注来源和时间。查询只随进程页或单次MCP请求运行，最后一个采样使用者退出后由采集器释放计数器及子进程。现有UI、完整MCP响应与历史记录兼容。

@@ -84,6 +84,32 @@ export function createWorkspaceCommands(
     context.globalStorageUri.fsPath,
   ));
   const change = () => core.emit("event", { type: "workspaces" });
+  const migrated = (async () => {
+    const remaining: Ref[] = [];
+    for (const ref of core.view.bookmarks) {
+      try {
+        const endpoint = core.endpoints.get(ref.endpoint).config;
+        const uri = nativeUri(core, ref)?.toString();
+        await store.importLocation({
+          name:
+            ref.path
+              .replace(/[\\/]$/, "")
+              .split(/[\\/]/)
+              .pop() || ref.path,
+          uri,
+          locations: [{ ref, endpoint }],
+        });
+      } catch {
+        remaining.push(ref);
+      }
+    }
+    if (remaining.length !== core.view.bookmarks.length)
+      await core.dispatch("setView", { bookmarks: remaining });
+    change();
+  })();
+  void migrated.catch((error) =>
+    core.profile.record("favorites.migration", { error: String(error) }),
+  );
   const get = async (arg?: any) => {
     const id = typeof arg === "string" ? arg : arg?.workspaceId;
     const item = (await store.list()).find((x) => x.id === id);
@@ -103,7 +129,7 @@ export function createWorkspaceCommands(
     defaultName: string,
   ) => {
     const name = await vscode.window.showInputBox({
-      title: "收藏工作区",
+      title: "收藏",
       value: defaultName,
     });
     if (!name?.trim()) return;
@@ -144,6 +170,16 @@ export function createWorkspaceCommands(
   };
   const open = async (arg: any, newWindow = false) => {
     const item = await get(arg);
+    if (!item.uri) {
+      const roots = resolveLocations(core, item);
+      if (roots[0]) {
+        await vscode.commands.executeCommand(
+          "workspaceMap.openLocation",
+          roots[0],
+        );
+        return;
+      }
+    }
     const uri = item.uri ? vscode.Uri.parse(item.uri) : await bind(item);
     if (!uri) return;
     const normalize = (u: vscode.Uri) =>
@@ -173,7 +209,10 @@ export function createWorkspaceCommands(
       if (uri.path.endsWith(".code-workspace")) {
         const document = await vscode.workspace.openTextDocument(uri);
         roots = [];
-        for (const target of parseWorkspaceRoots(uri.toString(), document.getText())) {
+        for (const target of parseWorkspaceRoots(
+          uri.toString(),
+          document.getText(),
+        )) {
           const ref = nativeRef(core, vscode.Uri.parse(target));
           if (ref) roots.push(ref);
         }
@@ -187,6 +226,47 @@ export function createWorkspaceCommands(
     return roots;
   };
   const definitions: Record<string, (...args: any[]) => any> = {
+    favorites: async () => {
+      await migrated;
+      const items = await store.list();
+      const chosen = await vscode.window.showQuickPick(
+        items.map((w) => ({
+          label: w.name,
+          description: w.locations[0]?.ref.path ?? w.uri,
+          id: w.id,
+        })),
+        {
+          title: "收藏",
+          placeHolder:
+            "选择收藏；项目在 VS Code 打开，未绑定的远端目录在地图定位",
+        },
+      );
+      if (chosen) await open(chosen.id);
+    },
+    addFavorite: async () => {
+      const picked = await vscode.window.showQuickPick(
+        [
+          {
+            label: "当前工作区",
+            description: "保存当前项目或多根工作区",
+            command: "favoriteCurrent",
+          },
+          {
+            label: "已有 .code-workspace 文件",
+            description: "选择已保存的工作区配置",
+            command: "favoriteFile",
+          },
+          {
+            label: "已登记的项目目录",
+            description: "选择地图中登记过的项目",
+            command: "favoriteDirectory",
+          },
+        ],
+        { title: "添加收藏" },
+      );
+      if (picked)
+        await vscode.commands.executeCommand("workspaceMap." + picked.command);
+    },
     favoriteCurrent: async () => {
       const folders = vscode.workspace.workspaceFolders ?? [];
       const uri =

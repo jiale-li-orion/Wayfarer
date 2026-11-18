@@ -1,3 +1,4 @@
+import { addSshMachine } from "./ssh";
 import * as vscode from "vscode";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -423,6 +424,8 @@ export async function activate(context: vscode.ExtensionContext) {
     );
   };
   const commands = async (name: string): Promise<any> => {
+    if (name === "favorites")
+      return vscode.commands.executeCommand("workspaceMap.favorites");
     if (name === "logs") {
       output.show();
       return;
@@ -464,7 +467,12 @@ export async function activate(context: vscode.ExtensionContext) {
         });
       return;
     }
-    if (name === "add") return addEndpoint(core, config);
+    if (name === "add")
+      return addSshMachine(
+        core,
+        path.join(context.extensionPath, "dist/helpers/ssh_setup.py"),
+        (e) => saveEndpoint(core, e),
+      );
     if (name === "codex") {
       const c = await chooseConnection();
       if (c) {
@@ -566,6 +574,46 @@ export async function activate(context: vscode.ExtensionContext) {
       flushAction();
     });
   register("workspaceMap.addEndpoint", () => commands("add"));
+  register("workspaceMap.importSSH", () => importEndpoint(core));
+  register("workspaceMap.renameMachine", async (arg?: { ref?: Ref }) => {
+    const chosen =
+      arg?.ref?.endpoint ??
+      (
+        await vscode.window.showQuickPick(
+          core.endpoints.configs().map((e) => ({ label: e.name, id: e.id })),
+          { title: "重命名机器" },
+        )
+      )?.id;
+    if (!chosen) return;
+    const endpoint = core.endpoints.get(chosen);
+    const name = await vscode.window.showInputBox({
+      title: "机器名称",
+      value: endpoint.config.name,
+      validateInput: (v) =>
+        !v.trim() || /[\r\n]/.test(v) || v.length > 80
+          ? "请输入 1–80 字符的名称"
+          : undefined,
+    });
+    if (!name) return;
+    const settings = vscode.workspace.getConfiguration("workspaceMap");
+    const scope = settings.inspect<EndpointConfig[]>("endpoints");
+    const saved = settings.get<EndpointConfig[]>("endpoints") ?? [];
+    const existing = saved.some((e) => e.id === chosen);
+    await settings.update(
+      "endpoints",
+      existing
+        ? saved.map((e) => (e.id === chosen ? { ...e, name: name.trim() } : e))
+        : [...saved, { ...endpoint.config, name: name.trim() }],
+      scope?.workspaceValue !== undefined
+        ? vscode.ConfigurationTarget.Workspace
+        : vscode.ConfigurationTarget.Global,
+    );
+    endpoint.config.name = name.trim();
+    core.emit("event", {
+      type: "endpoints",
+      endpoints: core.endpoints.configs(),
+    });
+  });
   register("workspaceMap.connectCodex", () => commands("codex"));
   register("workspaceMap.connectDsh", () => commands("dsh"));
   register("workspaceMap.mcpConfig", () => commands("config"));
@@ -639,7 +687,7 @@ export async function activate(context: vscode.ExtensionContext) {
     },
   });
 }
-async function addEndpoint(core: Core, config: vscode.WorkspaceConfiguration) {
+async function importEndpoint(core: Core) {
   const wsls = core.endpoints
     .configs()
     .filter((e) => e.kind === "wsl" || e.kind === "local");
@@ -695,7 +743,11 @@ async function addEndpoint(core: Core, config: vscode.WorkspaceConfiguration) {
     distro: transport.e.distro,
     python: "python3",
   };
-  config = vscode.workspace.getConfiguration("workspaceMap");
+  await saveEndpoint(core, endpoint);
+  return endpoint;
+}
+async function saveEndpoint(core: Core, endpoint: EndpointConfig) {
+  const config = vscode.workspace.getConfiguration("workspaceMap");
   const scope = config.inspect<EndpointConfig[]>("endpoints");
   await config.update(
     "endpoints",
@@ -705,7 +757,6 @@ async function addEndpoint(core: Core, config: vscode.WorkspaceConfiguration) {
       : vscode.ConfigurationTarget.Global,
   );
   await core.dispatch("addEndpoint", endpoint);
-  return endpoint;
 }
 export async function deactivate() {
   const a = active;

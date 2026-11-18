@@ -12,6 +12,7 @@ type Item = {
   command?: string;
   ref?: Ref;
   workspaceId?: string;
+  tooltip?: string;
 };
 
 /** Native navigation only: the editor canvas owns directory reads and watches. */
@@ -20,7 +21,7 @@ export function createSidebar(core: Core): vscode.Disposable {
   const groups: Item[] = [
     {
       id: "workspaces",
-      label: "常用工作区",
+      label: "收藏",
       icon: "root-folder",
       group: "workspaces",
     },
@@ -30,24 +31,46 @@ export function createSidebar(core: Core): vscode.Disposable {
       icon: "device-desktop",
       group: "machines",
     },
-    { id: "bookmarks", label: "书签", icon: "bookmark", group: "bookmarks" },
     { id: "actions", label: "常用操作", icon: "tools", group: "actions" },
+    {
+      id: "advanced",
+      label: "诊断与接入",
+      icon: "settings-gear",
+      group: "advanced",
+    },
   ];
   const actions = [
-    ["favoriteCurrent", "收藏当前工作区", "add"],
-    ["favoriteFile", "收藏工作区文件", "file-code"],
+    ["addFavorite", "添加收藏", "add"],
     ["environment", "当前工作区环境", "tools"],
     ["open", "打开地图", "map"],
     ["home", "全部机器", "home"],
-    ["search", "搜索当前子树", "search"],
-    ["tasks", "后台任务", "checklist"],
+    [
+      "search",
+      "按名称找文件",
+      "search",
+      "在当前目录下查找文件或目录名称；点击结果定位或打开",
+    ],
+    [
+      "tasks",
+      "传输与后台任务",
+      "checklist",
+      "查看复制、移动、扫描与安装进度，暂停、继续或取消任务",
+    ],
     ["addEndpoint", "添加 SSH 连接", "add"],
+    ["resources", "机器资源", "pulse"],
+    ["storage", "存储占用", "database"],
+  ];
+  const advanced = [
+    ["importSSH", "导入已有 SSH 配置", "remote"],
     ["connectCodex", "接入 Codex", "plug"],
     ["connectDsh", "接入 dsh", "plug"],
     ["mcpConfig", "MCP 配置", "settings-gear"],
-    ["resources", "机器资源", "pulse"],
-    ["storage", "存储占用", "database"],
-    ["logs", "性能日志", "output"],
+    [
+      "logs",
+      "诊断日志",
+      "output",
+      "查看插件运行、连接与耗时日志；整机占用见机器资源",
+    ],
   ];
   const provider: vscode.TreeDataProvider<Item> = {
     onDidChangeTreeData: changes.event,
@@ -75,43 +98,40 @@ export function createSidebar(core: Core): vscode.Disposable {
           description: e.root,
           ref: { endpoint: e.id, path: e.root },
         }));
-      if (item.group === "bookmarks")
-        return core.view.bookmarks.map((ref) => ({
-          id: "bookmark:" + JSON.stringify(ref),
-          label: ref.path,
-          icon: "bookmark",
-          description:
-            core.endpoints.configs().find((e) => e.id === ref.endpoint)?.name ??
-            ref.endpoint,
-          ref,
-        }));
-      if (item.group === "actions")
-        return actions.map(([command, label, icon]) => ({
-          id: command,
-          label,
-          icon,
-          command: "workspaceMap." + command,
-        }));
+      if (item.group === "actions" || item.group === "advanced")
+        return (item.group === "actions" ? actions : advanced).map(
+          ([command, label, icon, tooltip]) => ({
+            id: command,
+            label,
+            icon,
+            command: "workspaceMap." + command,
+            tooltip,
+          }),
+        );
       return [];
     },
     getTreeItem(item) {
       const row = new vscode.TreeItem(
         item.label,
         item.group
-          ? vscode.TreeItemCollapsibleState.Expanded
+          ? item.group === "advanced"
+            ? vscode.TreeItemCollapsibleState.Collapsed
+            : vscode.TreeItemCollapsibleState.Expanded
           : vscode.TreeItemCollapsibleState.None,
       );
       row.id = item.id;
       row.contextValue = item.workspaceId
         ? "workspaceMap.favorite"
-        : item.ref
-          ? "workspaceMap.directory"
-          : undefined;
+        : item.id.startsWith("endpoint:")
+          ? "workspaceMap.machine"
+          : item.ref
+            ? "workspaceMap.directory"
+            : undefined;
       row.iconPath = new vscode.ThemeIcon(item.icon);
       row.description = item.description;
       row.tooltip = item.ref
         ? item.ref.endpoint + ": " + item.ref.path
-        : item.label;
+        : (item.tooltip ?? item.label);
       if (!item.group)
         row.command = {
           command: item.ref ? "workspaceMap.openLocation" : item.command!,

@@ -54,6 +54,34 @@ def run(argv):
         CHILD = None
 
 
+def merge_restricted_memory(rows, samples, stamp):
+    """Restricted VM counters fill missing values; existing native values and identities take priority."""
+    by_pid = {int(p['pid']): p for p in samples if isinstance(p, dict) and str(p.get('pid', '')).isdigit()}
+    for p in rows:
+        source = by_pid.get(p['pid'])
+        if not source or p['name'].lower() not in ('vmmemwsl', 'vmmem') or source.get('name', '').lower() != p['name'].lower():
+            continue
+        if not source.get('identity') and source.get('memorySource') != 'PDH.Process':
+            continue
+        if p.get('identity') and source.get('identity'):
+            a, b = p['identity'].split(':'), source['identity'].split(':')
+            if a[0] != b[0] or abs(int(a[1]) - int(b[1])) > 10:
+                continue
+        changed = False
+        for field in ('rss', 'privateBytes'):
+            value = source.get(field)
+            if p.get(field) is None and isinstance(value, (int, float)) and value >= 0:
+                p[field] = int(value)
+                changed = True
+        if changed:
+            if not p.get('identity') and source.get('identity'):
+                p['identity'] = source['identity']
+                p['identitySource'] = 'Win32_Process.CreationDate'
+            p.update(memorySource=source.get('memorySource', 'Win32_Process'), memoryStamp=stamp)
+            if p.get('access') == 'restricted': p['access'] = 'partial'
+    return rows
+
+
 if WIN:
     from ctypes import wintypes as W
 
@@ -199,6 +227,40 @@ if WIN:
         finally:
             K.CloseHandle(token)
 
+    RESTRICTED_MEMORY = dict(key=None, stamp=0, rows=[], error=None)
+
+    def restricted_memory(rows, now):
+        targets = tuple(sorted((p['pid'], p['name']) for p in rows
+            if p['name'].lower() in ('vmmemwsl', 'vmmem')
+            and (p.get('rss') is None or p.get('privateBytes') is None)))
+        if not targets: return rows
+        # Native performance counters avoid starting PowerShell on the common path.
+        paths = [r'\Process(vmmem*)\ID Process', r'\Process(vmmem*)\Working Set', r'\Process(vmmem*)\Private Bytes']
+        values = PDH.read(paths)
+        samples = []
+        for instance, pid in values.get(paths[0], {}).items():
+            samples.append(dict(pid=int(pid), name=re.sub(r'#\d+$', '', instance),
+                rss=values.get(paths[1], {}).get(instance), privateBytes=values.get(paths[2], {}).get(instance),
+                memorySource='PDH.Process'))
+        merge_restricted_memory(rows, samples, int(now * 1000))
+        targets = tuple((p['pid'], p['name']) for p in rows if (p['pid'], p['name']) in targets
+            and (p.get('rss') is None or p.get('privateBytes') is None))
+        if not targets: return rows
+        if targets != RESTRICTED_MEMORY['key'] or now - RESTRICTED_MEMORY['stamp'] >= 60:
+            command = r'''[Console]::OutputEncoding=[Text.UTF8Encoding]::new();$rows=@(Get-CimInstance Win32_Process -Filter "Name='vmmemWSL' OR Name='vmmem'" -ErrorAction Stop|ForEach-Object {if($_.CreationDate){[pscustomobject]@{pid=$_.ProcessId;name=$_.Name;identity=([string]$_.ProcessId+':'+[string]$_.CreationDate.ToFileTimeUtc());rss=[double]$_.WorkingSetSize;privateBytes=[double]$_.PrivatePageCount}}});ConvertTo-Json -InputObject $rows -Compress'''
+            # Only the two protected VM process names are queried. No arguments or environment leave CIM.
+            try:
+                values = json.loads(run(['powershell.exe', '-NoProfile', '-Command', command]).lstrip('\ufeff'))
+                if not isinstance(values, list): raise ValueError('Expected CIM process array')
+                RESTRICTED_MEMORY.update(rows=values, error=None)
+            except (OSError, RuntimeError, ValueError) as error:
+                RESTRICTED_MEMORY.update(rows=[], error=str(error)[:400])
+            RESTRICTED_MEMORY.update(key=targets, stamp=now)
+        if RESTRICTED_MEMORY['error']:
+            for p in rows:
+                if (p['pid'], p['name']) in targets: p['memoryError'] = RESTRICTED_MEMORY['error']
+        return merge_restricted_memory(rows, RESTRICTED_MEMORY['rows'], int(RESTRICTED_MEMORY['stamp'] * 1000))
+
     def windows_processes(now):
         rows = []
         snapshot = K.CreateToolhelp32Snapshot(2, 0)
@@ -240,7 +302,7 @@ if WIN:
                 ok = K.Process32NextW(snapshot, ctypes.byref(entry))
         finally:
             K.CloseHandle(snapshot)
-        return rows
+        return restricted_memory(rows, now)
 
     WSL_BACKING = None
 

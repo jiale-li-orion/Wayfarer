@@ -80,3 +80,34 @@ test("MCP additions retain unique names and the original discovery/transfer sche
     assert.equal(tool.inputSchema.additionalProperties, false);
   }
 });
+
+test("legacy map favorites import once and preserve existing names", async () => {
+  const { WorkspaceStore } = await import("../src/core/workspaces");
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wm-favorites-import-"));
+  try {
+    const store = new WorkspaceStore(dir);
+    const item = {
+      name: "Existing",
+      uri: "file:///C:/Project",
+      locations: [
+        {
+          ref: { endpoint: "c", path: "C:\\Project" },
+          endpoint: {
+            id: "c",
+            name: "C",
+            kind: "windows" as const,
+            root: "C:\\",
+          },
+        },
+      ],
+    };
+    await store.save(item);
+    await store.importLocation({ ...item, name: "Old bookmark" });
+    await store.importLocation({ ...item, name: "Old bookmark" });
+    const saved = await store.list();
+    assert.equal(saved.length, 1);
+    assert.equal(saved[0].name, "Existing");
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+});

@@ -214,7 +214,6 @@ function App() {
   } | null>(null);
   const [mode, setMode] = useState<"copy" | "move">("move");
   const [conflict, setConflict] = useState("rename");
-  const [bookmarksOpen, setBookmarksOpen] = useState(false);
   const [packageOpen, setPackageOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [caps, setCaps] = useState<Record<string, string[]>>({});
@@ -732,12 +731,9 @@ function App() {
     );
   };
   const runSearch = async () => {
-    const ref =
-      workDirectory ??
-      (endpoints[0]
-        ? { endpoint: endpoints[0].id, path: endpoints[0].root }
-        : undefined);
-    if (!ref) return;
+    const ref = workDirectory;
+    if (!ref) throw Error("先进入要搜索的目录");
+    if (!query.trim()) return;
     setSearchResults([]);
     const j = await rpc("search", { ref, query });
     setSearchJob(j.id);
@@ -905,10 +901,13 @@ function App() {
         >
           <Icon name="screen-full" />
         </button>
-        <button title="搜索当前子树" onClick={() => setSearchOpen((v) => !v)}>
+        <button title="按名称找文件" onClick={() => setSearchOpen((v) => !v)}>
           <Icon name="search" />
         </button>
-        <button title="书签" onClick={() => setBookmarksOpen((v) => !v)}>
+        <button
+          title="收藏"
+          onClick={() => void rpc("command", { name: "favorites" })}
+        >
           <Icon name="bookmark" />
         </button>
       </nav>
@@ -985,17 +984,13 @@ function App() {
             <Icon name="package" />
           </button>
           <button
-            onClick={() => {
-              const bookmarks = [
-                ...view.bookmarks.filter(
-                  (b) => refKey(b) !== refKey(selected[0]),
-                ),
-                selected[0],
-              ];
-              setView((v) => ({ ...v, bookmarks }));
-              void rpc("setView", { bookmarks });
-            }}
-            title="添加书签"
+            onClick={() =>
+              void safe(rpc("favoriteDirectory", { ref: selected[0] }))
+            }
+            disabled={
+              selectedKind !== "directory" && selectedKind !== "endpoint"
+            }
+            title="收藏目录"
           >
             <Icon name="bookmark" />
           </button>
@@ -1009,52 +1004,19 @@ function App() {
           </button>
         </div>
       )}
-      {bookmarksOpen && (
-        <section className="floating bookmarks">
-          <h2>
-            书签
-            <button onClick={() => setBookmarksOpen(false)}>
-              <Icon name="close" />
-            </button>
-          </h2>
-          {view.bookmarks.length === 0 ? (
-            <p>选择目录后添加书签</p>
-          ) : (
-            view.bookmarks.map((b) => (
-              <div className="bookmark-row" key={refKey(b)}>
-                <button
-                  onClick={() => {
-                    navigate(b);
-                    setBookmarksOpen(false);
-                  }}
-                >
-                  {b.endpoint} · {b.path}
-                </button>
-                <button
-                  title="移除书签"
-                  onClick={() => {
-                    const bookmarks = view.bookmarks.filter(
-                      (x) => refKey(x) !== refKey(b),
-                    );
-                    setView((v) => ({ ...v, bookmarks }));
-                    void rpc("setView", { bookmarks });
-                  }}
-                >
-                  <Icon name="close" />
-                </button>
-              </div>
-            ))
-          )}
-        </section>
-      )}
       {searchOpen && (
         <section className="floating search">
           <h2>
-            搜索当前子树
+            按名称找文件
             <button onClick={() => setSearchOpen(false)}>
               <Icon name="close" />
             </button>
           </h2>
+          <div className="scope-path">
+            {workDirectory
+              ? `${endpoints.find((e) => e.id === workDirectory.endpoint)?.name ?? workDirectory.endpoint} · ${workDirectory.path}`
+              : "先进入一个目录再搜索"}
+          </div>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -1065,9 +1027,11 @@ function App() {
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="文件或目录名称"
+              placeholder="输入文件或目录名称"
             />
-            <button type="submit">搜索</button>
+            <button type="submit" disabled={!workDirectory || !query.trim()}>
+              搜索
+            </button>
             {searchJob && (
               <button
                 type="button"

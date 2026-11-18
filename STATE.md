@@ -1,9 +1,7 @@
-# Workspace Map · 0.7.0
+# Workspace Map · 0.7.1
 
-训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。GitHub jiale-li-orion/Wayfarer，显示名称Workspace Map。训练机独立工作树开发，本机安装与验收。
+训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。开发在训练机独立工作树，本机安装与验收，产物留D盘。
 
-当前插件0.7.0已安装并生效。存储刷新／对比、内存压力与有界录制沿原Core工作；本轮修改独立维护入口和测量工具，运行接口保持现状。
+C盘离线维护已完成：53份旧交换文件回收75.24GiB，完成时C盘余量约98.7GiB；现役F盘交换文件、10GiB内存及原配置保留。用户确认旧项目后，SecFusionAgent的14个容器和OpenViking旧自启动容器已移除，业务卷保留。后续采样及原始结果位于D:/Wayfarer-Acceptance/post-cleanup-20261118。
 
-现役交换文件已切到F:/WSL/swap.vhdx，WSL内存10GiB与原交换容量保留；53份旧交换文件约75.24GiB仍待离线回收。新维护入口支持现役文件存在时重跑、身份清单、独占句柄删除、完整诊断和真实退出状态，说明见docs/WSL_MAINTENANCE.md。当前WSL/Agent会话继续运行，正式停机与重启验证由离线阶段承接。
-
-Windows原生隔离测试覆盖删除、占用、替换、junction、重跑、部分失败、WSL重启与启动器退出传递。真实清单预览保留53份源文件，另1份已消失。Windows/WSL进程归组与页面对照数据留D:/Wayfarer-Acceptance/offline-swap-20261118；用户应用与其他业务进程按现有职责运行。交付后同步主仓库、清理本轮工作树。
+本轮统一收藏入口并迁移地图书签，明确文件名搜索／后台任务／诊断日志；增加SSH首次登录、专用密钥配置与命名。补受限VM进程内存来源、离线地图及时响应及Agent精简返回。实现边界见ARCHITECTURE.md，入口说明见README和docs/SSH.md；性能与验收结果归PERFORMANCE.md和docs/ACCEPTANCE.md。

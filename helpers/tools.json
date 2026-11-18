@@ -79,6 +79,23 @@
         },
         "refresh": {
           "type": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "name",
+              "path",
+              "kind",
+              "size",
+              "mtime",
+              "identity",
+              "target",
+              "error"
+            ]
+          },
+          "description": "Optional entry fields for compact Agent browsing; omit for complete metadata. Cursor and paging remain unchanged."
         }
       },
       "required": [
@@ -1140,6 +1157,10 @@
         },
         "gpu": {
           "type": "string"
+        },
+        "compact": {
+          "type": "boolean",
+          "description": "Return only the requested section, omitting history and unrelated GPU/storage metadata. Recommended for Agent queries; default preserves full responses."
         }
       },
       "additionalProperties": false

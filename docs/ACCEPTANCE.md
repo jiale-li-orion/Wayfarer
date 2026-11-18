@@ -95,3 +95,11 @@ Windows 清理使用实际管理器：pip purge、npm cache clean、uv cache pru
 维护测试由真实选择／状态机和Windows临时文件组成。Windows原生11项通过，覆盖文件身份、占用、替换、junction、共享文件、现役目标重跑、部分失败、WSL重启、空状态解码以及Python→PowerShell→cmd退出码传递。实际清单只执行预览，53份约75.24GiB文件可取得独占身份，另1份已消失；目标F盘文件和WSL配置保持原状。
 
 两端四段十分钟采样共244份，采样器平均单核CPU低于1%。资源页实际10轮开关后计数归零；Markdown预览和Codex侧栏对照后恢复原窗口。原始截图在核对后清理，数值、阶段与覆盖范围记录于PERFORMANCE.md；PR概览对照尚未覆盖。正式离线回收、80GiB目标和重启验证由更新后的Windows入口承接，当前会话继续运行。
+
+## 0.7.1
+
+- Node完整87项、portable42项及Windows原生Python13项通过；恢复测试覆盖离线即时返回、50轮绑定、10轮恢复及提交确认丢失的收据查询。
+- 真实OpenSSH与PTY对隔离本机SSH服务器完成指纹确认、密码认证、公钥追加与免密验证，密码输出检查为0；真实账号与现有authorized_keys保持原状。入口测试位于tests/ssh_terminal_acceptance.py。
+- Windows受限vmmemWSL的工作集／私有提交量通过原生PDH读取，来源及采样时间保留，60秒CPU对照见PERFORMANCE.md。CIM合并覆盖原生值优先及身份变化保留未知。
+- 共享收藏迁移验证重复导入与现有名称保留，目录字段投影及资源精简保留分页、状态和原缓存；侧边栏、SSH向导及新字段在VSIX重载后生效。
+- 15个已确认旧容器移除，数据卷保留；两端各十分钟内存记录在D:/Wayfarer-Acceptance/post-cleanup-20261118。WSL10GiB与Windows分页策略沿用。

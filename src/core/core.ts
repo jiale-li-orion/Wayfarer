@@ -1,3 +1,4 @@
+import { compactResourceSnapshot } from "./resourceExport";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { randomUUID, createHash } from "node:crypto";
@@ -368,8 +369,11 @@ export class Core extends EventEmitter {
         return this.storageAnalysis.query(a);
       case "listClose":
         return this.directories.closeClientCursor(a.ref, a.cursor, client);
-      case "systemResources":
-        return this.monitor.snapshot(a);
+      case "systemResources": {
+        const { compact, ...query } = a;
+        const value = await this.monitor.snapshot(query);
+        return compact ? compactResourceSnapshot(value) : value;
+      }
       case "resources":
         return this.endpoints.get(a.endpoint).call("resources");
       case "diagnostics":
@@ -409,13 +413,42 @@ export class Core extends EventEmitter {
         });
         return a;
       }
-      case "list":
-        return this.directories.list(
+      case "list": {
+        const allowed = new Set([
+          "name",
+          "path",
+          "kind",
+          "size",
+          "mtime",
+          "identity",
+          "target",
+          "error",
+        ]);
+        if (
+          a.fields !== undefined &&
+          (!Array.isArray(a.fields) ||
+            !a.fields.length ||
+            a.fields.some((k: string) => !allowed.has(k)))
+        )
+          throw Error("Select supported directory entry fields");
+        const page = await this.directories.list(
           a.ref,
           a.cursor,
           a.refresh,
           actor === "agent" ? (client ?? "agent") : "ui",
         );
+        if (!Array.isArray(a.fields)) return page;
+        return {
+          ...page,
+          entries: page.entries.map((entry) =>
+            Object.fromEntries(
+              a.fields
+                .filter((k: string) => k in entry)
+                .map((k: keyof typeof entry) => [k, entry[k]]),
+            ),
+          ),
+        };
+      }
       case "stat": {
         const endpoint = this.endpoints.get(a.ref.endpoint);
         const entry = await endpoint.call("stat", { path: a.ref.path });

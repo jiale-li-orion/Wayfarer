@@ -49,3 +49,9 @@ Get-FileHash '.\workspace-map.vsix' -Algorithm SHA256
 ## 0.7.0 升级
 
 沿用地图 ID、任务 journal、目录索引及现有 SSH 配置。新增 `workspaceMap.resourceRecordingDirectory` 指定本机记录根目录，每个地图独立子目录；默认 globalStorage。记录有十分钟／20 MiB 上限，历史 globalStorage 记录仍可选择读取。MCP 新增只读 storageCompare；更新接入助手沿原内容哈希与稳定 mapId 机制，原有授权保留。
+
+## 0.7.1 升级
+
+旧地图书签在对应地图打开时导入共享收藏，重复位置保留已有名称。只在迁移写入完成后清理对应旧书签；连接缺失的条目继续作为待迁移数据保留。旧收藏、任务、视图和端点配置沿用。
+
+重新执行“接入Codex／dsh”可更新助手内容哈希与当前地图绑定。新助手在离线地图查询时返回MAP_UNAVAILABLE并列出可选地图；切换依然由用户明确发起。VSIX安装后重载窗口生效；当前Agent会话的工具定义在下次连接后更新。
