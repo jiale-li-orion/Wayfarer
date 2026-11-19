@@ -115,3 +115,9 @@ Windows 清理使用实际管理器：pip purge、npm cache clean、uv cache pru
 - 两台训练机用 8 MiB、1 GiB 和批量小文件对照。1 GiB 直传三轮均完成。推理机仅验收 8 MiB，未占用 GPU。传输 SHA-256 核对通过。
 - 在两机的临时目录注入连接中断、取消和源文件发生变化。为了等到可观察的检查点，测试接收端加入短延迟，正式传输助手使用原速度。确认 16 MiB 后中断，恢复沿同一个任务继续并校验完整文件。取消时移除暂存。源文件变化时保留源且不提交。同名跳过保留原目标，私网配置失效转 SSH 中转。
 - Windows 隔离 VS Code 通过 WSL MCP 恢复已保存巡检组、共享挂载与机器对。确认两台训练机的 8 MiB 真实复制走私网直传。旧地图返回离线原因，测试客户端显式绑定后查询恢复。临时 Codex 配置测试验证只修改 Wayfarer 启动参数。
+
+## 0.11.0 机器与作业
+
+独立 Windows VS Code 窗口连接 Windows、Ubuntu WSL、两台训练机及一台推理机。五行机器摘要均返回在线状态；两台训练机往返各传 4 MiB 完成链路测速。临时 SSH Python 进程验证了运行、断开、重连、取消关注后仍在运行，以及进程真正退出后的独立状态。Windows 采集器分别核对存活 PID 和已不存在 PID。
+
+一次独立传输和一次显式关联传输均按内容核对，作业详情只查到关联的那一条。既有 CPU LoRA 回放从作业详情打开；重新加载验收窗口后，stdio MCP 客户端仍能查到同一个运行与 step。Linux 完整测试覆盖 101 项；并发登记、多 rank、恢复 segment、PID 复用、延迟返回和终态使用定向用例补齐。复现入口为 scripts/verify-workloads.mjs 和 scripts/verify-workload-bindings.mjs。

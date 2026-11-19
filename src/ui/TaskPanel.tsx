@@ -2,9 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { rpc, subscribeJobs } from "./rpc";
 import type { Job } from "../shared/types";
 export function TaskPanel({
+  transferOnly,
+  focusJob,
   close,
   onError,
 }: {
+  transferOnly: boolean;
+  focusJob?: string;
   close: () => void;
   onError: (s: string) => void;
 }) {
@@ -27,7 +31,21 @@ export function TaskPanel({
     pending.current = true;
     setLoading(true);
     try {
-      const page = await rpc("jobsPage", { cursor: next, limit: 30 });
+      if (!transferOnly && focusJob) {
+        const job = await rpc("job", { id: focusJob, fields: ["summary"] });
+        if (alive.current) {
+          setActive([job.summary ?? job]);
+          setHistory([]);
+          setCursor(undefined);
+          setTotal(0);
+        }
+        return;
+      }
+      const page = await rpc("jobsPage", {
+        cursor: next,
+        limit: 30,
+        kind: transferOnly ? "transfer" : undefined,
+      });
       if (alive.current) {
         setActive(page.active);
         setHistory(page.history);
@@ -52,6 +70,7 @@ export function TaskPanel({
     void load();
     const stop = subscribeJobs((event) => {
       const job = event.job as Job;
+      if (transferOnly ? job.kind !== "transfer" : job.id !== focusJob) return;
       if (["completed", "cancelled"].includes(job.state)) {
         setActive((old) => old.filter((j) => j.id !== job.id));
         void load(pages.current[pageIndex.current]);
@@ -61,14 +80,21 @@ export function TaskPanel({
       alive.current = false;
       stop();
     };
-  }, []);
+  }, [transferOnly, focusJob]);
   const action = (id: string, action: string) =>
     void rpc("jobControl", { id, action }).catch((e) => onError(String(e)));
   const rows = (jobs: Job[]) =>
     jobs.map((job) => (
       <article key={job.id}>
         <div className="job-title">
-          <strong>{({ linkProbe: "链路诊断", transfer: "文件传输" } as Record<string, string>)[job.kind] ?? job.kind}</strong>
+          <strong>
+            {(
+              { linkProbe: "链路诊断", transfer: "文件传输" } as Record<
+                string,
+                string
+              >
+            )[job.kind] ?? job.kind}
+          </strong>
           <span>{job.state}</span>
         </div>
         <p>{job.progress ?? job.id}</p>
@@ -122,15 +148,20 @@ export function TaskPanel({
               )
             }
           >
-            {job.kind === "transfer" || job.kind === "linkProbe" ? "性能详情" : "详情与日志"}
+            {job.kind === "transfer" || job.kind === "linkProbe"
+              ? "性能详情"
+              : "详情与日志"}
           </button>
         </div>
       </article>
     ));
   return (
-    <section className="floating jobs" aria-label="传输与后台任务">
+    <section
+      className="floating jobs"
+      aria-label={transferOnly ? "文件传输" : "操作记录"}
+    >
       <h2>
-        传输与后台任务
+        {transferOnly ? "文件传输" : "操作记录"}
         <button
           title="诊断日志"
           onClick={() => void rpc("command", { name: "logs" })}
@@ -142,11 +173,13 @@ export function TaskPanel({
         </button>
       </h2>
       <div className="job-list">
-        <h3>进行中与可恢复 · {active.length}</h3>
+        {transferOnly && <h3>进行中与可恢复 · {active.length}</h3>}
         {rows(active)}
-        <h3>
-          历史 · {total} · 第 {pageNumber} 页
-        </h3>
+        {transferOnly && (
+          <h3>
+            历史 · {total} · 第 {pageNumber} 页
+          </h3>
+        )}
         {rows(history)}
         {!active.length && !history.length && <p>暂无任务</p>}
         {pageNumber > 1 && (

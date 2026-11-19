@@ -435,6 +435,15 @@
             "relay"
           ],
           "description": "Auto uses an explicitly enabled Linux SSH peer route when eligible. Relay forces the existing host-mediated path."
+        },
+        "workloadId": {
+          "type": "string",
+          "description": "Run ID on this map to explicitly associate this transfer"
+        },
+        "workloadPhase": {
+          "type": "string",
+          "maxLength": 80,
+          "description": "Optional stage of an explicitly associated workload"
         }
       },
       "required": [
@@ -907,6 +916,14 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 200
+        },
+        "kind": {
+          "enum": [
+            "transfer"
+          ]
+        },
+        "workloadId": {
+          "type": "string"
         }
       },
       "required": [],
@@ -1659,6 +1676,179 @@
           "type": "string"
         }
       }
+    }
+  },
+  {
+    "name": "map_workloadRegister",
+    "description": "Register or update an explicitly observed external run on this map. Attach model/profile manifests, logs or artifacts by reference; no process control.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoint": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "running",
+            "completed",
+            "failed",
+            "exited"
+          ]
+        },
+        "phase": {
+          "type": "string"
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "process": {
+          "type": "object",
+          "required": [
+            "pid",
+            "identity"
+          ],
+          "properties": {
+            "pid": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bootId": {
+              "type": "string"
+            }
+          }
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "endpoint",
+              "path",
+              "kind"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "endpoint": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "enum": [
+                  "model",
+                  "profile",
+                  "log",
+                  "artifact"
+                ]
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "statusPath": {
+          "type": "string",
+          "description": "Absolute path on the execution endpoint of a small atomically written status JSON; include runId, Unix millisecond updated and optionally state, phase and step."
+        }
+      },
+      "required": [
+        "runId",
+        "endpoint"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_workloadsPage",
+    "description": "List registered workloads by creation cursor; batch-observe the registered process identities on this page.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "observe": {
+          "type": "boolean",
+          "description": "False to read the index without sampling processes"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_workloadDetail",
+    "description": "Read all registered references for a run. Set observe for a fresh process reading.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observe": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "runId"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_workloadForget",
+    "description": "Remove the local observation index entry only. Files and external jobs continue.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "runId"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": true
     }
   }
 ]

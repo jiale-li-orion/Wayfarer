@@ -30,7 +30,6 @@ import { fieldsFor } from "../packages/catalog";
 import type {
   EndpointConfig,
   Entry,
-  Job,
   Page,
   Ref,
   ViewState,
@@ -199,7 +198,8 @@ function App() {
   const [nodes, setNodes] = useState<MapNode[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [selected, setSelected] = useState<Ref[]>([]);
-  const [busy, setBusy] = useState(0);
+  const [transferOnly,setTransferOnly]=useState(true);
+  const [focusJob,setFocusJob]=useState<string>();
   const [projects, setProjects] = useState<Ref[]>([]);
   const projectKeys = useMemo(() => new Set(projects.map(refKey)), [projects]);
   const [error, setError] = useState("");
@@ -226,6 +226,14 @@ function App() {
     sources: Ref[];
     target: Ref;
   } | null>(null);
+  const [associated,setAssociated]=useState("");
+  const [transferPhase,setTransferPhase]=useState("");
+  const [knownRuns,setKnownRuns]=useState<{name:string;runId:string}[]>([]);
+  useEffect(()=>{
+    let current=true;setAssociated("");setTransferPhase("");
+    if(transfer)void rpc("workloadsPage",{observe:false,limit:30}).then(v=>{if(current)setKnownRuns(v.items);}).catch(()=>{});
+    return ()=>{current=false;};
+  },[transfer]);
   const [mode, setMode] = useState<"copy" | "move">("move");
   const [conflict, setConflict] = useState("rename");
   const [packageOpen, setPackageOpen] = useState(false);
@@ -458,7 +466,7 @@ function App() {
       if (m.type === "uiAction") {
         if (m.action === "search") setSearchOpen(true);
         if (m.action === "tasks") {
-          setJobsOpen(true);
+          setTransferOnly(true);setJobsOpen(true);
           setDetailOpen(false);
         }
         if (m.action === "fit")
@@ -482,7 +490,7 @@ function App() {
             refKey(viewRef.current.root) === refKey(m.ref)))
       )
         void load(m.ref, true);
-      if (m.type === "jobCount") setBusy(m.count);
+
       if (
         m.type === "search" &&
         m.operationId &&
@@ -502,10 +510,6 @@ function App() {
         setEndpoints(b.endpoints);
         setProjects(b.projects ?? []);
         setView(b.view);
-        setBusy(
-          b.jobs.filter((j: Job) => ["running", "queued"].includes(j.state))
-            .length,
-        );
         if (b.restored) requestedFocus.current = false;
         setCaps(b.capabilities);
         void flow.setViewport(b.view.viewport);
@@ -732,7 +736,7 @@ function App() {
     [],
   );
   const act = (method: string, args: any) =>
-    safe(rpc(method, args).then(() => setJobsOpen(true)));
+    safe(rpc(method,args).then(j=>{setFocusJob(j?.id);setTransferOnly(method==="transfer");setJobsOpen(true);}));
   const command = (name: string) => safe(rpc("command", { name }));
   const context = (action: string) => {
     if (!selectionPath) return;
@@ -965,15 +969,6 @@ function App() {
           <Icon name="hubot" />
           跟随 Agent {view.follow ? "开" : "关"}
         </button>
-        <button
-          onClick={() => {
-            setJobsOpen((v) => !v);
-            setDetailOpen(false);
-          }}
-        >
-          <Icon name="tasklist" />
-          任务{busy > 0 ? " " + busy : ""}
-        </button>
         <button title="连接和接入" onClick={() => command("connections")}>
           <Icon name="plug" />
         </button>
@@ -1011,7 +1006,7 @@ function App() {
             <Icon name="trash" />
           </button>
           <button
-            onClick={() => act("size", { ref: selected[0] })}
+            onClick={() => safe(rpc("storageView",{ref:selected[0]}))}
             title="统计大小"
           >
             <Icon name="dashboard" />
@@ -1101,7 +1096,7 @@ function App() {
         </section>
       )}
       {jobsOpen && (
-        <TaskPanel close={() => setJobsOpen(false)} onError={setError} />
+        <TaskPanel key={transferOnly?"transfer":focusJob} focusJob={focusJob} transferOnly={transferOnly} close={() => setJobsOpen(false)} onError={setError} />
       )}
       {detailOpen && selectionPath && (
         <DetailPanel
@@ -1140,6 +1135,9 @@ function App() {
                 {transfer.target.endpoint}: {transfer.target.path}
               </pre>
             </label>
+            <details><summary>关联作业</summary><label>运行编号<input list="workload-ids" value={associated} onChange={e=>setAssociated(e.target.value)}/></label>
+              <datalist id="workload-ids">{knownRuns.map(w=><option key={w.runId} value={w.runId}>{w.name}</option>)}</datalist>
+              {associated&&<label>阶段<input value={transferPhase} maxLength={80} onChange={e=>setTransferPhase(e.target.value)}/></label>}</details>
             <div className="form-row">
               <label>
                 操作
@@ -1166,7 +1164,7 @@ function App() {
             <button
               className="primary"
               onClick={() => {
-                void act("transfer", { ...transfer, mode, conflict });
+                void act("transfer", { ...transfer, mode, conflict, workloadId:associated||undefined,workloadPhase:associated&&transferPhase||undefined });
                 setTransfer(null);
               }}
             >

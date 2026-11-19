@@ -1,3 +1,4 @@
+import type { Ref } from "../shared/types";
 import { ModelBehavior } from "./ModelBehavior";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -5,7 +6,13 @@ type Call = (method: string, args?: any) => Promise<any>;
 const fmt = (v: number | undefined | null) =>
   v == null ? "—" : Number(v.toPrecision(5)).toString();
 
-export function ModelAnalysis({ call }: { call: Call }) {
+export function ModelAnalysis({
+  call,
+  initialRef,
+}: {
+  call: Call;
+  initialRef?: Ref;
+}) {
   const [record, setRecord] = useState<any>();
   const [events, setEvents] = useState<any[]>([]);
   const [probes, setProbes] = useState<any[]>([]);
@@ -59,7 +66,13 @@ export function ModelAnalysis({ call }: { call: Call }) {
     const version = openGeneration.current;
     let active = true;
     (async () => {
-      const saved = await call("modelAnalysis");
+      const previous = await call("modelAnalysis");
+      const saved =
+        initialRef &&
+        (initialRef.path !== previous?.ref?.path ||
+          initialRef.endpoint !== previous?.ref?.endpoint)
+          ? { ref: initialRef, follow: true }
+          : previous;
       if (!saved?.ref || !active || version !== openGeneration.current) return;
       const run = await call("modelAnalysis", { ref: saved.ref });
       if (!active || version !== openGeneration.current) return;
@@ -73,7 +86,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
     return () => {
       active = false;
     };
-  }, [call]);
+  }, [call, initialRef]);
   async function open() {
     openGeneration.current++;
     restoreFocus.current = undefined;
@@ -227,7 +240,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
     <section className="model-analysis">
       <header>
         <h1>模型分析</h1>
-        <button onClick={open}>打开实验记录</button>
+        {!initialRef && <button onClick={open}>打开实验记录</button>}
       </header>
       {error && <p role="alert">{error}</p>}
       {record?.run.type === "behavior" && (

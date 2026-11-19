@@ -61,6 +61,8 @@ export interface Endpoint {
 export type JobState =
   "queued" | "running" | "paused" | "completed" | "failed" | "cancelled";
 export interface Job {
+  workloadId?: string;
+  workloadPhase?: string;
   id: string;
   kind: string;
   operationId?: string;

@@ -240,7 +240,7 @@ def handle(message):
     try:
         if method == 'initialize':
             target = opts.map_id or opts.session
-            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.10.0'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
+            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.11.0'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
         elif method in ('ping', 'logging/setLevel'): result = {}
         elif method == 'tools/list': result = dict(tools=TOOLS)
         elif method == 'tools/call':

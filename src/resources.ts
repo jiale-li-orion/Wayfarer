@@ -9,7 +9,11 @@ import { csvRows, csvHeader } from "./core/resourceExport";
 import type { FileProvider } from "./filesystem/provider";
 import type { Ref } from "./shared/types";
 
-type ResourceOpen = { view?: "machine" | "comparison" | "runs" | "job"; jobId?: string };
+type ResourceOpen = {
+  view?: "machine" | "comparison" | "runs" | "job" | "model" | "workloads";
+  jobId?: string;
+  runId?: string;
+};
 
 export function createResourceView(
   context: vscode.ExtensionContext,
@@ -19,7 +23,7 @@ export function createResourceView(
   let panel: vscode.WebviewPanel | undefined;
   let ready = false;
   let surfaceVisible = true;
-  let query: any = {};
+  let query: any;
   let compared: string[] = [];
   let recordingFile: string | undefined;
   let selection: ResourceOpen | undefined;
@@ -41,7 +45,7 @@ export function createResourceView(
   core.monitor.on("sample", sample);
   core.monitor.on("recordingError", recordingError);
   const open = (request?: ResourceOpen) => {
-    if (request?.view) selection = request;
+    selection = request?.view ? request : { view: "machine" };
     if (panel) {
       panel.reveal();
       if (ready && selection) {
@@ -69,13 +73,14 @@ export function createResourceView(
     panel.webview.html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; media-src blob:; style-src ${panel.webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link rel="stylesheet" href="${asset("resources.css")}"></head><body><div id="root"></div><script nonce="${nonce}" src="${asset("resources.js")}"></script></body></html>`;
     const current = panel;
     current.webview.onDidReceiveMessage(async (m) => {
+      if (current !== panel) return;
       try {
         let result: any;
         switch (m.method) {
           case "bootstrap":
             ready = true;
             surfaceVisible = m.args?.visible !== false;
-            result = { ...await core.monitor.snapshot(), selection };
+            result = { ...(await core.monitor.snapshot()), selection };
             selection = undefined;
             break;
           case "watch":
@@ -88,12 +93,18 @@ export function createResourceView(
             break;
           case "watchComparison":
             compared = m.args.endpoints ?? [];
-            core.monitor.retainComparison(owner, current.visible && surfaceVisible ? compared : []);
+            core.monitor.retainComparison(
+              owner,
+              current.visible && surfaceVisible ? compared : [],
+            );
             result = true;
             break;
           case "visibility":
             surfaceVisible = !!m.args.visible;
-            core.monitor.retainComparison(owner, current.visible && surfaceVisible ? compared : []);
+            core.monitor.retainComparison(
+              owner,
+              current.visible && surfaceVisible ? compared : [],
+            );
             core.monitor.watch(
               owner,
               current.visible && surfaceVisible ? query : undefined,
@@ -113,15 +124,99 @@ export function createResourceView(
             break;
           case "peerPairSave": {
             const pair = m.args.pair;
-            const approved = m.args.remove === true || (await vscode.window.showQuickPick([
-              { label: "允许直传", description: pair.source.address + " ↔ " + pair.target.address, allow: true },
-              { label: "继续使用 SSH 中转", allow: false },
-            ], { title: "选择这两台机器的大文件传输方式" }))?.allow;
+            const approved =
+              m.args.remove === true ||
+              (
+                await vscode.window.showQuickPick(
+                  [
+                    {
+                      label: "允许直传",
+                      description:
+                        pair.source.address + " ↔ " + pair.target.address,
+                      allow: true,
+                    },
+                    { label: "继续使用 SSH 中转", allow: false },
+                  ],
+                  { title: "选择这两台机器的大文件传输方式" },
+                )
+              )?.allow;
             if (approved) result = await core.dispatch("peerPairSave", m.args);
             break;
           }
+          case "observeProcess": {
+            const { endpoint, pid, identity, name } = m.args;
+            const proc = await core.monitor.snapshot({
+              endpoint,
+              section: "identities",
+              pids: [pid],
+            });
+            if (
+              proc.status !== "online" ||
+              !identity ||
+              proc.identities?.[pid] !== identity
+            )
+              throw Error("进程已退出或身份已变化");
+            const label = await vscode.window.showInputBox({
+              title: "加入作业",
+              value: name,
+            });
+            if (label?.trim())
+              result = await core.dispatch("workloadRegister", {
+                runId:
+                  "process/" +
+                  endpoint +
+                  "/" +
+                  (proc.bootId ?? "") +
+                  "/" +
+                  identity,
+                endpoint,
+                name: label.trim(),
+                process: { pid, identity, bootId: proc.bootId },
+              });
+            break;
+          }
+          case "forgetWorkload": {
+            const choice = await vscode.window.showWarningMessage(
+              "移除此作业的关注记录？运行中的进程和实验文件会保留。",
+              { modal: true },
+              "取消关注",
+            );
+            if (choice) {
+              await core.dispatch("workloadForget", m.args);
+              result = true;
+            }
+            break;
+          }
+          case "registerPickedRecord": {
+            const { ref, kind, runId, label } = m.args;
+            const row = await core.dispatch("workloadRegister", {
+              runId,
+              endpoint: ref.endpoint,
+              name: label ?? runId,
+              files: [{ ...ref, kind }],
+            });
+            result = row.runId;
+            break;
+          }
+          case "fileTransfers":
+            await vscode.commands.executeCommand("workspaceMap.tasks");
+            break;
+          case "openWorkloadFile":
+            await vscode.commands.executeCommand(
+              "vscode.open",
+              provider.uri(m.args.ref),
+            );
+            break;
+          case "workloadsPage":
+          case "workloadDetail":
+          case "jobsPage":
+          case "jobControl":
+            result = await core.dispatch(m.method, m.args);
+            break;
           case "modelSelection":
-            core.setModelSelection(m.args);result=true;break;
+            core.setModelSelection(m.args);
+            result = true;
+            break;
           case "opsCatalog":
           case "opsGroupSave":
           case "opsGroupSelect":
@@ -131,95 +226,176 @@ export function createResourceView(
             result = await core.dispatch(m.method, m.args);
             break;
           case "linkProbe":
-            result = await core.dispatch("linkProbe", { ...m.args, operationId: randomUUID() });
+            result = await core.dispatch("linkProbe", {
+              ...m.args,
+              operationId: randomUUID(),
+            });
             break;
           case "performanceJob":
           case "performanceCancel":
           case "openJobRecord": {
             const job = await core.jobs.details(m.args.id);
-            if (!["transfer", "linkProbe"].includes(job.kind)) throw Error("该任务没有性能报告");
+            if (!["transfer", "linkProbe"].includes(job.kind))
+              throw Error("该任务没有性能报告");
             if (m.method === "performanceCancel") {
-              if (job.kind !== "linkProbe") throw Error("请从任务窗口管理文件传输");
+              if (job.kind !== "linkProbe")
+                throw Error("请从任务窗口管理文件传输");
               result = core.jobs.control(job.id, "cancel");
             } else if (m.method === "openJobRecord") {
-              await vscode.window.showTextDocument(await vscode.workspace.openTextDocument({
-                language: "json", content: JSON.stringify(job, null, 2),
-              }), { preview: true });
+              await vscode.window.showTextDocument(
+                await vscode.workspace.openTextDocument({
+                  language: "json",
+                  content: JSON.stringify(job, null, 2),
+                }),
+                { preview: true },
+              );
               result = true;
             } else {
-              const { id, kind, state, bytes, progress, error, result: payload } = job;
-              result = { id, kind, state, bytes, progress, error, result: payload };
+              const {
+                id,
+                kind,
+                state,
+                bytes,
+                progress,
+                error,
+                result: payload,
+              } = job;
+              result = {
+                id,
+                kind,
+                state,
+                bytes,
+                progress,
+                error,
+                result: payload,
+              };
             }
             break;
           }
           case "pickModelRun":
           case "pickProfile": {
-            const targets = (await core.monitor.snapshot()).machines as { endpoint: string; name: string; kind: string }[];
-            const pick = await vscode.window.showQuickPick([
-              { endpoint: "", label: "本机文件…" },
-              ...targets.filter((m) => m.kind === "ssh" || m.kind === "wsl")
-                .map((m) => ({ endpoint: m.endpoint, label: m.name })),
-            ], { title: "选择运行记录所在机器" });
+            const targets = (await core.monitor.snapshot()).machines as {
+              endpoint: string;
+              name: string;
+              kind: string;
+            }[];
+            const pick = await vscode.window.showQuickPick(
+              [
+                { endpoint: "", label: "本机文件…" },
+                ...targets
+                  .filter((m) => m.kind === "ssh" || m.kind === "wsl")
+                  .map((m) => ({ endpoint: m.endpoint, label: m.name })),
+              ],
+              { title: "选择运行记录所在机器" },
+            );
             if (!pick) break;
             let ref: Ref;
             if (pick.endpoint) {
               const file = await vscode.window.showInputBox({
-                title: pick.label + " · 运行记录", prompt: "记录文件的绝对路径",
+                title: pick.label + " · 运行记录",
+                prompt: "记录文件的绝对路径",
               });
               if (!file) break;
               ref = { endpoint: pick.endpoint, path: file };
             } else {
               const files = await vscode.window.showOpenDialog({
-                title: "打开运行记录", canSelectMany: false, filters: { 运行记录: ["json"] },
+                title: "打开运行记录",
+                canSelectMany: false,
+                filters: { 运行记录: ["json"] },
               });
               if (!files?.[0]) break;
               const file = files[0].fsPath;
-              const native = core.endpoints.configs().filter((m) => m.kind === "windows" || m.kind === "local")
+              const native = core.endpoints
+                .configs()
+                .filter((m) => m.kind === "windows" || m.kind === "local")
                 .find((m) => {
                   const paths = pathApi(m);
-                  return paths.parse(file).root.toLowerCase() === paths.parse(m.root).root.toLowerCase();
+                  return (
+                    paths.parse(file).root.toLowerCase() ===
+                    paths.parse(m.root).root.toLowerCase()
+                  );
                 });
               if (!native) throw Error("找不到此文件所在的本机端点");
               ref = { endpoint: native.id, path: file };
             }
-            result = m.method === "pickModelRun" ? await core.dispatch("modelAnalysis", { ref }) : await core.dispatch("runProfile", { ref, remember: true });
+            result =
+              m.method === "pickModelRun"
+                ? await core.dispatch("modelAnalysis", { ref })
+                : await core.dispatch("runProfile", { ref, remember: true });
             break;
           }
           case "modelAudio": {
             const ref = m.args.ref as Ref;
             const ep = core.endpoints.get(ref.endpoint);
             const ext = pathApi(ep.config).extname(ref.path).toLowerCase();
-            if (!pathApi(ep.config).isAbsolute(ref.path) || ![".wav",".flac",".mp3",".ogg"].includes(ext))
+            if (
+              !pathApi(ep.config).isAbsolute(ref.path) ||
+              ![".wav", ".flac", ".mp3", ".ogg"].includes(ext)
+            )
               throw Error("请选择音频文件");
-            const stat = await ep.call<{kind:string;size:number}>("stat",{path:ref.path});
-            if(stat.kind !== "file" || stat.size > 16 * 1024 * 1024) throw Error("内置试听上限为 16 MiB");
-            const chunks:string[] = [];
-            for(let offset=0;offset<stat.size;offset+=65536) {
-              const length=Math.min(65536,stat.size-offset);
-              const data=await ep.call<string>("read",{path:ref.path,offset,length});
-              if(Buffer.byteLength(data,"base64")!==length) throw Error("音频文件已变更");
+            const stat = await ep.call<{ kind: string; size: number }>("stat", {
+              path: ref.path,
+            });
+            if (stat.kind !== "file" || stat.size > 16 * 1024 * 1024)
+              throw Error("内置试听上限为 16 MiB");
+            const chunks: string[] = [];
+            for (let offset = 0; offset < stat.size; offset += 65536) {
+              const length = Math.min(65536, stat.size - offset);
+              const data = await ep.call<string>("read", {
+                path: ref.path,
+                offset,
+                length,
+              });
+              if (Buffer.byteLength(data, "base64") !== length)
+                throw Error("音频文件已变更");
               chunks.push(data);
             }
-            result={chunks,type:ext===".mp3"?"audio/mpeg":"audio/"+ext.slice(1)};
+            result = {
+              chunks,
+              type: ext === ".mp3" ? "audio/mpeg" : "audio/" + ext.slice(1),
+            };
             break;
           }
           case "openModelSource": {
-            const ref=m.args.ref as Ref;
-            const ep=core.endpoints.get(ref.endpoint);
-            if (!pathApi(ep.config).isAbsolute(ref.path)) throw Error("源码需要绝对路径");
-            const stat=await ep.call<{kind:string;size:number}>("stat",{path:ref.path});
-            if(stat.kind!=="file" || stat.size>1024*1024) throw Error("源码超出查看范围");
-            const document=await vscode.workspace.openTextDocument(provider.uri(ref));
-            if(createHash("sha256").update(document.getText()).digest("hex")!==m.args.sha256) throw Error("当前源码与运行记录版本不同");
-            const line=Math.max(0,Math.min(document.lineCount-1,Number(m.args.line)-1||0));
-            await vscode.window.showTextDocument(document,{selection:new vscode.Range(line,0,line,0),preview:true});
-            result=true;break;
+            const ref = m.args.ref as Ref;
+            const ep = core.endpoints.get(ref.endpoint);
+            if (!pathApi(ep.config).isAbsolute(ref.path))
+              throw Error("源码需要绝对路径");
+            const stat = await ep.call<{ kind: string; size: number }>("stat", {
+              path: ref.path,
+            });
+            if (stat.kind !== "file" || stat.size > 1024 * 1024)
+              throw Error("源码超出查看范围");
+            const document = await vscode.workspace.openTextDocument(
+              provider.uri(ref),
+            );
+            if (
+              createHash("sha256").update(document.getText()).digest("hex") !==
+              m.args.sha256
+            )
+              throw Error("当前源码与运行记录版本不同");
+            const line = Math.max(
+              0,
+              Math.min(document.lineCount - 1, Number(m.args.line) - 1 || 0),
+            );
+            await vscode.window.showTextDocument(document, {
+              selection: new vscode.Range(line, 0, line, 0),
+              preview: true,
+            });
+            result = true;
+            break;
           }
           case "openPerformanceFile": {
             const ref = m.args.ref as Ref;
-            if (!pathApi(core.endpoints.get(ref.endpoint).config).isAbsolute(ref.path))
+            if (
+              !pathApi(core.endpoints.get(ref.endpoint).config).isAbsolute(
+                ref.path,
+              )
+            )
               throw Error("日志路径需要是绝对路径");
-            const doc = await vscode.workspace.openTextDocument(provider.uri(ref));
+            const doc = await vscode.workspace.openTextDocument(
+              provider.uri(ref),
+            );
             await vscode.window.showTextDocument(doc, { preview: true });
             result = true;
             break;
@@ -358,6 +534,9 @@ export function createResourceView(
     current.onDidChangeViewState((e) => {
       if (!e.webviewPanel.visible) {
         ready = false;
+        surfaceVisible = false;
+        query = undefined;
+        compared = [];
         core.monitor.watch(owner, undefined);
         core.monitor.retainComparison(owner, []);
       }

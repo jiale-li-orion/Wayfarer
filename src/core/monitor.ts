@@ -9,7 +9,18 @@ import { EXIT_GRACE_MS } from "./lifecycle";
 
 export interface ResourceQuery {
   endpoint?: string;
-  section?: "summary" | "processes" | "gpus" | "io" | "process" | "gpu" | "comparison";
+  section?:
+    | "summary"
+    | "processes"
+    | "gpus"
+    | "io"
+    | "process"
+    | "gpu"
+    | "comparison"
+    | "identities";
+  selectedOnly?: boolean;
+  pids?: number[];
+  paths?: string[];
   search?: string;
   sort?: string;
   offset?: number;
@@ -140,7 +151,7 @@ export class SystemMonitor extends EventEmitter {
   retainComparison(owner: string, endpoints: string[]) {
     if (this.disposed) return;
     const previous = this.comparisons.get(owner) ?? new Set<string>();
-    const selected = new Set(endpoints.slice(0, 8));
+    const selected = new Set(endpoints);
     const next = new Set(this.machines().filter((m) =>
       selected.has(m.endpoint) || m.roots.some((r) => selected.has(r.endpoint))
     ).map((m) => m.id));
@@ -190,11 +201,13 @@ export class SystemMonitor extends EventEmitter {
         .filter((q) => q?.endpoint && q.section !== "io")
         .map((q) => q.endpoint),
     );
-    const queries: ResourceQuery[] = summary
-      ? machines
-          .filter((m) => !detailed.has(m.endpoint))
-          .map((m) => ({ endpoint: m.endpoint, section: "summary" }))
-      : [];
+    const queries: ResourceQuery[] =
+      summary &&
+      (!!this.recording || selections.some((q) => q && !q.selectedOnly))
+        ? machines
+            .filter((m) => !detailed.has(m.endpoint))
+            .map((m) => ({ endpoint: m.endpoint, section: "summary" }))
+        : [];
     for (const q of selections) if (q?.endpoint) queries.push(q);
     const queue = queries.slice();
     const worker = async () => {
@@ -260,9 +273,16 @@ export class SystemMonitor extends EventEmitter {
       section: query.section ?? "summary",
     };
     if (
-      !["summary", "processes", "gpus", "io", "process", "gpu", "comparison"].includes(
-        args.section,
-      )
+      ![
+        "summary",
+        "processes",
+        "gpus",
+        "io",
+        "process",
+        "gpu",
+        "comparison",
+        "identities",
+      ].includes(args.section)
     )
       throw Error("Unknown resource section");
     const key = JSON.stringify(args);
@@ -291,6 +311,15 @@ export class SystemMonitor extends EventEmitter {
         });
         if (!this.enabled(machine.endpoint))
           throw Error("Endpoint explicitly disconnected");
+        if (args.section === "identities")
+          return {
+            endpoint: machine.endpoint,
+            status: "online",
+            stamp: raw.stamp,
+            identities: raw.identities,
+            bootId: raw.bootId,
+            reports: raw.reports,
+          };
         const afterTransport = s.channel.transportStats?.();
         if (machine.kind === "wsl") {
           const host = this.machines().find((m) => m.kind === "windows");
@@ -408,6 +437,12 @@ export class SystemMonitor extends EventEmitter {
         return value;
       } catch (error) {
         await this.release(s);
+        if (args.section === "identities")
+          return {
+            endpoint: machine.endpoint,
+            status: "offline",
+            error: String(error),
+          };
         const value = {
           ...(args.section === "comparison" ? s.lastComparison ?? s.last : s.last),
           endpoint: machine.endpoint,

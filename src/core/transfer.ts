@@ -7,6 +7,8 @@ import { TransferTiming } from "./transferTiming";
 import type { OperationsStore } from "./operations";
 import type { PeerTransfer } from "./peerTransfer";
 export interface TransferInput {
+  workloadId?: string;
+  workloadPhase?: string;
   sources: Ref[];
   target: Ref;
   mode: "copy" | "move";

@@ -25,6 +25,7 @@ import { SystemMonitor } from "./monitor";
 import { compareMachines, sameConfirmedShare } from "./fleet";
 import { Links } from "./links";
 import { modelAnalysis } from "./modelAnalysis";
+import { Workloads, type ObserveRuns } from "./workloads";
 import { RunProfiles } from "./runProfiles";
 import { OperationsStore } from "./operations";
 import { PeerTransfer } from "./peerTransfer";
@@ -41,6 +42,7 @@ export class Core extends EventEmitter {
   readonly inspector: Inspector;
   readonly monitor: SystemMonitor;
   readonly links: Links;
+  readonly workloads: Workloads;
   readonly runProfiles: RunProfiles;
   readonly operations: OperationsStore;
   readonly peer: PeerTransfer;
@@ -146,15 +148,32 @@ export class Core extends EventEmitter {
     );
     this.inspector = new Inspector(this.endpoints, storage, profile);
     this.monitor.projects = () => this.inspector.projects();
-    this.links = new Links(this.endpoints, path.join(path.dirname(helper), "link_probe.py"));
+    this.links = new Links(
+      this.endpoints,
+      path.join(path.dirname(helper), "link_probe.py"),
+    );
+    this.workloads = new Workloads(
+      path.join(storage, "workloads.json"),
+      (ref) =>
+        typeof ref.path === "string" &&
+        pathApi(this.endpoints.get(ref.endpoint).config).isAbsolute(ref.path),
+    );
     this.runProfiles = new RunProfiles(this.endpoints, storage);
     this.jobs.register("linkProbe", (context) => this.links.run(context));
     this.jobs.register("storage", (c) => this.storageAnalysis.run(c));
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
-    this.operations = new OperationsStore(path.join(storage, "operations-settings.json"), () => this.endpoints.configs());
-    this.peer = new PeerTransfer(path.join(path.dirname(helper), "peer_transfer.py"));
-    const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
-      this.invalidateParent(r), this.operations, this.peer,
+    this.operations = new OperationsStore(
+      path.join(storage, "operations-settings.json"),
+      () => this.endpoints.configs(),
+    );
+    this.peer = new PeerTransfer(
+      path.join(path.dirname(helper), "peer_transfer.py"),
+    );
+    const transfers = (this.transfers = new Transfers(
+      this.endpoints,
+      (r) => this.invalidateParent(r),
+      this.operations,
+      this.peer,
       (a, b) => sameConfirmedShare(this.monitor, this.operations, a, b),
     ));
     this.jobs.register("transfer", (c) => transfers.run(c));
@@ -191,6 +210,7 @@ export class Core extends EventEmitter {
     await fs.mkdir(this.storage, { recursive: true, mode: 0o700 });
     await this.endpoints.discover(configs);
     await this.operations.init();
+    await this.workloads.init();
     await this.jobs.init();
     await this.inspector.init();
     try {
@@ -205,6 +225,16 @@ export class Core extends EventEmitter {
     for (const job of this.jobs.records.values())
       if (job.pauseReason === "network") this.recover(job.id);
   }
+  private observeRuns: ObserveRuns = async (endpoint, pids, paths) => {
+    const { status, stamp, bootId, identities, reports } =
+      await this.monitor.snapshot({
+        endpoint,
+        section: "identities",
+        pids,
+        paths,
+      });
+    return { status, stamp, bootId, identities, reports };
+  };
   private saveView() {
     clearTimeout(this.timer);
     if (this.closing) return;
@@ -397,17 +427,44 @@ export class Core extends EventEmitter {
       case "linkProbe":
         this.links.validate(a);
         return submit("linkProbe", a, ["link-probe"]);
+      case "workloadRegister":
+        if (!this.endpoints.items.has(a.endpoint))
+          throw Error("作业端点未登记");
+        return this.workloads.register(a);
+      case "workloadsPage":
+        return this.workloads.page(
+          a.cursor,
+          a.limit ?? 30,
+          a.observe === false ? undefined : this.observeRuns,
+        );
+      case "workloadDetail":
+        return this.workloads.detail(
+          a.runId,
+          a.observe ? this.observeRuns : undefined,
+        );
+      case "workloadForget":
+        return this.workloads.forget(a.runId);
       case "modelAnalysis":
         if (!a.ref && !a.view) return this.view.modelSelection ?? null;
-        return modelAnalysis(this.endpoints, a.ref ? a : {...this.view.modelSelection,...a});
+        return modelAnalysis(
+          this.endpoints,
+          a.ref ? a : { ...this.view.modelSelection, ...a },
+        );
       case "runProfile":
         return a.ref ? this.runProfiles.read(a) : this.runProfiles.list();
       case "opsCatalog":
         return this.operations.catalog();
       case "patrolGroups": {
         const { groups, selected } = this.operations.catalog();
-        return { groups: groups.map(({ id, name, endpoints, mounts }) =>
-          ({ id, name, endpoints, mounts })), selected };
+        return {
+          groups: groups.map(({ id, name, endpoints, mounts }) => ({
+            id,
+            name,
+            endpoints,
+            mounts,
+          })),
+          selected,
+        };
       }
       case "opsGroupSave":
         if (actor !== "user") throw Error("请通过资源页保存巡检组");
@@ -421,12 +478,22 @@ export class Core extends EventEmitter {
       case "systemResources": {
         const group = a.groupId ? this.operations.group(a.groupId) : undefined;
         if (a.endpoints !== undefined || group) {
-          const known = new Set(this.endpoints.configs().map((endpoint) => endpoint.id));
-          const endpoints = a.endpoints ?? group!.endpoints.filter((id) => known.has(id));
+          const known = new Set(
+            this.endpoints.configs().map((endpoint) => endpoint.id),
+          );
+          const endpoints =
+            a.endpoints ?? group!.endpoints.filter((id) => known.has(id));
           const missing = group?.endpoints.filter((id) => !known.has(id)) ?? [];
           return endpoints.length
-            ? { ...await compareMachines(this.monitor, endpoints,
-                a.confirmedShares ?? group?.confirmedShares, a.trends === true), missing }
+            ? {
+                ...(await compareMachines(
+                  this.monitor,
+                  endpoints,
+                  a.confirmedShares ?? group?.confirmedShares,
+                  a.trends === true,
+                )),
+                missing,
+              }
             : { machines: [], shares: [], missing };
         }
         const { compact, ...query } = a;
@@ -652,7 +719,18 @@ export class Core extends EventEmitter {
         return this.view;
       }
       case "transfer": {
-        if (a.transport !== undefined && !["auto", "relay"].includes(a.transport))
+        if (a.workloadId !== undefined) this.workloads.get(a.workloadId);
+        if (
+          a.workloadPhase !== undefined &&
+          (!a.workloadId ||
+            typeof a.workloadPhase !== "string" ||
+            a.workloadPhase.length > 80)
+        )
+          throw Error("关联阶段需要有效作业");
+        if (
+          a.transport !== undefined &&
+          !["auto", "relay"].includes(a.transport)
+        )
           throw Error("传输方式无效");
         const i = {
           ...a,
@@ -785,7 +863,11 @@ export class Core extends EventEmitter {
         return this.jobs.summary(job);
       }
       case "jobsPage":
-        return this.jobs.page(a.cursor, a.limit);
+        return this.jobs.page(
+          a.cursor,
+          a.limit,
+          a.kind === "transfer" ? { workloadId: a.workloadId } : undefined,
+        );
       case "jobs":
         return this.jobs.list();
       case "job":
@@ -1070,6 +1152,7 @@ export class Core extends EventEmitter {
         this.storageAnalysis.abort();
       });
       this.stage = "persisting";
+      await this.workloads.durable();
       await this.inspector.dispose();
       await this.persist(cache);
     } finally {

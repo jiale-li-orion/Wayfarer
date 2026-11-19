@@ -257,15 +257,7 @@ export async function activate(context: vscode.ExtensionContext) {
       asset("ui.js") +
       '"></script></body></html>';
     let jobsSubscribed = false;
-    let lastJobCount = -1;
     const send = (event: any) => {
-      if (event.type === "job" && panel?.visible) {
-        const count = core.jobs.busyCount();
-        if (count !== lastJobCount) {
-          lastJobCount = count;
-          void webview.postMessage({ type: "jobCount", count });
-        }
-      }
       if (panel?.visible && (event.type !== "job" || jobsSubscribed))
         void webview.postMessage(event);
     };
@@ -629,6 +621,11 @@ export async function activate(context: vscode.ExtensionContext) {
         }
       }),
     );
+  register("workspaceMap.workloads", () =>
+    vscode.commands.executeCommand("workspaceMap.resources", {
+      view: "workloads",
+    }),
+  );
   register("workspaceMap.open", () => open());
   register("workspaceMap.sidebar", () =>
     vscode.commands.executeCommand("workspaceMap.locations.focus"),

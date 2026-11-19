@@ -45,7 +45,14 @@ export function sameConfirmedShare(monitor: SystemMonitor, operations: Operation
       const sourcePath = relative(a.volume.path, from.path);
       if (sourcePath === undefined) continue;
       const members = seen.filter(v => v.volume.source === a.volume.source);
-      if (!group.confirmedShares.includes(shareKey(a.volume.source, members))) continue;
+      const pairMembers = members.filter(
+        (v) => v.endpoint === from.endpoint || v.endpoint === to.endpoint,
+      );
+      if (
+        !group.confirmedShares.includes(shareKey(a.volume.source, members)) &&
+        !group.confirmedShares.includes(shareKey(a.volume.source, pairMembers))
+      )
+        continue;
       if (members.some(b => b.endpoint === to.endpoint &&
           relative(b.volume.path, to.path) === sourcePath)) return true;
     }
