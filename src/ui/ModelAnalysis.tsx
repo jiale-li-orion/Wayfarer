@@ -515,22 +515,52 @@ export function ModelAnalysis({ call }: { call: Call }) {
           )}
           <details>
             <summary>运行身份与实际注入</summary>
-            {record.run.source && (
+            {record.run.recipe && (
+              <p>
+                配方声明　rank {record.run.recipe.lora_rank}　·　alpha{" "}
+                {record.run.recipe.lora_alpha}　·　dropout{" "}
+                {record.run.recipe.lora_dropout}　·　
+                {record.run.recipe.lora_target}
+              </p>
+            )}
+            <p>
+              {record.run.gitCommit && "观测器 " + record.run.gitCommit}　
+              {record.run.publisherCommit &&
+                "训练源码 " + record.run.publisherCommit}
+            </p>
+            {Object.entries(
+              record.run.sources ??
+                (record.run.source
+                  ? {
+                      loss: {
+                        path: record.run.source,
+                        sha256: record.run.sourceSha256,
+                        line: record.run.sourceLine,
+                      },
+                    }
+                  : {}),
+            ).map(([key, loc]: [string, any]) => (
               <button
+                key={key}
                 onClick={() =>
                   call("openModelSource", {
-                    ref: {
-                      endpoint: record.ref.endpoint,
-                      path: record.run.source,
-                    },
-                    sha256: record.run.sourceSha256,
-                    line: record.run.sourceLine,
+                    ref: { endpoint: record.ref.endpoint, path: loc.path },
+                    sha256: loc.sha256,
+                    line: loc.line,
                   }).catch((e) => setError(String(e)))
                 }
               >
-                定位实际 Loss 源码 · 第 {record.run.sourceLine} 行
+                {(
+                  {
+                    loss: "损失计算",
+                    collator: "样本组批",
+                    update: "参数更新",
+                    sample: "样本记录",
+                  } as Record<string, string>
+                )[key] ?? key}{" "}
+                · 第 {loc.line} 行
               </button>
-            )}
+            ))}
             {record.run.modules?.map((m: any) => (
               <p key={m.name}>
                 {m.name}　A {m.A.join("×")}　B {m.B.join("×")}　scale{" "}
