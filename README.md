@@ -10,7 +10,7 @@
   <a href="CHANGELOG.md">版本记录</a>
 </p>
 
-![VS Code 编辑器与 MCP 客户端通过同一张地图访问 Windows、WSL 和 SSH 主机](docs/images/readme/workspace.svg)
+![VS Code 编辑器与 MCP 客户端通过同一张地图访问 Windows、WSL 和 SSH 主机](docs/images/readme/workspace.png)
 
 Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows 窗口打开训练机上的源文件，让 Codex 在同一目录查找实验记录，再从侧边栏查看远端 GPU、磁盘余量和传输进度。编辑、文件操作和 Agent 查询都使用所选机器的路径与账号权限。
 
