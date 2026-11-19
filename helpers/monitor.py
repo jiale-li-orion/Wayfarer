@@ -7,6 +7,7 @@ PREV = {}
 PROCESSES = []
 CHILD_CPU = 0.0
 CHILD = None
+BLOCKED_MOUNTS = {}
 if not WIN:
     import resource, pwd
 
@@ -1109,6 +1110,69 @@ def process_detail(a, rows):
     return p
 
 
+def nfs_capacity(mount):
+    for key, process in list(BLOCKED_MOUNTS.items()):
+        if process.poll() is not None:
+            BLOCKED_MOUNTS.pop(key)
+    if mount in BLOCKED_MOUNTS or len(BLOCKED_MOUNTS) >= 12:
+        raise TimeoutError("仍在等待挂载设备")
+    process = subprocess.Popen(["df", "-P", "-B1", "--", mount],
+                               stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+    try:
+        output, _ = process.communicate(timeout=0.75)
+    except subprocess.TimeoutExpired:
+        try:
+            process.kill()
+        except ProcessLookupError:
+            pass
+        if process.stdout:
+            process.stdout.close()
+        # A hard NFS mount can leave df blocked in the kernel after sending SIGKILL.
+        if process.poll() is None:
+            BLOCKED_MOUNTS[mount] = process
+        raise
+    if process.returncode:
+        raise OSError("挂载容量读取失败")
+    fields = output.decode("utf-8").splitlines()[-1].split()
+    return dict(total=int(fields[1]), available=int(fields[3]))
+
+
+def comparison_mounts(now):
+    if WIN:
+        return [dict(v, source=v["path"], filesystem="windows") for v in io_snapshot(now)["volumes"]]
+    candidates = {}
+    for line in text("/proc/self/mountinfo").splitlines():
+        description, marker, filesystem = line.partition(" - ")
+        if not marker:
+            continue
+        fields, detail = description.split(), filesystem.split()
+        if len(fields) < 5 or len(detail) < 2:
+            continue
+        decode = lambda s: re.sub(r"\\([0-7]{3})", lambda m: chr(int(m[1], 8)), s)
+        mount, kind, source = decode(fields[4]), detail[0], decode(detail[1])
+        if mount.startswith(("/boot/", "/var/lib/docker/", "/var/lib/containers/")):
+            continue
+        block_volume = source.startswith("/dev/") and (fields[3] == "/" or kind == "btrfs")
+        if not (mount == "/" or block_volume or kind in ("nfs", "nfs4", "fuse.ossfs")):
+            continue
+        candidates[mount] = dict(path=mount, source=source, filesystem=kind)
+    results = []
+    for mount in sorted(candidates, key=lambda p: (p not in ("/", "/data", "/data/share"), p))[:12]:
+        row = candidates[mount]
+        try:
+            if row["filesystem"] == "fuse.ossfs":
+                row["error"] = "对象存储容量需从 OSS 查询"
+            elif row["filesystem"] in ("nfs", "nfs4"):
+                row.update(nfs_capacity(mount))
+            else:
+                st = os.statvfs(mount)
+                row.update(total=st.f_blocks * st.f_frsize, available=st.f_bavail * st.f_frsize)
+        except (OSError, ValueError, IndexError, subprocess.SubprocessError):
+            row["error"] = "容量暂不可读"
+        results.append(row)
+    return results
+
+
 def snapshot(a):
     global PROCESSES
     if a.get("_baseline"):
@@ -1132,9 +1196,9 @@ def snapshot(a):
         ),
         pss=not WIN,
     )
-    if section in ("summary", "gpus", "gpu", "processes", "process"):
+    if section in ("summary", "gpus", "gpu", "processes", "process", "comparison"):
         try:
-            g, apps, errors = gpu_query(section != "summary")
+            g, apps, errors = gpu_query(section not in ("summary", "comparison"))
         except (OSError, RuntimeError, AttributeError) as error:
             g, apps, errors = [], [], [str(error)]
         result["gpus"] = g
@@ -1229,6 +1293,8 @@ def snapshot(a):
                 offset=offset,
                 limit=limit,
             )
+    if section == "comparison":
+        result["mounts"] = comparison_mounts(now)
     if section == "io":
         try:
             result["io"] = io_snapshot(now)

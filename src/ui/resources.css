@@ -640,3 +640,230 @@ small,
 .pressure-panel p {
   margin: 0 0 8px;
 }
+
+.performance-nav,
+.performance-actions,
+.machine-options,
+.stage-summary,
+.timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.performance-nav {
+  margin: 0 0 16px;
+  border-bottom: 1px solid var(--vscode-widget-border, transparent);
+}
+.performance-nav button {
+  border-radius: 5px 5px 0 0;
+}
+.performance-nav button[aria-pressed="true"] {
+  color: var(--vscode-button-foreground);
+  background: var(--vscode-button-background);
+}
+.performance-page {
+  display: grid;
+  gap: 14px;
+}
+.performance-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  min-width: 0;
+  background: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  border: 1px solid var(--vscode-widget-border, var(--vscode-editorGroup-border));
+  border-radius: 8px;
+}
+.performance-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 14px;
+}
+.performance-muted {
+  color: var(--vscode-descriptionForeground);
+}
+.machine-options, .link-selectors fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.machine-options label, .share-confirmation {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 28px;
+}
+.machine-options legend, .link-selectors legend { margin-bottom: 5px; }
+.fleet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  align-items: start;
+  gap: 14px;
+}
+.fleet-gpu {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px 10px;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.fleet-gpu progress {
+  grid-column: 1 / -1;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border: 0;
+}
+.fleet-gpu progress::-webkit-progress-bar,
+.performance-bar,
+.timeline-track {
+  background: var(--vscode-editor-background);
+}
+.fleet-gpu progress::-webkit-progress-value,
+.performance-bar span {
+  background: var(--vscode-charts-blue, var(--vscode-progressBar-background));
+}
+.fleet-volume {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+.fleet-volume button { padding: 2px 7px; }
+.shared-volume, .link-results {
+  display: grid;
+  gap: 8px;
+}
+.link-selectors, .link-results, .run-selectors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+}
+.link-selectors fieldset, .run-selectors > div {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.link-selectors select, .run-selectors select {
+  max-width: 100%;
+}
+.run-selectors label { display: grid; gap: 4px; min-width: 0; }
+.link-route {
+  display: grid;
+  padding: 8px 0;
+  gap: 3px;
+  border-top: 1px solid var(--vscode-editorGroup-border);
+}
+.performance-bar-row {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(120px, 1fr) minmax(50px, 2fr) auto minmax(100px, auto);
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.performance-bar {
+  height: 10px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.performance-bar span {
+  display: block;
+  height: 100%;
+}
+.performance-bar-row:nth-of-type(even) .performance-bar span {
+  background: var(--vscode-charts-purple, var(--vscode-progressBar-background));
+}
+.stage-summary > span {
+  padding: 4px 8px;
+  border: 1px solid var(--vscode-editorGroup-border);
+  border-radius: 4px;
+}
+.timeline {
+  display: grid;
+  gap: 7px;
+  grid-template-columns: minmax(62px, 120px) minmax(0, 1fr);
+}
+.timeline-legend, .timeline-selection { grid-column: 1 / -1; }
+.timeline-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.timeline-legend > span::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--phase);
+}
+.timeline [data-phase] { --phase: var(--vscode-charts-blue, var(--vscode-progressBar-background)); }
+.timeline [data-phase="wait"], .timeline [data-phase="read"] { --phase: var(--vscode-charts-yellow, var(--vscode-editorWarning-foreground)); }
+.timeline [data-phase="communication"], .timeline [data-phase="verify"] { --phase: var(--vscode-charts-purple, var(--vscode-progressBar-background)); }
+.timeline [data-phase="write"] { --phase: var(--vscode-charts-green, var(--vscode-progressBar-background)); }
+.timeline-scale {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+  color: var(--vscode-descriptionForeground);
+}
+.timeline-lane { display: contents; }
+.timeline-lane > span { overflow-wrap: anywhere; }
+.timeline-track {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.timeline-track button {
+  position: absolute;
+  height: 19px;
+  min-width: 4px;
+  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-left: 3px solid var(--phase);
+  border-radius: 2px;
+  background: var(--vscode-button-secondaryBackground);
+  text-align: left;
+  outline-offset: -2px;
+}
+.timeline-selection {
+  display: flex;
+  gap: 6px 12px;
+  flex-wrap: wrap;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-editorGroup-border);
+  padding: 8px;
+}
+.report-details p { overflow-wrap: anywhere; }
+@media (max-width: 570px) {
+  .performance-bar-row { grid-template-columns: minmax(80px, 1fr) 1fr auto; }
+  .performance-bar-row .performance-muted { grid-column: 1 / -1; }
+  .timeline { grid-template-columns: minmax(58px, 90px) minmax(0, 1fr); }
+}
+.fleet-gpus {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 185px), 1fr));
+  gap: 6px 12px;
+}
+.fleet-gpu {
+  padding: 4px 0;
+}
+.fleet-gpu > span:nth-of-type(2) {
+  justify-self: end;
+}
+.timeline [data-phase="other"] {
+  --phase: var(--vscode-charts-orange, var(--vscode-descriptionForeground));
+}
+.performance-actions button[aria-pressed="true"] {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}

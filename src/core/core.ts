@@ -22,6 +22,9 @@ import { capabilities, recipe } from "../packages/catalog";
 import { Inspector } from "./inspect";
 import { StorageAnalysis } from "./storage";
 import { SystemMonitor } from "./monitor";
+import { compareMachines } from "./fleet";
+import { Links } from "./links";
+import { RunProfiles } from "./runProfiles";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
   agentStats?: () => any;
@@ -34,6 +37,8 @@ export class Core extends EventEmitter {
   readonly transfers: Transfers;
   readonly inspector: Inspector;
   readonly monitor: SystemMonitor;
+  readonly links: Links;
+  readonly runProfiles: RunProfiles;
   readonly storageAnalysis: StorageAnalysis;
   private inventories = new Map<string, string>();
   view = defaultView();
@@ -136,6 +141,9 @@ export class Core extends EventEmitter {
     );
     this.inspector = new Inspector(this.endpoints, storage, profile);
     this.monitor.projects = () => this.inspector.projects();
+    this.links = new Links(this.endpoints, path.join(path.dirname(helper), "link_probe.py"));
+    this.runProfiles = new RunProfiles(this.endpoints, storage);
+    this.jobs.register("linkProbe", (context) => this.links.run(context));
     this.jobs.register("storage", (c) => this.storageAnalysis.run(c));
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
     const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
@@ -268,6 +276,7 @@ export class Core extends EventEmitter {
         "inventory",
         "search",
         "storageScan",
+        "linkProbe",
         "size",
       ].includes(method)
     ) {
@@ -305,6 +314,7 @@ export class Core extends EventEmitter {
         "package",
         "inventory",
         "storageScan",
+        "linkProbe",
         "size",
         "search",
       ].includes(method)
@@ -369,7 +379,16 @@ export class Core extends EventEmitter {
         return this.storageAnalysis.query(a);
       case "listClose":
         return this.directories.closeClientCursor(a.ref, a.cursor, client);
+      case "linkInterfaces":
+        return this.links.interfaces(a.endpoint);
+      case "linkProbe":
+        this.links.validate(a);
+        return submit("linkProbe", a, ["link-probe"]);
+      case "runProfile":
+        return a.ref ? this.runProfiles.read(a) : this.runProfiles.list();
       case "systemResources": {
+        if (a.endpoints !== undefined)
+          return compareMachines(this.monitor, a.endpoints, a.confirmedShares);
         const { compact, ...query } = a;
         const value = await this.monitor.snapshot(query);
         return compact ? compactResourceSnapshot(value) : value;

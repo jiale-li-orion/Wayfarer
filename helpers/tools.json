@@ -1109,7 +1109,7 @@
   },
   {
     "name": "map_systemResources",
-    "description": "Read machine resource summaries, paginated processes, GPUs and selected process/GPU details. Queries reuse visible UI samples; a one-off request releases its collector afterward. CPU per process is percent of one logical CPU. Windows commit/working set and Linux RSS/PSS are distinct. No process arguments or environment are returned. Omit endpoint to list machine targets and cached summaries; then pass its endpoint to sample.",
+    "description": "Read machine resource summaries, paginated processes, GPUs and selected process/GPU details. Queries reuse visible UI samples; a one-off request releases its collector afterward. CPU per process is percent of one logical CPU. Windows commit/working set and Linux RSS/PSS are distinct. No process arguments or environment are returned. Omit endpoint to list machine targets and cached summaries; then pass its endpoint to sample. Pass endpoints to compare selected machines, GPUs, and mounted volumes in one compact request.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1161,6 +1161,21 @@
         "compact": {
           "type": "boolean",
           "description": "Return only the requested section, omitting history and unrelated GPU/storage metadata. Recommended for Agent queries; default preserves full responses."
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        },
+        "confirmedShares": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keys returned by comparison whose NFS network scope and export were explicitly verified as shared."
         }
       },
       "additionalProperties": false
@@ -1442,6 +1457,132 @@
       "readOnlyHint": true,
       "destructiveHint": false,
       "openWorldHint": false
+    }
+  },
+  {
+    "name": "map_linkInterfaces",
+    "description": "Read private IPv4 addresses on a registered SSH endpoint.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpoint"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_linkProbe",
+    "description": "Submit a bidirectional probe on two registered SSH private addresses. Default: check routing and TCP port 22. Explicit measure starts a short memory-only direct test, 64 MiB each direction by default. Use map_job and map_jobControl.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "address": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "address"
+          ]
+        },
+        "target": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "address": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "address"
+          ]
+        },
+        "measure": {
+          "type": "boolean"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 134217728
+        },
+        "operationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_runProfile",
+    "description": "List indexed performance reports or read a paginated v1 run record from one endpoint. Use remember to add the reference to the current map's recent reports.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "remember": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
     }
   }
 ]

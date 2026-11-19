@@ -2,6 +2,8 @@ import { pressureSignals } from "../shared/pressure";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./resources.css";
+import { FleetPanel, JobPerformance, RunsPanel } from "./PerformanceViews";
+type ResourceTab = "machine" | "comparison" | "runs" | "job";
 declare const acquireVsCodeApi: () => {
   postMessage(v: any): void;
   setState(v: any): void;
@@ -190,6 +192,14 @@ function Pressure({
 }
 function App() {
   const saved = api.getState() ?? {};
+  const [view, setView] = useState<ResourceTab>(saved.view ?? "machine");
+  const [jobId, setJobId] = useState<string | undefined>(saved.jobId);
+  const openView = (request?: { view?: ResourceTab; jobId?: string }) => {
+    if (request?.view) {
+      setView(request.view);
+      setJobId(request.jobId);
+    }
+  };
   const [machines, setMachines] = useState<any[]>([]),
     [snapshots, setSnapshots] = useState<Record<string, any>>({});
   const [endpoint, setEndpoint] = useState<string | undefined>(saved.endpoint),
@@ -253,6 +263,7 @@ function App() {
     mounted.current = true;
     const listen = (m: any) => {
       if (m.type === "sample") accept(m.value);
+      if (m.type === "open") openView(m.request);
       if (m.type === "recordingStopped") setRecording(false);
       if (m.type === "recordingError") {
         setFailure(m.error);
@@ -267,6 +278,7 @@ function App() {
       .then((s) => {
         if (!mounted.current) return;
         setMachines(s.machines);
+        openView(s.selection);
         for (const v of s.snapshots) accept(v);
         setRecording(!!s.recording);
       })
@@ -281,9 +293,9 @@ function App() {
     if (!machines.length) return;
     setLoading(!!endpoint);
     setFailure("");
-    void rpc("watch", query).catch((e) => setFailure(String(e)));
-    api.setState({ endpoint, tab, search: filter, sort });
-  }, [query, machines.length]);
+    void rpc("watch", view === "machine" ? query : null).catch((e) => setFailure(String(e)));
+    api.setState({ endpoint, tab, search: filter, sort, view, jobId });
+  }, [query, machines.length, view, jobId]);
   useEffect(() => {
     const t = setTimeout(() => {
       setFilter(search);
@@ -341,8 +353,23 @@ function App() {
       }
     });
   };
+  const navigation = (
+    <nav className="performance-nav" aria-label="机器资源">
+      {([["machine", "机器"], ["comparison", "多机对照"], ["runs", "运行报告"]] as const).map(([value, label]) =>
+        <button key={value} aria-pressed={view === value} onClick={() => setView(value)}>{label}</button>)}
+      {view === "job" && <button aria-pressed="true">任务性能</button>}
+    </nav>
+  );
+  if (view !== "machine")
+    return <main className="resources-root">
+      {navigation}
+      {view === "comparison" && machines.length > 0 && <FleetPanel machines={machines} call={rpc} />}
+      {view === "runs" && <RunsPanel call={rpc} />}
+      {view === "job" && jobId && <JobPerformance id={jobId} call={rpc} />}
+    </main>;
   return (
     <main className="resources-root">
+      {navigation}
       <header className="resource-toolbar">
         <div className="breadcrumbs">
           <button onClick={() => selectMachine()}>机器资源</button>

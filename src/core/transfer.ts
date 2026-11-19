@@ -3,6 +3,7 @@ import type { Endpoints } from "../adapters/registry";
 import type { Endpoint, Entry, Ref, Job } from "../shared/types";
 import { alias, assertName, changed, contains, pathApi } from "../shared/paths";
 import type { JobContext } from "./jobs";
+import { TransferTiming } from "./transferTiming";
 export interface TransferInput {
   sources: Ref[];
   target: Ref;
@@ -33,6 +34,7 @@ export class Transfers {
   private leases = 0;
   private buffers = 0;
   private bufferBytes = 0;
+  private timings = new WeakMap<Job, TransferTiming>();
   stats() {
     return {
       leases: this.leases,
@@ -93,14 +95,21 @@ export class Transfers {
       }
       return scope.endpoint;
     };
+    const timing = new TransferTiming();
+    this.timings.set(ctx.job, timing);
+    let outcome: Awaited<ReturnType<Transfers["perform"]>> | undefined;
     try {
-      return await this.perform(ctx, get);
+      outcome = await this.perform(ctx, get);
     } finally {
+      this.timings.delete(ctx.job);
+      const previous = ctx.job.result?.timing;
+      ctx.job.result = { ...(outcome ?? ctx.job.result), timing: timing.finish(previous) };
       for (const scope of scopes.values()) {
         scope.release();
         this.leases--;
       }
     }
+    return ctx.job.result;
   }
   private async perform(ctx: JobContext, get: (id: string) => Endpoint) {
     const input = ctx.job.input as TransferInput;
@@ -496,11 +505,12 @@ export class Transfers {
         throw Error("Partial file missing after committed progress");
       if (partial.kind !== "file" || partial.size < f.offset)
         throw Error("Partial file changed: " + f.partial);
+      const timing = this.timings.get(ctx.job)!;
       if (f.offset) {
-        const [sourcePrefix, targetPrefix] = await Promise.all([
+        const [sourcePrefix, targetPrefix] = await timing.measure("verify", () => Promise.all([
           this.prefixHash(src, p, f.offset),
           this.prefixHash(dst, f.partial, f.offset),
-        ]);
+        ]));
         if (sourcePrefix !== targetPrefix)
           throw Error("Partial content changed; source retained");
       }
@@ -522,32 +532,21 @@ export class Transfers {
               let data: string | undefined;
               let bytes: number;
               const buffer = lease.buffer;
-              if (src.readInto)
-                bytes = await src.readInto(p, buffer, offset, length);
-              else {
-                data = await src.call<string>("read", {
-                  path: p,
-                  offset,
-                  length,
-                });
-                bytes =
-                  (data.length * 3) / 4 -
-                  (data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0);
+              bytes = await timing.measure("read", async () => {
+                if (src.readInto) return src.readInto(p, buffer, offset, length);
+                data = await src.call<string>("read", { path: p, offset, length });
                 if (dst.writeBuffer) buffer.write(data, 0, "base64");
-              }
+                return (data.length * 3) / 4 -
+                  (data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0);
+              });
               if (bytes !== length) throw Error("Source changed during read");
-              if (dst.writeBuffer)
-                await dst.writeBuffer(
-                  f!.partial,
-                  buffer.subarray(0, bytes),
-                  offset,
-                );
-              else
-                await dst.call("write", {
-                  path: f!.partial,
-                  data: data ?? buffer.subarray(0, bytes).toString("base64"),
-                  offset,
-                });
+              await timing.measure("write", () => dst.writeBuffer
+                ? dst.writeBuffer(f!.partial, buffer.subarray(0, bytes), offset)
+                : dst.call("write", {
+                    path: f!.partial,
+                    data: data ?? buffer.subarray(0, bytes).toString("base64"),
+                    offset,
+                  }));
               return bytes;
             } finally {
               lease.release();
@@ -565,11 +564,11 @@ export class Transfers {
         await save();
       }
       ctx.check();
-      const [before, after, targetHash] = await Promise.all([
+      const [before, after, targetHash] = await timing.measure("verify", () => Promise.all([
         src.call<string>("hash", { path: p, size: s.size }),
         src.call<Entry>("stat", { path: p }),
         dst.call<string>("hash", { path: f.partial, size: s.size }),
-      ]);
+      ]));
       if (changed(f.source, after) || before !== targetHash)
         throw Error("Verification failed; source and partial retained: " + p);
       await dst.call("metadata", {

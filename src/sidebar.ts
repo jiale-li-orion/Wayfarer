@@ -16,7 +16,7 @@ type Item = {
 };
 
 /** Native navigation only: the editor canvas owns directory reads and watches. */
-export function createSidebar(core: Core): vscode.Disposable {
+export function createSidebar(core: Core, mapId: string): vscode.Disposable {
   const changes = new vscode.EventEmitter<Item | undefined>();
   const groups: Item[] = [
     {
@@ -62,8 +62,7 @@ export function createSidebar(core: Core): vscode.Disposable {
   ];
   const advanced = [
     ["importSSH", "导入已有 SSH 配置", "remote"],
-    ["connectCodex", "接入 Codex", "plug"],
-    ["connectDsh", "接入 dsh", "plug"],
+    ["bindWindow", "绑定此窗口", "plug", "此窗口的持久地图 ID · " + mapId],
     ["mcpConfig", "MCP 配置", "settings-gear"],
     [
       "logs",
@@ -105,6 +104,7 @@ export function createSidebar(core: Core): vscode.Disposable {
             label,
             icon,
             command: "workspaceMap." + command,
+            description: command === "bindWindow" ? mapId.slice(0, 8) : undefined,
             tooltip,
           }),
         );

@@ -176,8 +176,8 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(createWorkspaceCommands(context, core));
   context.subscriptions.push(createEnvironmentView(context, core, provider));
-  context.subscriptions.push(createSidebar(core));
-  context.subscriptions.push(createResourceView(context, core));
+  context.subscriptions.push(createSidebar(core, bridge.mapId));
+  context.subscriptions.push(createResourceView(context, core, provider));
   context.subscriptions.push(createStorageView(context, core));
   await vscode.commands.executeCommand(
     "setContext",
@@ -327,6 +327,11 @@ export async function activate(context: vscode.ExtensionContext) {
             break;
           case "jobDetails": {
             const j = await core.jobs.details(m.args.id);
+            if (j.kind === "transfer" || j.kind === "linkProbe") {
+              await vscode.commands.executeCommand("workspaceMap.resources", { view: "job", jobId: j.id });
+              result = true;
+              break;
+            }
             const doc = await vscode.workspace.openTextDocument({
               language: "json",
               content: JSON.stringify(j, null, 2),
@@ -676,6 +681,17 @@ export async function activate(context: vscode.ExtensionContext) {
   register("workspaceMap.connectCodex", () => commands("codex"));
   register("workspaceMap.connectDsh", () => commands("dsh"));
   register("workspaceMap.mcpConfig", () => commands("config"));
+  register("workspaceMap.bindWindow", async () => {
+    const current = bridge.stats();
+    const choice = await vscode.window.showQuickPick([
+      { label: "绑定 Codex 到此窗口", name: "codex" },
+      { label: "绑定 dsh 到此窗口", name: "dsh" },
+      { label: "复制当前地图 ID", name: "copy" },
+    ], { title: "当前地图 " + current.mapId.slice(0, 8),
+         placeHolder: current.clients ? `${current.clients} 个 Agent 已连接` : "等待 Agent 连接" });
+    if (choice?.name === "copy") await vscode.env.clipboard.writeText(current.mapId);
+    else if (choice) await commands(choice.name);
+  });
   register("workspaceMap.logs", () => commands("logs"));
   let cpu = process.cpuUsage();
   let at = performance.now();
