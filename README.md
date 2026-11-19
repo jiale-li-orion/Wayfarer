@@ -2,7 +2,11 @@
 
 <p align="center"><strong>一张轻量的 VS Code 工作区地图，连接 Windows、WSL、SSH，以及与你并肩工作的 Agent。</strong></p>
 
-<p align="center"><em>一个尚未出口的音节，在那里过夜。</em>　<a href="#行路人">《行路人》</a></p>
+<p align="center"><em>一个行路人，手里握着一张不断生长的手绘地图。上面画着来路与去路，画着人能去的地方，和 Agent 能替人走的路。所有路汇在一起，成了一条可以回家的路。。</em>　<a href="#行路人">《行路人》</a></p>
+
+从一块屏幕望向另一块屏幕，中间隔着的是同一片可以自由穿行的原野。风从一台机器的窗口吹进另一台，带着你未写完的代码，和 Agent 刚读到的、某个遥远目录里沉睡的实验记录。
+
+你走到哪里，哪里就是桌面。你停下，整片原野便轻轻收拢，像黄昏收拢所有劳作的身影，把未完成的事，交给还在醒着的进程。
 
 <p align="center">
   <a href="https://github.com/jiale-li-orion/Wayfarer/releases/latest"><b>下载 VSIX</b></a> ·
@@ -92,16 +96,4 @@ npm run package       # artifacts/workspace-map.vsix
 
 [架构与数据流](ARCHITECTURE.md) · [性能实测](PERFORMANCE.md) · [实机验收范围](docs/ACCEPTANCE.md) · [构建发布](docs/RELEASE.md) · [MCP 工具定义](helpers/tools.json) · [许可证](LICENSE)
 
-## 行路人
 
-天黑以后，每台机器都亮成一座岛。<br>
-你把海图摊在桌上。Agent 循着一道铅笔印，<br>
-在远岸，找到你昨晚写到一半的那一行。
-
-你收起海图，关了台灯。<br>
-远岸的风扇还在低低地转。<br>
-一个尚未出口的音节，在那里过夜。
-
-清晨，你戴上耳机。<br>
-那声音很轻，带着昨夜梯度的湿润。<br>
-你对着空房间，也轻轻说了声早。
