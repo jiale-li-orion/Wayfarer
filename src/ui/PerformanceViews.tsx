@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { Ref } from "../shared/types";
+import type { PatrolGroup, PeerPair } from "../core/operations";
 import type { TransferTimingRecord } from "../core/transferTiming";
 
 type Call = (method: string, args?: any) => Promise<any>;
@@ -40,6 +41,7 @@ const labels: Record<string, string> = {
   write: "写入",
   verify: "校验",
   read: "读取",
+  direct: "服务器直传",
   other: "其他",
 };
 
@@ -67,9 +69,49 @@ export function FleetPanel({
       .map((m) => m.endpoint),
   );
   const [confirmed, setConfirmed] = useState<string[]>([]);
+  const [groups, setGroups] = useState<PatrolGroup[]>([]);
+  const [groupId, setGroupId] = useState("daily");
+  const [groupName, setGroupName] = useState("常用巡检");
+  const [mounts, setMounts] = useState<Record<string, string[]>>({});
+  const [pairs, setPairs] = useState<PeerPair[]>([]);
+  const [saving, setSaving] = useState(false);
   const [sample, setSample] = useState<any>();
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+  type Catalog = { groups: PatrolGroup[]; selected: string; pairs: PeerPair[] };
+  const apply = (value: Catalog) => {
+    setGroups(value.groups);
+    setPairs(value.pairs);
+    const group = value.groups.find((item) => item.id === value.selected);
+    if (!group) return;
+    setGroupId(group.id);
+    setGroupName(group.name);
+    const known = new Set(machines.map((machine) => machine.endpoint));
+    setChosen(group.endpoints.filter((endpoint) => known.has(endpoint)));
+    setConfirmed(group.confirmedShares);
+    setMounts(group.mounts);
+  };
+  useEffect(() => {
+    let current = true;
+    void call("opsCatalog").then((value) => { if (current) apply(value); })
+      .catch((error) => { if (current) setError(String(error)); });
+    return () => { current = false; };
+  }, [call]);
+  const save = async (create = false) => {
+    setSaving(true);
+    try {
+      const result = await call("opsGroupSave", { id: create ? undefined : groupId,
+        name: groupName, endpoints: chosen, confirmedShares: confirmed, mounts });
+      apply(result);
+      setError("");
+    } catch (error) { setError(String(error)); }
+    finally { setSaving(false); }
+  };
+  const focusMount = (endpoint: string, path: string) => setMounts((old) => {
+    const paths = old[endpoint] ?? [];
+    return { ...old, [endpoint]: paths.includes(path)
+      ? paths.filter((value) => value !== path) : [...paths, path] };
+  });
   useEffect(() => {
     void call("watchComparison", { endpoints: chosen }).catch((error) =>
       setError(String(error)),
@@ -92,6 +134,7 @@ export function FleetPanel({
         const value = await call("compare", {
           endpoints: chosen,
           confirmedShares: confirmed,
+          trends: true,
         });
         if (active) {
           setSample(value);
@@ -125,6 +168,18 @@ export function FleetPanel({
         <div className="performance-head">
           <h1>多机对照</h1>
           <button onClick={() => setRefresh((n) => n + 1)}>刷新</button>
+        </div>
+        <div className="performance-actions">
+          <select aria-label="巡检组" value={groupId} onChange={(event) =>
+            void call("opsGroupSelect", { id: event.target.value }).then(apply)
+              .catch((error) => setError(String(error)))}>
+            {groups.map((group) => <option key={group.id} value={group.id}>{group.name}</option>)}
+          </select>
+          <input aria-label="巡检组名称" value={groupName} maxLength={60}
+            onChange={(event) => setGroupName(event.target.value)} />
+          <button disabled={saving || !chosen.length} onClick={() => void save()}>保存本组</button>
+          <button disabled={saving || !chosen.length || groups.some((group) => group.name === groupName.trim())}
+            onClick={() => void save(true)}>另存为新组</button>
         </div>
         <fieldset className="machine-options">
           <legend>选择机器</legend>
@@ -192,6 +247,8 @@ export function FleetPanel({
                   (v: any) =>
                     !included.has(JSON.stringify([m.endpoint, v.path])),
                 )
+                .sort((a: any, b: any) => Number((mounts[m.endpoint] ?? []).includes(b.path)) -
+                  Number((mounts[m.endpoint] ?? []).includes(a.path)))
                 .map((v: any) => (
                   <div className="fleet-volume" key={v.path}>
                     <button
@@ -203,10 +260,12 @@ export function FleetPanel({
                     >
                       {v.path}
                     </button>
-                    <span>
-                      {v.error ??
-                        `${amount(v.available)} 可用 / ${amount(v.total)}`}
-                    </span>
+                    <Capacity value={v} />
+                    <button className="volume-bookmark"
+                      aria-pressed={(mounts[m.endpoint] ?? []).includes(v.path)}
+                      onClick={() => focusMount(m.endpoint, v.path)}>
+                      {(mounts[m.endpoint] ?? []).includes(v.path) ? "已关注" : "关注"}
+                    </button>
                     {v.filesystem.startsWith("nfs") && (
                       <span className="performance-muted">{v.source}</span>
                     )}
@@ -218,14 +277,15 @@ export function FleetPanel({
       {!!sample?.shares?.length && (
         <section className="performance-card">
           <h2>共享挂载</h2>
+          {confirmed.some((key) => !sample.shares.some((share: any) => share.key === key)) &&
+            <p className="performance-muted">此前确认的挂载有变化或暂不可读，请核对来源。</p>}
           {sample.shares.map((share: any) => (
             <div className="shared-volume" key={share.key}>
               <div className="performance-head">
                 <strong>{share.source}</strong>
                 {share.confirmed && share.sample && (
                   <span>
-                    {amount(share.sample.volume.available)} 可用 ·{" "}
-                    {stamp(share.sample.stamp)}
+                    <Capacity value={share.sample.volume} /> · {stamp(share.sample.stamp)}
                   </span>
                 )}
               </div>
@@ -266,12 +326,38 @@ export function FleetPanel({
           (m) => m.kind === "ssh" && chosen.includes(m.endpoint),
         )}
         call={call}
+        pairs={pairs}
+        onPairs={setPairs}
       />
     </div>
   );
 }
 
-function LinkPanel({ machines, call }: { machines: Machine[]; call: Call }) {
+function Capacity({ value }: { value: any }) {
+  if (value.error) return <span className="performance-muted">{value.error}</span>;
+  const { available, total, trend } = value;
+  const low = total > 0 && available / total <= 0.1;
+  const high = Math.max(1, ...(trend ?? []).map((point: any) => point.available));
+  return <div className="capacity-chart">
+    <span className={low ? "capacity-low" : ""}>
+      {amount(available)} 可用 / {amount(total)}{low && " · 余量低"}
+    </span>
+    {trend?.length > 1 && <details>
+      <summary>容量趋势</summary>
+      <div className="capacity-trend" role="img"
+        aria-label={"最近采样可用空间，从 " + amount(trend[0].available) + " 到 " + amount(available)}>
+        {trend.map((point: any) => <i key={point.stamp}
+          title={stamp(point.stamp) + " · " + amount(point.available)}
+          style={{ height: Math.max(6, 100 * point.available / high) + "%" }} />)}
+      </div>
+      <small>{stamp(trend[0].stamp)} → {stamp(trend.at(-1).stamp)} · 最新 {amount(available)}</small>
+    </details>}
+  </div>;
+}
+
+function LinkPanel({ machines, call, pairs, onPairs }: {
+  machines: Machine[]; call: Call; pairs: PeerPair[]; onPairs: (pairs: PeerPair[]) => void;
+}) {
   const [source, setSource] = useState("");
   const [target, setTarget] = useState("");
   const [addresses, setAddresses] = useState<Interface[][]>([[], []]);
@@ -320,9 +406,7 @@ function LinkPanel({ machines, call }: { machines: Machine[]; call: Call }) {
     const check = async () => {
       if (!active) return;
       try {
-        const value = document.hidden
-          ? undefined
-          : await call("performanceJob", { id: job.id });
+        const value = await call("performanceJob", { id: job.id });
         if (!active) return;
         if (value) setJob(value);
         if (!value || ["queued", "running"].includes(value.state))
@@ -355,6 +439,21 @@ function LinkPanel({ machines, call }: { machines: Machine[]; call: Call }) {
     }
   };
   const disabled = !from || !to || loading || running;
+  const enabledPair = pairs.find((p) =>
+    p.source.endpoint === sourceId && p.target.endpoint === targetId ||
+    p.source.endpoint === targetId && p.target.endpoint === sourceId);
+  const measured = job?.result?.directions?.length === 2 &&
+    job.result.routes[0]?.address === from && job.result.routes[1]?.address === to;
+  const savePair = async () => {
+    setFailure(""); setLoading(true);
+    try {
+      const result = await call("peerPairSave", { remove: !!enabledPair, pair: enabledPair ?? {
+        source: { endpoint: sourceId, address: from }, target: { endpoint: targetId, address: to },
+      } });
+      if (result) onPairs(result.pairs);
+    } catch (error) { setFailure(String(error)); }
+    finally { setLoading(false); }
+  };
   if (machines.length < 2) return null;
   return (
     <section className="performance-card link-section">
@@ -412,6 +511,10 @@ function LinkPanel({ machines, call }: { machines: Machine[]; call: Call }) {
         </button>
         <button disabled={disabled} onClick={() => void probe(true)}>
           双向测速 · 每方向 64 MiB
+        </button>
+        <button disabled={loading || running || !enabledPair && (!from || !to || !measured)}
+          onClick={() => void savePair()}>
+          {enabledPair ? "停用此机器对直传" : "允许此机器对直传"}
         </button>
         {running && (
           <button
@@ -580,14 +683,19 @@ export function TransferReport({ job }: { job: any }) {
     offsetMs: s.startMs,
     durationMs: s.durationMs,
   }));
-  const lanes = ["read", "write", "verify"].map((id) => ({
+  const route = job.result?.transport;
+  const phases = ["read", "write", "direct", "verify"].filter((phase) =>
+    stages.some((stage) => stage.kind === phase));
+  const lanes = phases.map((id) => ({
     id,
     label: labels[id],
   }));
   return (
     <section className="performance-card">
       <div className="performance-head">
-        <h2>经 Wayfarer 的文件传输</h2>
+        <h2>{route?.directBytes
+          ? route.relayBytes ? "私网直传与 SSH 中转" : "服务器私网直传"
+          : "经 Wayfarer 的文件传输"}</h2>
         <strong>{elapsed(timing.executionMs)}</strong>
       </div>
       <div className="stage-summary">
@@ -606,6 +714,13 @@ export function TransferReport({ job }: { job: any }) {
       <p className="performance-muted">
         读取与写入含通道开销。阶段可重叠，右上为执行总耗时。
       </p>
+      {route?.directBytes > 0 && <div className="stage-summary">
+        <span>直传 <strong>{amount(route.directBytes)}</strong></span>
+        <span>源盘读取 <strong>{elapsed(route.readMs)}</strong></span>
+        <span>目标盘写入 <strong>{elapsed(route.writeMs)}</strong></span>
+        <span>落盘确认 <strong>{elapsed(route.syncMs)}</strong></span>
+      </div>}
+      {!!route?.reasons?.length && <p className="performance-muted">切换到 SSH 中转 · {route.reasons.join(" · ")}</p>}
       <Timeline stages={stages} lanes={lanes} total={timing.executionMs} />
       {timing.clipped && (
         <p className="performance-muted">
@@ -882,24 +997,30 @@ export function JobPerformance({ id, call }: { id: string; call: Call }) {
   useEffect(() => {
     let active = true;
     let next: ReturnType<typeof setTimeout>;
+    let pending = false;
+    let unfinished = true;
     const load = async () => {
-      if (!active) return;
+      if (!active || pending || !unfinished) return;
+      pending = true;
+      clearTimeout(next);
       try {
-        const value = document.hidden
-          ? undefined
-          : await call("performanceJob", { id });
+        const value = await call("performanceJob", { id });
         if (!active) return;
-        if (value) setJob(value);
-        if (!value || ["queued", "running"].includes(value.state))
-          next = setTimeout(load, 1000);
+        setJob(value);
+        unfinished = ["queued", "running"].includes(value.state);
+        if (unfinished && !document.hidden) next = setTimeout(load, 1000);
       } catch (error) {
         if (active) setFailure(String(error));
-      }
+      } finally { pending = false; }
     };
+    const visible = () => { if (!document.hidden) void load(); };
+    document.addEventListener("visibilitychange", visible);
+    // Opening a job is an explicit read, including when the editor is restoring visibility.
     void load();
     return () => {
       active = false;
       clearTimeout(next);
+      document.removeEventListener("visibilitychange", visible);
     };
   }, [id, call]);
   return (

@@ -169,7 +169,11 @@ class Client:
                      for s in sessions() if s.get('state', 'running') == 'running']
         return MapUnavailable(json.dumps(dict(code='MAP_UNAVAILABLE', mapId=self.map_id,
             state=self.state, availableMaps=available,
-            message='Open the bound workspace, or explicitly select another map with map_bind.'), ensure_ascii=False))
+            reason='ambiguous' if self.state == 'ambiguous' else
+                   'connecting' if any(s.get('mapId') == self.map_id for s in available) else 'bound_map_offline',
+            suggestedMapId=available[0].get('mapId') if len(available) == 1 and
+                           available[0].get('mapId') != self.map_id else None,
+            message='Open the bound workspace, or confirm a listed map and use map_bind.'), ensure_ascii=False))
     def request(self, method, args, binding, wait_for_resume=False):
         rid = uuid.uuid4().hex
         frame = (json.dumps(dict(id=rid, method=method, args=args)) + '\n').encode()
@@ -236,7 +240,7 @@ def handle(message):
     try:
         if method == 'initialize':
             target = opts.map_id or opts.session
-            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.8.0'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
+            result = dict(protocolVersion=params.get('protocolVersion') if params.get('protocolVersion') in ('2024-11-05', '2025-03-26', '2025-06-18') else '2025-06-18', capabilities=dict(tools=dict(listChanged=False), logging={}), serverInfo=dict(name='workspace-map', version='0.9.0'), instructions=('Bound to map ' + target + '. Switch maps only on explicit user request. ' if target else 'Select a mapId with map_sessions and map_bind. ') + 'Long operations return a durable job and operationId. Resume queries the original receipt before submitting again. Paths and permissions belong to each endpoint. Windows delete uses recycle bin; Linux/WSL deletion is permanent.')
         elif method in ('ping', 'logging/setLevel'): result = {}
         elif method == 'tools/list': result = dict(tools=TOOLS)
         elif method == 'tools/call':

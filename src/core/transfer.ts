@@ -4,11 +4,14 @@ import type { Endpoint, Entry, Ref, Job } from "../shared/types";
 import { alias, assertName, changed, contains, pathApi } from "../shared/paths";
 import type { JobContext } from "./jobs";
 import { TransferTiming } from "./transferTiming";
+import type { OperationsStore } from "./operations";
+import type { PeerTransfer } from "./peerTransfer";
 export interface TransferInput {
   sources: Ref[];
   target: Ref;
   mode: "copy" | "move";
   conflict: "skip" | "rename" | "overwrite";
+  transport?: "auto" | "relay";
 }
 type BufferLease = { buffer: Buffer; release(): void };
 type AcquireBuffer = () => Promise<BufferLease>;
@@ -20,6 +23,7 @@ type FileProgress = {
   committed?: boolean;
   removed?: boolean;
   digest?: string;
+  peer?: boolean;
 };
 async function maybe(e: Endpoint, p: string) {
   try {
@@ -35,6 +39,7 @@ export class Transfers {
   private buffers = 0;
   private bufferBytes = 0;
   private timings = new WeakMap<Job, TransferTiming>();
+  private route = new WeakMap<Job, { directBytes: number; relayBytes: number; readMs: number; writeMs: number; syncMs: number; cpuMs: number; encodingMs: number; reasons: string[] }>();
   stats() {
     return {
       leases: this.leases,
@@ -46,6 +51,9 @@ export class Transfers {
   constructor(
     private endpoints: Endpoints,
     private invalidate: (r: Ref) => void,
+    private operations?: OperationsStore,
+    private peer?: PeerTransfer,
+    private sameSharedPath?: (source: Ref, target: Ref) => boolean,
   ) {}
   async cleanup(job: Job) {
     const registered =
@@ -97,13 +105,18 @@ export class Transfers {
     };
     const timing = new TransferTiming();
     this.timings.set(ctx.job, timing);
+    const route = { directBytes: 0, relayBytes: 0, readMs: 0, writeMs: 0, syncMs: 0,
+      cpuMs: 0, encodingMs: 0, reasons: [], ...ctx.job.result?.transport };
+    this.route.set(ctx.job, route);
+    ctx.job.result = { ...ctx.job.result, transport: route };
     let outcome: Awaited<ReturnType<Transfers["perform"]>> | undefined;
     try {
       outcome = await this.perform(ctx, get);
     } finally {
       this.timings.delete(ctx.job);
+      this.route.delete(ctx.job);
       const previous = ctx.job.result?.timing;
-      ctx.job.result = { ...(outcome ?? ctx.job.result), timing: timing.finish(previous) };
+      ctx.job.result = { ...(outcome ?? ctx.job.result), timing: timing.finish(previous), transport: route };
       for (const scope of scopes.values()) {
         scope.release();
         this.leases--;
@@ -199,6 +212,9 @@ export class Transfers {
       const targetCanonical = await dest.call<string>("realpath", {
         path: input.target.path,
       });
+      if (this.sameSharedPath?.({ endpoint: src.config.id, path: canonical },
+          { endpoint: dest.config.id, path: dpath.join(targetCanonical, name) }))
+        throw Error("源和目标是同一个共享文件，可直接引用原路径");
       const sourceKey = alias(src.config, source.path);
       const destKey = alias(dest.config, dpath.join(targetCanonical, name));
       if (
@@ -506,6 +522,8 @@ export class Transfers {
       if (partial.kind !== "file" || partial.size < f.offset)
         throw Error("Partial file changed: " + f.partial);
       const timing = this.timings.get(ctx.job)!;
+      const route = this.route.get(ctx.job)!;
+      if (f.peer) await this.peer?.fence(dst.config, partial);
       if (f.offset) {
         const [sourcePrefix, targetPrefix] = await timing.measure("verify", () => Promise.all([
           this.prefixHash(src, p, f.offset),
@@ -513,6 +531,38 @@ export class Transfers {
         ]));
         if (sourcePrefix !== targetPrefix)
           throw Error("Partial content changed; source retained");
+      }
+      const input = ctx.job.input as TransferInput;
+      const pair = input.transport !== "relay" && s.size - f.offset >= 8 * 1024 * 1024
+        ? this.operations?.pair(src.config.id, dst.config.id) : undefined;
+      if (pair && this.peer) {
+        const before = f.offset;
+        const progress = async (offset: number) => {
+          const bytes = offset - f!.offset;
+          if (bytes <= 0) return;
+          f!.offset = offset;
+          route.directBytes += bytes;
+          ctx.progress({ bytes: ctx.job.bytes + bytes, progress: p });
+          await save();
+        };
+        f.peer = true;
+        await save();
+        const result = await timing.measure("direct", () => this.peer!.send(ctx, pair,
+          src.config, dst.config, s, partial!, before, progress));
+        route.readMs += result.readMs;
+        route.writeMs += result.writeMs;
+        route.syncMs += result.syncMs;
+        route.cpuMs += result.cpuMs;
+        if (!result.completed && f.offset < s.size) {
+          const reason = result.reason ?? "直传提前结束";
+          if (!route.reasons.includes(reason) && route.reasons.length < 5) route.reasons.push(reason);
+          if (f.offset > before && f.offset < s.size) {
+            const [sourcePrefix, targetPrefix] = await timing.measure("verify", () => Promise.all([
+              this.prefixHash(src, p, f!.offset), this.prefixHash(dst, f!.partial, f!.offset),
+            ]));
+            if (sourcePrefix !== targetPrefix) throw Error("直传暂存校验失败，源文件保留");
+          }
+        }
       }
       const chunk = 1048576;
       const window = 4;
@@ -535,18 +585,22 @@ export class Transfers {
               bytes = await timing.measure("read", async () => {
                 if (src.readInto) return src.readInto(p, buffer, offset, length);
                 data = await src.call<string>("read", { path: p, offset, length });
-                if (dst.writeBuffer) buffer.write(data, 0, "base64");
+                if (dst.writeBuffer) {
+                  const start = performance.now();
+                  buffer.write(data, 0, "base64");
+                  route.encodingMs += performance.now() - start;
+                }
                 return (data.length * 3) / 4 -
                   (data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0);
               });
               if (bytes !== length) throw Error("Source changed during read");
-              await timing.measure("write", () => dst.writeBuffer
-                ? dst.writeBuffer(f!.partial, buffer.subarray(0, bytes), offset)
-                : dst.call("write", {
-                    path: f!.partial,
-                    data: data ?? buffer.subarray(0, bytes).toString("base64"),
-                    offset,
-                  }));
+              await timing.measure("write", () => {
+                if (dst.writeBuffer) return dst.writeBuffer(f!.partial, buffer.subarray(0, bytes), offset);
+                const start = performance.now();
+                const encoded = data ?? buffer.subarray(0, bytes).toString("base64");
+                route.encodingMs += performance.now() - start;
+                return dst.call("write", { path: f!.partial, data: encoded, offset });
+              });
               return bytes;
             } finally {
               lease.release();
@@ -560,6 +614,7 @@ export class Transfers {
           0,
         );
         f.offset += bytes;
+        route.relayBytes += bytes;
         ctx.progress({ bytes: ctx.job.bytes + bytes, progress: p });
         await save();
       }
@@ -607,18 +662,6 @@ export class Transfers {
       throw Error("Destination changed; source retained");
   }
   private async prefixHash(e: Endpoint, p: string, size: number) {
-    const h = createHash("sha256");
-    for (let offset = 0; offset < size; offset += 1048576)
-      h.update(
-        Buffer.from(
-          await e.call<string>("read", {
-            path: p,
-            offset,
-            length: Math.min(1048576, size - offset),
-          }),
-          "base64",
-        ),
-      );
-    return h.digest("hex");
+    return e.call<string>("hashPrefix", { path: p, length: size });
   }
 }

@@ -1,4 +1,4 @@
-type Phase = "read" | "write" | "verify";
+type Phase = "read" | "write" | "verify" | "direct";
 type Span = { phase: Phase; startMs: number; durationMs: number };
 
 export interface TransferTimingRecord {

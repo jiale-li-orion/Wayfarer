@@ -14,7 +14,7 @@ import { Core } from "./core/core";
 import { EXIT_GRACE_MS } from "./core/lifecycle";
 import { Profiler } from "./core/log";
 import { Bridge } from "./mcp/bridge";
-import { connectCodex, connectDsh, dshProfiles } from "./mcp/integrations";
+import { connectCodex, connectDsh, dshProfiles, readCodexBinding } from "./mcp/integrations";
 import { FileProvider } from "./filesystem/provider";
 import type { Ref, EndpointConfig } from "./shared/types";
 import { pathApi } from "./shared/paths";
@@ -176,7 +176,16 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(createWorkspaceCommands(context, core));
   context.subscriptions.push(createEnvironmentView(context, core, provider));
-  context.subscriptions.push(createSidebar(core, bridge.mapId));
+  let bindingCache: { stamp: number; value: ReturnType<typeof readCodexBinding> } | undefined;
+  const codexBinding = (refresh = false) => {
+    const connection = bridge.connections[0];
+    if (!connection) return Promise.resolve({ state: "unavailable" as const, mapId: undefined });
+    if (!refresh && bindingCache && Date.now() - bindingCache.stamp < 60000) return bindingCache.value;
+    const value = readCodexBinding(core, connection.endpoint);
+    bindingCache = { stamp: Date.now(), value };
+    return value;
+  };
+  context.subscriptions.push(createSidebar(core, bridge.mapId, codexBinding));
   context.subscriptions.push(createResourceView(context, core, provider));
   context.subscriptions.push(createStorageView(context, core));
   await vscode.commands.executeCommand(
@@ -498,6 +507,10 @@ export async function activate(context: vscode.ExtensionContext) {
   const chooseConnection = async () => {
     if (!bridge.connections.length)
       throw Error("MCP bridge is still starting; check Workspace Map output");
+    if (bridge.connections.length === 1) {
+      const c = bridge.connections[0];
+      return { label: c.distro ?? "Local", c };
+    }
     return vscode.window.showQuickPick(
       bridge.connections.map((c) => ({ label: c.distro ?? "Local", c })),
       { title: "Agent 所在环境" },
@@ -557,6 +570,8 @@ export async function activate(context: vscode.ExtensionContext) {
       const c = await chooseConnection();
       if (c) {
         const result = await connectCodex(core, bridge, c.c.endpoint);
+        bindingCache = undefined;
+        core.emit("event", { type: "agentBinding" });
         void vscode.window.showInformationMessage(
           "已配置 workspace-map MCP。重新加载 Codex MCP 连接后使用。",
         );
@@ -683,11 +698,12 @@ export async function activate(context: vscode.ExtensionContext) {
   register("workspaceMap.mcpConfig", () => commands("config"));
   register("workspaceMap.bindWindow", async () => {
     const current = bridge.stats();
+    const configured = await codexBinding(true).catch(() => ({ mapId: undefined }));
     const choice = await vscode.window.showQuickPick([
       { label: "绑定 Codex 到此窗口", name: "codex" },
       { label: "绑定 dsh 到此窗口", name: "dsh" },
       { label: "复制当前地图 ID", name: "copy" },
-    ], { title: "当前地图 " + current.mapId.slice(0, 8),
+    ], { title: "窗口 " + current.mapId.slice(0, 8) + " · Codex " + (configured.mapId?.slice(0, 8) ?? "状态待查"),
          placeHolder: current.clients ? `${current.clients} 个 Agent 已连接` : "等待 Agent 连接" });
     if (choice?.name === "copy") await vscode.env.clipboard.writeText(current.mapId);
     else if (choice) await commands(choice.name);

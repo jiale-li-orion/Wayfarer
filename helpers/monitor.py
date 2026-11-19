@@ -1141,6 +1141,7 @@ def comparison_mounts(now):
     if WIN:
         return [dict(v, source=v["path"], filesystem="windows") for v in io_snapshot(now)["volumes"]]
     candidates = {}
+    routes = {}
     for line in text("/proc/self/mountinfo").splitlines():
         description, marker, filesystem = line.partition(" - ")
         if not marker:
@@ -1155,7 +1156,23 @@ def comparison_mounts(now):
         block_volume = source.startswith("/dev/") and (fields[3] == "/" or kind == "btrfs")
         if not (mount == "/" or block_volume or kind in ("nfs", "nfs4", "fuse.ossfs")):
             continue
-        candidates[mount] = dict(path=mount, source=source, filesystem=kind)
+        row = dict(path=mount, source=source, filesystem=kind)
+        if kind in ("nfs", "nfs4") and len(detail) > 2:
+            actual = next((v[5:] for v in detail[2].split(",") if v.startswith("addr=")), None)
+            if actual:
+                row["serverAddress"] = actual
+                if actual not in routes:
+                    try:
+                        output = subprocess.check_output(["ip", "route", "get", actual],
+                            stderr=subprocess.DEVNULL, timeout=0.4).decode("utf-8").split()
+                        fields = {}
+                        for field in ("dev", "src", "via"):
+                            if field in output: fields[field] = output[output.index(field) + 1]
+                        routes[actual] = fields
+                    except (OSError, ValueError, IndexError, subprocess.SubprocessError):
+                        routes[actual] = {}
+                row["route"] = routes[actual]
+        candidates[mount] = row
     results = []
     for mount in sorted(candidates, key=lambda p: (p not in ("/", "/data", "/data/share"), p))[:12]:
         row = candidates[mount]
