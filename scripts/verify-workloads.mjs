@@ -89,6 +89,17 @@ try {
     await until(() => read('!!document.querySelector(".fleet-table")'));
     receipt.cycles++;
   }
+  if (process.env.WM_VERIFY_EDITOR_CYCLES === "1") {
+    receipt.editorCycles = 0;
+    for (let i = 0; i < 50; i++) {
+      await live.command("View: Close Editor");
+      await until(async () => quiet((await live.ipc("diagnostics")).monitor));
+      await live.command("Workspace Map: 作业");
+      page = await live.canvas();
+      await until(() => read('!!document.querySelector(".workload-row")'));
+      receipt.editorCycles++;
+    }
+  }
   if (process.env.WM_VERIFY_MODEL) {
     await read(
       'Array.from(document.querySelectorAll("nav button")).find(b=>b.textContent==="作业").click()',

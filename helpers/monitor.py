@@ -1210,10 +1210,17 @@ def snapshot(a):
             raise ValueError("Invalid process selection")
         identities = {}
         if WIN:
-            entries = {p["pid"]: p for p in windows_processes(now)}
             for pid in pids:
-                if pid not in entries: identities[str(pid)] = None
-                elif entries[pid].get("identity"): identities[str(pid)] = entries[pid]["identity"]
+                handle = K.OpenProcess(0x1000, False, pid)
+                if handle:
+                    try:
+                        start_ticks = win_cpu(handle)[1]
+                        if start_ticks:
+                            identities[str(pid)] = "%d:%d" % (pid, start_ticks)
+                    finally:
+                        K.CloseHandle(handle)
+                elif ctypes.get_last_error() == 87:
+                    identities[str(pid)] = None
         else:
             try:
                 with open("/proc/sys/kernel/random/boot_id") as stream:
