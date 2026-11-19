@@ -52,6 +52,9 @@ export function ModelAnalysis({ call }: { call: Call }) {
   following.current = follow;
 
   const openGeneration = useRef(0);
+  const restoreFocus = useRef<
+    { attempt: number; module?: string; sample?: string } | undefined
+  >(undefined);
   useEffect(() => {
     const version = openGeneration.current;
     let active = true;
@@ -60,6 +63,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
       if (!saved?.ref || !active || version !== openGeneration.current) return;
       const run = await call("modelAnalysis", { ref: saved.ref });
       if (!active || version !== openGeneration.current) return;
+      restoreFocus.current = saved;
       setFollow(saved.follow);
       select(saved.attempt);
       setRecord(run);
@@ -72,6 +76,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
   }, [call]);
   async function open() {
     openGeneration.current++;
+    restoreFocus.current = undefined;
     try {
       const picked = await call("pickModelRun");
       if (!picked) return;
@@ -160,6 +165,20 @@ export function ModelAnalysis({ call }: { call: Call }) {
       call("modelAnalysis", { ref: record.ref, view: "step", attempt }).then(
         (v) => {
           if (active) {
+            const saved = restoreFocus.current;
+            restoreFocus.current = undefined;
+            if (saved && saved.attempt === attempt) {
+              setDetail(saved.module ?? "");
+              for (const m of v.step.microbatches) {
+                const index = m.samples.findIndex(
+                  (s: any) => s.id === saved.sample,
+                );
+                if (index !== -1) {
+                  setSample(m.index + "-" + index);
+                  break;
+                }
+              }
+            }
             setStep(v.step);
             setError("");
           }
@@ -195,7 +214,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
     (e) => attempt == null || e.attempt <= attempt,
   );
   useEffect(() => {
-    if (record)
+    if (record && !restoreFocus.current)
       void call("modelSelection", {
         ref: record.ref,
         attempt,
@@ -452,7 +471,8 @@ export function ModelAnalysis({ call }: { call: Call }) {
               </p>
               <h3>参数更新</h3>
               <p>
-                裁剪前总梯度范数 {fmt(step.clip?.preGlobal)}　·　裁剪阈值{" "}
+                裁剪前 / 后总梯度范数 {fmt(step.clip?.preGlobal)} /{" "}
+                {fmt(step.clip?.postGlobal)}　·　裁剪阈值{" "}
                 {fmt(step.clip?.maxNorm)}　·　梯度缩放 {fmt(step.scaler)}
               </p>
               <table>
