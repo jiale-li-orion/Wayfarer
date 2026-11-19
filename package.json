@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -94,7 +94,7 @@
       },
       {
         "command": "workspaceMap.tasks",
-        "title": "Workspace Map: 传输与后台任务",
+        "title": "Workspace Map: 文件传输",
         "icon": "$(checklist)"
       },
       {
@@ -200,6 +200,11 @@
         "command": "workspaceMap.renameMachine",
         "title": "Workspace Map: 重命名机器",
         "icon": "$(edit)"
+      },
+      {
+        "command": "workspaceMap.workloads",
+        "title": "Workspace Map: 作业",
+        "icon": "$(list-tree)"
       }
     ],
     "configuration": {
@@ -255,19 +260,9 @@
     "menus": {
       "view/title": [
         {
-          "command": "workspaceMap.open",
-          "when": "view == workspaceMap.locations",
-          "group": "navigation@0"
-        },
-        {
           "command": "workspaceMap.addEndpoint",
           "when": "view == workspaceMap.locations",
           "group": "navigation@1"
-        },
-        {
-          "command": "workspaceMap.tasks",
-          "when": "view == workspaceMap.locations",
-          "group": "navigation@2"
         }
       ],
       "view/item/context": [

@@ -1204,6 +1204,62 @@ def snapshot(a):
         cpuUnit="one-logical-core-percent",
         errors=[],
     )
+    if section == "identities":
+        pids = a.get("pids", [])
+        if not isinstance(pids, list) or len(pids) > 100 or any(type(p) is not int or p < 1 for p in pids):
+            raise ValueError("Invalid process selection")
+        identities = {}
+        if WIN:
+            entries = {p["pid"]: p for p in windows_processes(now)}
+            for pid in pids:
+                if pid not in entries: identities[str(pid)] = None
+                elif entries[pid].get("identity"): identities[str(pid)] = entries[pid]["identity"]
+        else:
+            try:
+                with open("/proc/sys/kernel/random/boot_id") as stream:
+                    result["bootId"] = stream.read().strip()
+            except OSError:
+                pass
+            for pid in pids:
+                try:
+                    with open("/proc/%d/stat" % pid) as stream:
+                        fields = stream.read().rsplit(")", 1)[1].split()
+                    identities[str(pid)] = None if fields[0] == "Z" else "%d:%s" % (pid, fields[19])
+                except (FileNotFoundError, ProcessLookupError):
+                    identities[str(pid)] = None
+                except PermissionError:
+                    pass
+        reports = {}
+        paths = a.get("paths", [])
+        if not isinstance(paths, list) or len(paths) > 100:
+            raise ValueError("Invalid status files")
+        import stat
+        for file in paths:
+            if not isinstance(file, str) or not os.path.isabs(file):
+                raise ValueError("Expected absolute status path")
+            try:
+                fd = os.open(file, os.O_RDONLY | getattr(os, "O_NONBLOCK", 0))
+                with os.fdopen(fd, "rb") as stream:
+                    if not stat.S_ISREG(os.fstat(fd).st_mode):
+                        continue
+                    raw = stream.read(8193)
+                if len(raw) > 8192:
+                    continue
+                data = json.loads(raw.decode("utf-8"))
+                if not isinstance(data, dict) or not isinstance(data.get("runId"), str) or type(data.get("updated")) is not int:
+                    continue
+                if "state" in data and data["state"] not in ("running","completed","failed","exited"):
+                    continue
+                if "step" in data and (type(data["step"]) is not int or data["step"] < 0):
+                    continue
+                if "phase" in data and (not isinstance(data["phase"], str) or len(data["phase"]) > 256):
+                    continue
+                reports[file] = {k:data[k] for k in ("runId","state","phase","step","updated") if k in data}
+            except (OSError, ValueError):
+                continue
+        result["reports"] = reports
+        result["identities"] = identities
+        return result
     result["system"] = windows_summary(now) if WIN else linux_summary(now)
     result["capabilities"] = dict(
         gpu=(

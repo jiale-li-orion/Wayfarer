@@ -21,6 +21,19 @@ export function createSidebar(core: Core, mapId: string,
 ): vscode.Disposable {
   const changes = new vscode.EventEmitter<Item | undefined>();
   const groups: Item[] = [
+    { id: "map", label: "地图", icon: "map", command: "workspaceMap.open" },
+    {
+      id: "overview",
+      label: "机器",
+      icon: "pulse",
+      command: "workspaceMap.resources",
+    },
+    {
+      id: "workloads",
+      label: "作业",
+      icon: "list-tree",
+      command: "workspaceMap.workloads",
+    },
     {
       id: "workspaces",
       label: "收藏",
@@ -29,7 +42,7 @@ export function createSidebar(core: Core, mapId: string,
     },
     {
       id: "machines",
-      label: "机器",
+      label: "连接",
       icon: "device-desktop",
       group: "machines",
     },
@@ -44,22 +57,15 @@ export function createSidebar(core: Core, mapId: string,
   const actions = [
     ["addFavorite", "添加收藏", "add"],
     ["environment", "当前工作区环境", "tools"],
-    ["open", "打开地图", "map"],
-    ["home", "全部机器", "home"],
+
+    ["home", "地图根目录", "home"],
     [
       "search",
       "按名称找文件",
       "search",
       "在当前目录下查找文件或目录名称；点击结果定位或打开",
     ],
-    [
-      "tasks",
-      "传输与后台任务",
-      "checklist",
-      "查看复制、移动、扫描与安装进度，暂停、继续或取消任务",
-    ],
-    ["addEndpoint", "添加 SSH 连接", "add"],
-    ["resources", "机器资源", "pulse"],
+
     ["storage", "存储占用", "database"],
   ];
   const advanced = [
@@ -119,7 +125,7 @@ export function createSidebar(core: Core, mapId: string,
       const row = new vscode.TreeItem(
         item.label,
         item.group
-          ? item.group === "advanced"
+          ? ["advanced", "actions", "machines"].includes(item.group)
             ? vscode.TreeItemCollapsibleState.Collapsed
             : vscode.TreeItemCollapsibleState.Expanded
           : vscode.TreeItemCollapsibleState.None,

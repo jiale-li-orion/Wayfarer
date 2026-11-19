@@ -4,7 +4,9 @@ import { createRoot } from "react-dom/client";
 import "./resources.css";
 import { FleetPanel, JobPerformance, RunsPanel } from "./PerformanceViews";
 import { ModelAnalysis } from "./ModelAnalysis";
-type ResourceTab = "model" | "machine" | "comparison" | "runs" | "job";
+import {WorkloadPanel} from "./WorkloadPanel";
+import type {WorkloadFile} from "../core/workloads";
+type ResourceTab = "workloads" | "model" | "machine" | "comparison" | "runs" | "job";
 declare const acquireVsCodeApi: () => {
   postMessage(v: any): void;
   setState(v: any): void;
@@ -193,11 +195,16 @@ function Pressure({
 }
 function App() {
   const saved = api.getState() ?? {};
-  const [view, setView] = useState<ResourceTab>(saved.view ?? "machine");
+  const [view, setView] = useState<ResourceTab>(saved.view === "comparison" ? "machine" : saved.view ?? "machine");
   const [jobId, setJobId] = useState<string | undefined>(saved.jobId);
-  const openView = (request?: { view?: ResourceTab; jobId?: string }) => {
+  const [runId,setRunId]=useState<string|undefined>(saved.runId);
+  const [file,setFile]=useState<WorkloadFile|undefined>(saved.file);
+  const [sweep,setSweep]=useState(0);
+  const openView = (request?: { view?: ResourceTab; jobId?: string;runId?:string }) => {
     if (request?.view) {
-      setView(request.view);
+      if(request.view==="machine" || request.view==="comparison")selectMachine();
+      setView(request.view==="comparison"?"machine":request.view);
+      setRunId(request.runId);setFile(undefined);
       setJobId(request.jobId);
     }
   };
@@ -219,7 +226,7 @@ function App() {
     () =>
       endpoint
         ? {
-            endpoint,
+            selectedOnly:true,endpoint,
             section: selected?.exited ? tab : (selected?.kind ?? tab),
             search: filter,
             sort,
@@ -294,9 +301,9 @@ function App() {
     if (!machines.length) return;
     setLoading(!!endpoint);
     setFailure("");
-    void rpc("watch", view === "machine" ? query : null).catch((e) => setFailure(String(e)));
-    api.setState({ endpoint, tab, search: filter, sort, view, jobId });
-  }, [query, machines.length, view, jobId]);
+    void rpc("watch", view === "machine" && endpoint ? query : null).catch((e) => setFailure(String(e)));
+    api.setState({ endpoint, tab, search: filter, sort, view, jobId,runId,file });
+  }, [query, machines.length, view, jobId,runId,file]);
   useEffect(() => {
     const t = setTimeout(() => {
       setFilter(search);
@@ -356,17 +363,33 @@ function App() {
   };
   const navigation = (
     <nav className="performance-nav" aria-label="机器资源">
-      {([["machine", "机器"], ["comparison", "多机对照"], ["runs", "运行报告"], ["model", "模型分析"]] as const).map(([value, label]) =>
-        <button key={value} aria-pressed={view === value} onClick={() => setView(value)}>{label}</button>)}
-      {view === "job" && <button aria-pressed="true">任务性能</button>}
+      <button aria-pressed={view==="machine"} onClick={()=>{setView("machine");selectMachine();}}>机器</button>
+      <button aria-pressed={view==="workloads"} onClick={()=>{setView("workloads");if(view==="workloads")setRunId(undefined);}}>作业</button>
+      {(view==="model"||view==="runs"||view==="job") && runId&&<button onClick={()=>setView("workloads")}>返回作业详情</button>}
+      <details className="export-menu"><summary>更多</summary><div>
+<button onClick={() => void act("export", { format: "json" })}>
+                快照 JSON
+              </button>
+              <button onClick={() => void act("export", { format: "csv" })}>
+                快照 CSV
+              </button>
+              <button onClick={() => void act("export", { recording: true })}>
+                导出记录…
+              </button>
+        <button onClick={async()=>{const picked=await act("pickModelRun");if(picked){const id=await act("registerPickedRecord",{ref:picked.ref,kind:"model",runId:picked.run.runId});if(id){setRunId(id);setView("workloads");}}}}>关注已有模型运行</button>
+        <button onClick={()=>void act("fileTransfers")}>文件传输</button>
+        <button onClick={()=>{setFile(undefined);setView("runs");}}>打开历史耗时记录</button>
+        <button onClick={()=>{setFile(undefined);setView("model");}}>打开其他模型记录</button>
+      </div></details>
     </nav>
   );
   if (view !== "machine")
     return <main className="resources-root">
       {navigation}
-      {view === "comparison" && machines.length > 0 && <FleetPanel machines={machines} call={rpc} />}
-      {view === "model" && <ModelAnalysis call={rpc} />}
-      {view === "runs" && <RunsPanel call={rpc} />}
+      {view==="workloads" && <WorkloadPanel machines={machines} call={rpc} runId={runId} select={setRunId} onTransfer={id=>{setJobId(id);setView("job");}}
+        onFile={f=>{if(f.kind==="model"||f.kind==="profile"){setFile(f);setView(f.kind==="model"?"model":"runs");}else void act("openWorkloadFile",{ref:f});}}/>}
+      {view === "model" && <ModelAnalysis key={file?.path} call={rpc} initialRef={file}/>}
+      {view === "runs" && <RunsPanel key={file?.path} call={rpc} initialRef={file}/>}
       {view === "job" && jobId && <JobPerformance id={jobId} call={rpc} />}
     </main>;
   return (
@@ -374,7 +397,7 @@ function App() {
       {navigation}
       <header className="resource-toolbar">
         <div className="breadcrumbs">
-          <button onClick={() => selectMachine()}>机器资源</button>
+          {machine && <button onClick={() => selectMachine()}>所有机器</button>}
           {machine && (
             <>
               <span aria-hidden="true">/</span>
@@ -383,7 +406,7 @@ function App() {
           )}
         </div>
         <div className="toolbar-actions">
-          <button onClick={refresh}>刷新</button>
+          <button onClick={()=>endpoint?refresh():setSweep(n=>n+1)}>刷新</button>
           <button
             className={recording ? "recording" : ""}
             onClick={() =>
@@ -396,21 +419,7 @@ function App() {
           >
             {recording ? "停止记录" : "开始记录"}
           </button>
-          <details className="export-menu">
-            <summary>导出</summary>
-            <div>
-              <button onClick={() => void act("storage")}>存储占用</button>
-              <button onClick={() => void act("export", { format: "json" })}>
-                快照 JSON
-              </button>
-              <button onClick={() => void act("export", { format: "csv" })}>
-                快照 CSV
-              </button>
-              <button onClick={() => void act("export", { recording: true })}>
-                导出记录…
-              </button>
-            </div>
-          </details>
+
         </div>
       </header>
       {failure && (
@@ -426,97 +435,7 @@ function App() {
         </div>
       )}
       {!endpoint ? (
-        <>
-          <div className="section-heading">
-            <h1>机器总览</h1>
-            <span>按需采样 · 10 秒刷新</span>
-          </div>
-          <div className="machine-grid">
-            {machines.map((m) => {
-              const s = snapshots[m.endpoint],
-                mem = s?.system?.memory,
-                gpus = s?.gpus ?? [];
-              return (
-                <button
-                  key={m.id}
-                  className="machine-card"
-                  onClick={() => selectMachine(m.endpoint)}
-                >
-                  <div className="machine-title">
-                    <h2>{m.name}</h2>
-                    <span
-                      className={
-                        s?.status === "online"
-                          ? "status-online"
-                          : "status-muted"
-                      }
-                    >
-                      {s?.status === "online"
-                        ? "已连接"
-                        : s?.status === "offline"
-                          ? "离线"
-                          : "正在查询"}
-                    </span>
-                  </div>
-                  <div className="machine-kind">
-                    {m.kind === "wsl"
-                      ? "与 Windows 共用物理资源"
-                      : m.kind === "windows"
-                        ? "本机 · 编辑与界面"
-                        : m.kind === "ssh"
-                          ? "SSH 主机"
-                          : "本机"}
-                  </div>
-                  <div className="machine-metric">
-                    <span>CPU</span>
-                    <strong>{percent(s?.system?.cpuPercent)}</strong>
-                  </div>
-                  <Meter value={s?.system?.cpuPercent} label="整机 CPU" />
-                  <div className="machine-metric">
-                    <span>内存</span>
-                    <strong>
-                      {bytes(mem?.used)}{" "}
-                      <span className="denominator">/ {bytes(mem?.total)}</span>
-                    </strong>
-                  </div>
-                  <Meter value={mem?.used} max={mem?.total} label="已用内存" />
-                  <Pressure sample={s} compact />
-                  <div className="machine-metric gpu-summary">
-                    <span>GPU</span>
-                    <strong>
-                      {s?.capabilities?.gpu === "unavailable"
-                        ? "—"
-                        : s
-                          ? gpus.length
-                          : "—"}
-                      <span className="denominator"> 张</span>
-                    </strong>
-                  </div>
-                  <div className="card-bottom">
-                    <span>
-                      显存{" "}
-                      {bytes(
-                        gpus.length
-                          ? gpus.reduce(
-                              (n: number, g: any) =>
-                                n + (g.memoryUsed ?? g.dedicatedUsed ?? 0),
-                              0,
-                            )
-                          : null,
-                      )}
-                    </span>
-                    <span>{at(s?.stamp)}</span>
-                  </div>
-                  {s?.error && <div className="inline-error">{s.error}</div>}
-                </button>
-              );
-            })}
-          </div>
-          <p className="resource-note">
-            Windows 显示工作集与私有提交量；Linux 显示 RSS，进程详情补充
-            PSS。各机器独立计量。
-          </p>
-        </>
+        <FleetPanel machines={machines} call={rpc} onMachine={selectMachine} refreshToken={sweep}/>
       ) : (
         <>
           <div className="machine-switch">
@@ -782,6 +701,10 @@ function App() {
                   </button>
                 </div>
                 <h3>{details?.name ?? selected.name}</h3>
+                {details && selected.kind==="process" && selected.identity && <button onClick={async()=>{
+                  const w=await act("observeProcess",{endpoint,pid:selected.pid,identity:selected.identity,name:selected.name});
+                  if(w){setRunId(w.runId);setView("workloads");}
+                }}>加入作业</button>}
                 {!details ? (
                   <p>
                     {loading

@@ -127,6 +127,12 @@ export class Jobs extends EventEmitter {
     return path.join(this.dir, "history");
   }
   private historyCount = 0;
+  private transferRevision = 0;
+  private transferPages = new Map<
+    string,
+    { history: ReturnType<Jobs["summary"]>[]; total: number; cursor?: string }
+  >();
+  private transferKinds = new Map<string, string | null>();
   private readonly recentLimit = 100;
   private terminal(j: Pick<Job, "state">) {
     return j.state === "completed" || j.state === "cancelled";
@@ -258,6 +264,9 @@ export class Jobs extends EventEmitter {
     const j: Job = {
       id: identity?.id ?? randomUUID(),
       ...(identity ?? {}),
+      ...(kind === "transfer" && input.workloadId
+        ? { workloadId: input.workloadId, workloadPhase: input.workloadPhase }
+        : {}),
       kind,
       state: "queued",
       created: now,
@@ -344,13 +353,56 @@ export class Jobs extends EventEmitter {
     return this.list().filter((j) => !this.terminal(j));
   }
   /** Cursor is an immutable created/id key. Concurrent completions cannot shift a page. */
-  async page(cursor?: string, limit = 50) {
+  async page(cursor?: string, limit = 50, transfers?: { workloadId?: string }) {
     limit = Math.max(1, Math.min(200, Math.floor(Number(limit) || 50)));
     await this.writes;
+    const matches = (j: Pick<Job, "kind" | "workloadId">) =>
+      !transfers ||
+      (j.kind === "transfer" &&
+        (!transfers.workloadId || j.workloadId === transfers.workloadId));
+    const revision = this.transferRevision;
+    const filterKey = JSON.stringify([
+      transfers?.workloadId ?? null,
+      cursor ?? null,
+      limit,
+    ]);
+    const cached = transfers && this.transferPages.get(filterKey);
+    if (cached) return { ...cached, active: this.active().filter(matches) };
+    let filteredCount = 0;
     const names: string[] = [];
     for await (const entry of await fs.opendir(this.historyDir)) {
-      if (!entry.name.endsWith(".json") || (cursor && entry.name >= cursor))
-        continue;
+      if (!entry.name.endsWith(".json")) continue;
+      if (transfers) {
+        let meta = this.transferKinds.get(entry.name);
+        if (meta === undefined) {
+          let archived;
+          try {
+            archived = JSON.parse(
+              await fs.readFile(path.join(this.historyDir, entry.name), "utf8"),
+            );
+          } catch (error) {
+            this.profile.record("journal.read", {
+              file: entry.name,
+              error: String(error),
+            });
+            continue;
+          }
+          meta =
+            archived.kind === "transfer"
+              ? String(archived.workloadId ?? "")
+              : null;
+          if (this.transferKinds.size >= 4096)
+            this.transferKinds.delete(this.transferKinds.keys().next().value!);
+          this.transferKinds.set(entry.name, meta);
+        }
+        if (
+          meta === null ||
+          (transfers.workloadId && transfers.workloadId !== meta)
+        )
+          continue;
+        filteredCount++;
+      }
+      if (cursor && entry.name >= cursor) continue;
       names.push(entry.name);
       names.sort((a, b) => b.localeCompare(a));
       if (names.length > limit + 1) names.pop();
@@ -374,12 +426,22 @@ export class Jobs extends EventEmitter {
         });
       }
     }
-    return {
-      active: this.active(),
+    const result = {
+      active: this.active().filter(matches),
       history,
       cursor: hasMore ? chosen.at(-1) : undefined,
-      total: this.historyCount,
+      total: transfers ? filteredCount : this.historyCount,
     };
+    if (transfers && this.transferRevision === revision) {
+      if (this.transferPages.size >= 32)
+        this.transferPages.delete(this.transferPages.keys().next().value!);
+      this.transferPages.set(filterKey, {
+        history,
+        cursor: result.cursor,
+        total: result.total,
+      });
+    }
+    return result;
   }
   private async stored(id: string, created?: number) {
     if (!id || path.basename(id) !== id || id.includes("\\"))
@@ -728,6 +790,10 @@ export class Jobs extends EventEmitter {
             .catch(() => undefined);
           await fs.rm(path.join(this.dir, j.id + ".json"), { force: true });
           if (previous) this.historyCount++;
+          if (metadata.kind === "transfer") {
+            this.transferRevision++;
+            this.transferPages.clear();
+          }
           await fs.rm(journal, { force: true });
           this.dirty.delete(j.id);
           this.inputs.delete(j.id);

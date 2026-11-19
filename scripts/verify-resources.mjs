@@ -60,7 +60,7 @@ try {
   await live.normalizeWindow();
   if (!process.env.WM_RESOURCE_RESUME) {
     await until(() =>
-      value('document.querySelectorAll(".machine-card").length===4'),
+      value('document.querySelectorAll(".fleet-table tbody tr").length>=4'),
     );
     await until(
       async () =>
@@ -89,7 +89,7 @@ try {
       });
     }
     await value(
-      '[...document.querySelectorAll(".machine-card")].find(e=>e.textContent.includes("训练机")).click()',
+      '[...document.querySelectorAll(".fleet-table tbody tr td:nth-child(2) button")].find(e=>e.textContent.includes("训练机")).click()',
     );
     await until(() => value('!!document.querySelector(".resource-tabs")'));
     await click(".resource-tabs button", "GPU");
@@ -140,9 +140,9 @@ try {
       nextPage: next.processes.length,
       detailKeys: Object.keys(detail.detail),
     };
-    await click(".breadcrumbs button", "机器资源");
+    await click(".breadcrumbs button", "所有机器");
     await until(() =>
-      value('document.querySelectorAll(".machine-card").length===4'),
+      value('document.querySelectorAll(".fleet-table tbody tr").length>=4'),
     );
     await click(".toolbar-actions button", "开始记录");
     await until(
