@@ -406,9 +406,7 @@ function LinkPanel({ machines, call, pairs, onPairs }: {
     const check = async () => {
       if (!active) return;
       try {
-        const value = document.hidden
-          ? undefined
-          : await call("performanceJob", { id: job.id });
+        const value = await call("performanceJob", { id: job.id });
         if (!active) return;
         if (value) setJob(value);
         if (!value || ["queued", "running"].includes(value.state))
@@ -999,24 +997,30 @@ export function JobPerformance({ id, call }: { id: string; call: Call }) {
   useEffect(() => {
     let active = true;
     let next: ReturnType<typeof setTimeout>;
+    let pending = false;
+    let unfinished = true;
     const load = async () => {
-      if (!active) return;
+      if (!active || pending || !unfinished) return;
+      pending = true;
+      clearTimeout(next);
       try {
-        const value = document.hidden
-          ? undefined
-          : await call("performanceJob", { id });
+        const value = await call("performanceJob", { id });
         if (!active) return;
-        if (value) setJob(value);
-        if (!value || ["queued", "running"].includes(value.state))
-          next = setTimeout(load, 1000);
+        setJob(value);
+        unfinished = ["queued", "running"].includes(value.state);
+        if (unfinished && !document.hidden) next = setTimeout(load, 1000);
       } catch (error) {
         if (active) setFailure(String(error));
-      }
+      } finally { pending = false; }
     };
+    const visible = () => { if (!document.hidden) void load(); };
+    document.addEventListener("visibilitychange", visible);
+    // Opening a job is an explicit read, including when the editor is restoring visibility.
     void load();
     return () => {
       active = false;
       clearTimeout(next);
+      document.removeEventListener("visibilitychange", visible);
     };
   }, [id, call]);
   return (
