@@ -435,7 +435,7 @@ function App() {
         </div>
       )}
       {!endpoint ? (
-        <FleetPanel machines={machines} call={rpc} onMachine={selectMachine} refreshToken={sweep}/>
+        machines.length ? <FleetPanel machines={machines} call={rpc} onMachine={selectMachine} refreshToken={sweep}/> : null
       ) : (
         <>
           <div className="machine-switch">

@@ -125,7 +125,11 @@ export function FleetPanel({
       setSaving(false);
     }
   };
-  const focusMount = (endpoint: string, path: string) =>
+  const focusMount = (endpoint: string, path: string) => {
+    if (!chosen.includes(endpoint)) {
+      if (chosen.length >= 8) {setError("巡检组已选八台机器，请先调整成员");return;}
+      setChosen([...chosen,endpoint]);
+    }
     setMounts((old) => {
       const paths = old[endpoint] ?? [];
       return {
@@ -135,6 +139,7 @@ export function FleetPanel({
           : [...paths, path],
       };
     });
+  };
   const visible = groupFilter
     ? machines.filter((m) => chosen.includes(m.endpoint))
     : machines;
@@ -278,6 +283,8 @@ export function FleetPanel({
                 );
                 const volumes = m?.volumes ?? [],
                   pinned = mounts[machine.endpoint] ?? [];
+                const primary=volumes.find((v:any)=>v.path==="/")??volumes[0];
+                const displayed=pinned.length?volumes.filter((v:any)=>pinned.includes(v.path)):(primary?[primary]:[]);
                 return (
                   <tr key={machine.endpoint}>
                     <td>
@@ -327,8 +334,7 @@ export function FleetPanel({
                       </div>
                     </td>
                     <td>
-                      {volumes
-                        .filter((v: any) => pinned.includes(v.path))
+                      {displayed
                         .map((v: any) => (
                           <div key={v.path}>
                             {v.path} <Capacity value={v} />
