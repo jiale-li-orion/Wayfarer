@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
@@ -65,7 +66,7 @@ export function createResourceView(
       panel!.webview
         .asWebviewUri(vscode.Uri.joinPath(context.extensionUri, "dist", name))
         .toString();
-    panel.webview.html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${panel.webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link rel="stylesheet" href="${asset("resources.css")}"></head><body><div id="root"></div><script nonce="${nonce}" src="${asset("resources.js")}"></script></body></html>`;
+    panel.webview.html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; media-src blob:; style-src ${panel.webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';"><link rel="stylesheet" href="${asset("resources.css")}"></head><body><div id="root"></div><script nonce="${nonce}" src="${asset("resources.js")}"></script></body></html>`;
     const current = panel;
     current.webview.onDidReceiveMessage(async (m) => {
       try {
@@ -119,10 +120,13 @@ export function createResourceView(
             if (approved) result = await core.dispatch("peerPairSave", m.args);
             break;
           }
+          case "modelSelection":
+            core.setModelSelection(m.args);result=true;break;
           case "opsCatalog":
           case "opsGroupSave":
           case "opsGroupSelect":
           case "linkInterfaces":
+          case "modelAnalysis":
           case "runProfile":
             result = await core.dispatch(m.method, m.args);
             break;
@@ -148,6 +152,7 @@ export function createResourceView(
             }
             break;
           }
+          case "pickModelRun":
           case "pickProfile": {
             const targets = (await core.monitor.snapshot()).machines as { endpoint: string; name: string; kind: string }[];
             const pick = await vscode.window.showQuickPick([
@@ -177,8 +182,38 @@ export function createResourceView(
               if (!native) throw Error("找不到此文件所在的本机端点");
               ref = { endpoint: native.id, path: file };
             }
-            result = await core.dispatch("runProfile", { ref, remember: true });
+            result = m.method === "pickModelRun" ? await core.dispatch("modelAnalysis", { ref }) : await core.dispatch("runProfile", { ref, remember: true });
             break;
+          }
+          case "modelAudio": {
+            const ref = m.args.ref as Ref;
+            const ep = core.endpoints.get(ref.endpoint);
+            const ext = pathApi(ep.config).extname(ref.path).toLowerCase();
+            if (!pathApi(ep.config).isAbsolute(ref.path) || ![".wav",".flac",".mp3",".ogg"].includes(ext))
+              throw Error("请选择音频文件");
+            const stat = await ep.call<{kind:string;size:number}>("stat",{path:ref.path});
+            if(stat.kind !== "file" || stat.size > 16 * 1024 * 1024) throw Error("内置试听上限为 16 MiB");
+            const chunks:string[] = [];
+            for(let offset=0;offset<stat.size;offset+=65536) {
+              const length=Math.min(65536,stat.size-offset);
+              const data=await ep.call<string>("read",{path:ref.path,offset,length});
+              if(Buffer.byteLength(data,"base64")!==length) throw Error("音频文件已变更");
+              chunks.push(data);
+            }
+            result={chunks,type:ext===".mp3"?"audio/mpeg":"audio/"+ext.slice(1)};
+            break;
+          }
+          case "openModelSource": {
+            const ref=m.args.ref as Ref;
+            const ep=core.endpoints.get(ref.endpoint);
+            if (!pathApi(ep.config).isAbsolute(ref.path)) throw Error("源码需要绝对路径");
+            const stat=await ep.call<{kind:string;size:number}>("stat",{path:ref.path});
+            if(stat.kind!=="file" || stat.size>1024*1024) throw Error("源码超出查看范围");
+            const document=await vscode.workspace.openTextDocument(provider.uri(ref));
+            if(createHash("sha256").update(document.getText()).digest("hex")!==m.args.sha256) throw Error("当前源码与运行记录版本不同");
+            const line=Math.max(0,Math.min(document.lineCount-1,Number(m.args.line)-1||0));
+            await vscode.window.showTextDocument(document,{selection:new vscode.Range(line,0,line,0),preview:true});
+            result=true;break;
           }
           case "openPerformanceFile": {
             const ref = m.args.ref as Ref;

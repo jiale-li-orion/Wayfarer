@@ -3,7 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./resources.css";
 import { FleetPanel, JobPerformance, RunsPanel } from "./PerformanceViews";
-type ResourceTab = "machine" | "comparison" | "runs" | "job";
+import { ModelAnalysis } from "./ModelAnalysis";
+type ResourceTab = "model" | "machine" | "comparison" | "runs" | "job";
 declare const acquireVsCodeApi: () => {
   postMessage(v: any): void;
   setState(v: any): void;
@@ -355,7 +356,7 @@ function App() {
   };
   const navigation = (
     <nav className="performance-nav" aria-label="机器资源">
-      {([["machine", "机器"], ["comparison", "多机对照"], ["runs", "运行报告"]] as const).map(([value, label]) =>
+      {([["machine", "机器"], ["comparison", "多机对照"], ["runs", "运行报告"], ["model", "模型分析"]] as const).map(([value, label]) =>
         <button key={value} aria-pressed={view === value} onClick={() => setView(value)}>{label}</button>)}
       {view === "job" && <button aria-pressed="true">任务性能</button>}
     </nav>
@@ -364,6 +365,7 @@ function App() {
     return <main className="resources-root">
       {navigation}
       {view === "comparison" && machines.length > 0 && <FleetPanel machines={machines} call={rpc} />}
+      {view === "model" && <ModelAnalysis call={rpc} />}
       {view === "runs" && <RunsPanel call={rpc} />}
       {view === "job" && jobId && <JobPerformance id={jobId} call={rpc} />}
     </main>;
