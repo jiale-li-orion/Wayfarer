@@ -5,16 +5,23 @@ import path from "node:path";
 import type { Core } from "./core/core";
 import { pathApi } from "./shared/paths";
 import { csvRows, csvHeader } from "./core/resourceExport";
+import type { FileProvider } from "./filesystem/provider";
+import type { Ref } from "./shared/types";
+
+type ResourceOpen = { view?: "machine" | "comparison" | "runs" | "job"; jobId?: string };
 
 export function createResourceView(
   context: vscode.ExtensionContext,
   core: Core,
+  provider: FileProvider,
 ): vscode.Disposable {
   let panel: vscode.WebviewPanel | undefined;
   let ready = false;
   let surfaceVisible = true;
   let query: any = {};
+  let compared: string[] = [];
   let recordingFile: string | undefined;
+  let selection: ResourceOpen | undefined;
   const owner = "resources:" + randomUUID();
   const sample = (value: any) => {
     if (ready && panel?.visible)
@@ -32,9 +39,14 @@ export function createResourceView(
   core.monitor.on("recordingStopped", recordingStopped);
   core.monitor.on("sample", sample);
   core.monitor.on("recordingError", recordingError);
-  const open = () => {
+  const open = (request?: ResourceOpen) => {
+    if (request?.view) selection = request;
     if (panel) {
       panel.reveal();
+      if (ready && selection) {
+        void panel.webview.postMessage({ type: "open", request: selection });
+        selection = undefined;
+      }
       return;
     }
     panel = vscode.window.createWebviewPanel(
@@ -62,7 +74,8 @@ export function createResourceView(
           case "bootstrap":
             ready = true;
             surfaceVisible = m.args?.visible !== false;
-            result = await core.monitor.snapshot();
+            result = { ...await core.monitor.snapshot(), selection };
+            selection = undefined;
             break;
           case "watch":
             query = m.args;
@@ -72,8 +85,14 @@ export function createResourceView(
             );
             result = true;
             break;
+          case "watchComparison":
+            compared = m.args.endpoints ?? [];
+            core.monitor.retainComparison(owner, current.visible && surfaceVisible ? compared : []);
+            result = true;
+            break;
           case "visibility":
             surfaceVisible = !!m.args.visible;
+            core.monitor.retainComparison(owner, current.visible && surfaceVisible ? compared : []);
             core.monitor.watch(
               owner,
               current.visible && surfaceVisible ? query : undefined,
@@ -88,6 +107,76 @@ export function createResourceView(
           case "snapshot":
             result = await core.monitor.snapshot(m.args);
             break;
+          case "compare":
+            result = await core.dispatch("systemResources", m.args);
+            break;
+          case "linkInterfaces":
+          case "runProfile":
+            result = await core.dispatch(m.method, m.args);
+            break;
+          case "linkProbe":
+            result = await core.dispatch("linkProbe", { ...m.args, operationId: randomUUID() });
+            break;
+          case "performanceJob":
+          case "performanceCancel":
+          case "openJobRecord": {
+            const job = await core.jobs.details(m.args.id);
+            if (!["transfer", "linkProbe"].includes(job.kind)) throw Error("该任务没有性能报告");
+            if (m.method === "performanceCancel") {
+              if (job.kind !== "linkProbe") throw Error("请从任务窗口管理文件传输");
+              result = core.jobs.control(job.id, "cancel");
+            } else if (m.method === "openJobRecord") {
+              await vscode.window.showTextDocument(await vscode.workspace.openTextDocument({
+                language: "json", content: JSON.stringify(job, null, 2),
+              }), { preview: true });
+              result = true;
+            } else {
+              const { id, kind, state, bytes, progress, error, result: payload } = job;
+              result = { id, kind, state, bytes, progress, error, result: payload };
+            }
+            break;
+          }
+          case "pickProfile": {
+            const targets = (await core.monitor.snapshot()).machines as { endpoint: string; name: string; kind: string }[];
+            const pick = await vscode.window.showQuickPick([
+              { endpoint: "", label: "本机文件…" },
+              ...targets.filter((m) => m.kind === "ssh" || m.kind === "wsl")
+                .map((m) => ({ endpoint: m.endpoint, label: m.name })),
+            ], { title: "选择运行记录所在机器" });
+            if (!pick) break;
+            let ref: Ref;
+            if (pick.endpoint) {
+              const file = await vscode.window.showInputBox({
+                title: pick.label + " · 运行记录", prompt: "记录文件的绝对路径",
+              });
+              if (!file) break;
+              ref = { endpoint: pick.endpoint, path: file };
+            } else {
+              const files = await vscode.window.showOpenDialog({
+                title: "打开运行记录", canSelectMany: false, filters: { 运行记录: ["json"] },
+              });
+              if (!files?.[0]) break;
+              const file = files[0].fsPath;
+              const native = core.endpoints.configs().filter((m) => m.kind === "windows" || m.kind === "local")
+                .find((m) => {
+                  const paths = pathApi(m);
+                  return paths.parse(file).root.toLowerCase() === paths.parse(m.root).root.toLowerCase();
+                });
+              if (!native) throw Error("找不到此文件所在的本机端点");
+              ref = { endpoint: native.id, path: file };
+            }
+            result = await core.dispatch("runProfile", { ref, remember: true });
+            break;
+          }
+          case "openPerformanceFile": {
+            const ref = m.args.ref as Ref;
+            if (!pathApi(core.endpoints.get(ref.endpoint).config).isAbsolute(ref.path))
+              throw Error("日志路径需要是绝对路径");
+            const doc = await vscode.workspace.openTextDocument(provider.uri(ref));
+            await vscode.window.showTextDocument(doc, { preview: true });
+            result = true;
+            break;
+          }
           case "record":
             if (m.args.start) {
               result = await core.monitor.startRecording();
@@ -223,10 +312,13 @@ export function createResourceView(
       if (!e.webviewPanel.visible) {
         ready = false;
         core.monitor.watch(owner, undefined);
+        core.monitor.retainComparison(owner, []);
       }
     });
     current.onDidDispose(() => {
       core.monitor.watch(owner, undefined);
+      core.monitor.retainComparison(owner, []);
+      compared = [];
       panel = undefined;
       ready = false;
     });
@@ -239,6 +331,7 @@ export function createResourceView(
     dispose() {
       command.dispose();
       core.monitor.watch(owner, undefined);
+      core.monitor.retainComparison(owner, []);
       core.monitor.off("sample", sample);
       core.monitor.off("recordingStopped", recordingStopped);
       core.monitor.off("recordingError", recordingError);

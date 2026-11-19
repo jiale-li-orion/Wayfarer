@@ -9,7 +9,7 @@ import { EXIT_GRACE_MS } from "./lifecycle";
 
 export interface ResourceQuery {
   endpoint?: string;
-  section?: "summary" | "processes" | "gpus" | "io" | "process" | "gpu";
+  section?: "summary" | "processes" | "gpus" | "io" | "process" | "gpu" | "comparison";
   search?: string;
   sort?: string;
   offset?: number;
@@ -43,6 +43,7 @@ export class SystemMonitor extends EventEmitter {
   projects?: () => { endpoint: string; path: string }[];
   private states = new Map<string, State>();
   private readers = new Map<string, ResourceQuery>();
+  private comparisons = new Map<string, Set<string>>();
   private timer?: NodeJS.Timeout;
   private disposed = false;
   private retiring = new Set<Promise<void>>();
@@ -134,6 +135,25 @@ export class SystemMonitor extends EventEmitter {
     }
     return s;
   }
+  retainComparison(owner: string, endpoints: string[]) {
+    if (this.disposed) return;
+    const previous = this.comparisons.get(owner) ?? new Set<string>();
+    const selected = new Set(endpoints.slice(0, 8));
+    const next = new Set(this.machines().filter((m) =>
+      selected.has(m.endpoint) || m.roots.some((r) => selected.has(r.endpoint))
+    ).map((m) => m.id));
+    if (next.size) this.comparisons.set(owner, next);
+    else this.comparisons.delete(owner);
+    if (!this.active()) for (const id of previous) {
+      const state = this.states.get(id);
+      if (state && !state.pending.size && !this.held(id)) void this.release(state);
+    }
+  }
+
+  private held(id: string) {
+    return [...this.comparisons.values()].some((machines) => machines.has(id));
+  }
+
   private active() {
     return this.readers.size > 0 || !!this.recording;
   }
@@ -152,8 +172,8 @@ export class SystemMonitor extends EventEmitter {
     } else {
       if (this.timer) clearInterval(this.timer);
       this.timer = undefined;
-      for (const s of this.states.values())
-        if (!s.pending.size) void this.release(s);
+      for (const [id, s] of this.states)
+        if (!s.pending.size && !this.held(id)) void this.release(s);
     }
   }
   private async tick(owner?: string) {
@@ -232,7 +252,7 @@ export class SystemMonitor extends EventEmitter {
       section: query.section ?? "summary",
     };
     if (
-      !["summary", "processes", "gpus", "io", "process", "gpu"].includes(
+      !["summary", "processes", "gpus", "io", "process", "gpu", "comparison"].includes(
         args.section,
       )
     )
@@ -385,7 +405,7 @@ export class SystemMonitor extends EventEmitter {
     void task
       .finally(() => {
         s.pending.delete(key);
-        if (!this.active() && !s.pending.size) void this.release(s);
+        if (!this.active() && !s.pending.size && !this.held(machine.id)) void this.release(s);
       })
       .catch(() => {});
     return task;
@@ -528,6 +548,7 @@ export class SystemMonitor extends EventEmitter {
   stats() {
     return {
       readers: this.readers.size,
+      comparisonViews: this.comparisons.size,
       machines: this.states.size,
       historyPoints: [...this.states.values()].reduce(
         (n, s) => n + s.history.length,
@@ -552,6 +573,7 @@ export class SystemMonitor extends EventEmitter {
     if (this.timer) clearInterval(this.timer);
     this.timer = undefined;
     this.readers.clear();
+    this.comparisons.clear();
     clearTimeout(this.recordingTimer);
     this.recordingTimer = undefined;
     this.recording = undefined;

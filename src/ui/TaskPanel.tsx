@@ -68,7 +68,7 @@ export function TaskPanel({
     jobs.map((job) => (
       <article key={job.id}>
         <div className="job-title">
-          <strong>{job.kind}</strong>
+          <strong>{({ linkProbe: "链路诊断", transfer: "文件传输" } as Record<string, string>)[job.kind] ?? job.kind}</strong>
           <span>{job.state}</span>
         </div>
         <p>{job.progress ?? job.id}</p>
@@ -122,7 +122,7 @@ export function TaskPanel({
               )
             }
           >
-            详情与日志
+            {job.kind === "transfer" || job.kind === "linkProbe" ? "性能详情" : "详情与日志"}
           </button>
         </div>
       </article>

@@ -437,3 +437,23 @@ test("compact resource replies omit unrelated sections without changing the shar
   assert.ok(snapshot.history.length);
   assert.ok(JSON.stringify(small).length < JSON.stringify(snapshot).length);
 });
+
+test("visible comparison reuses collectors and releases them without an idle monitor timer", async () => {
+  const f = await fixture();
+  try {
+    f.monitor.retainComparison("fleet", ["train", "d"]);
+    await f.monitor.snapshot({ endpoint: "train", section: "comparison" });
+    await f.monitor.snapshot({ endpoint: "d", section: "comparison" });
+    assert.equal(f.stats().live, 2);
+    assert.equal(f.monitor.stats().timer, false);
+    f.monitor.retainComparison("fleet", ["train"]);
+    await pause(5);
+    assert.equal(f.stats().live, 1);
+    f.monitor.retainComparison("fleet", []);
+    await pause(5);
+    assert.equal(f.stats().live, 0);
+    assert.equal(f.monitor.stats().comparisonViews, 0);
+  } finally {
+    await f.done();
+  }
+});
