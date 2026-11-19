@@ -1,9 +1,12 @@
 <h1 align="center">Wayfarer</h1>
 
-<p align="center"><strong>在一张地图上，和 Agent 一起管理 Windows、WSL 与 SSH 主机。</strong></p>
+<p align="center"><strong>一张轻量的 VS Code 工作区地图，连接 Windows、WSL、SSH，以及与你并肩工作的 Agent。</strong></p>
+
+<p align="center"><em>Wayfarer，意为行路人。夜里在笔记本上写下几行代码，清晨去远端听模型生成的第一段声音。<br>机器各有各的地址，这段工作的来路，却可以画在同一张图上。</em></p>
 
 <p align="center">
   <a href="https://github.com/jiale-li-orion/Wayfarer/releases/latest"><b>下载 VSIX</b></a> ·
+  <a href="#轻量运行与性能实测">性能实测</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="#与-agent-共用地图">接入 Agent</a> ·
   <a href="docs/MODEL_ANALYSIS.md">模型分析</a> ·
@@ -13,6 +16,18 @@
 ![VS Code 编辑器与 MCP 客户端通过同一张地图访问 Windows、WSL 和 SSH 主机](docs/images/readme/workspace.png)
 
 Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows 窗口打开训练机上的源文件，让 Codex 在同一目录查找实验记录，再从侧边栏查看远端 GPU、磁盘余量和传输进度。编辑、文件操作和 Agent 查询都使用所选机器的路径与账号权限。
+
+## 轻量运行与性能实测
+
+展开目录时，Wayfarer 才分页读取这一层。切回编辑器后，隐藏的画布会释放目录监听。跨机复制有独立的数据通道，传大文件时仍可浏览目录。下面是三个实际工作场景的历史验收结果。
+
+| 工作场景 | 实测表现 |
+| --- | --- |
+| 四端连接，回到编辑器写代码 | **画布监听、游标、待处理读取和轮询定时器均为 0**。0.1.1 验收中，切到空白页签采样 10 分钟，40 次采样均如此。共享扩展宿主在稳定阶段约占单核 CPU 的 **0.046%**。 |
+| 扫描百万文件，查看磁盘占用 | **3.30 秒，峰值 RSS 26.19 MiB**。0.6.0 在训练机扫描 1,000 个目录中的 100 万个空文件。耗时和内存对应独立元数据采集器。 |
+| 在两台训练机之间搬运数据 | **1 GiB 直传中位耗时 6.44 秒**。0.9.0 的三轮私网实测均计入准备、传输、整文件校验和提交。数据直接在两台服务器之间流动。 |
+
+[测试环境、对照数据与测量口径](PERFORMANCE.md)
 
 ## 能用它做什么
 
@@ -66,7 +81,7 @@ Windows 删除进入回收站，WSL 和 Linux SSH 删除为永久删除。跨端
 
 ## 开发与验收
 
-使用 Node.js 22 和 npm 构建。Windows UI 扩展宿主连接 WSL 和 Linux／POSIX SSH 端点，远端助手使用 Python 3.6+。目录按需分页，布局在 Web Worker 中计算；资源页隐藏后停止自动采样，已提交的后台任务有独立的生命周期。
+使用 Node.js 22 和 npm 构建。Windows UI 扩展宿主连接 WSL 和 Linux／POSIX SSH 端点，远端助手使用 Python 3.6+。画布布局在 Web Worker 中计算，后台任务由任务系统独立调度。
 
 ```sh
 npm ci
