@@ -1,3 +1,4 @@
+import { ModelBehavior } from "./ModelBehavior";
 import React, { useEffect, useRef, useState } from "react";
 
 type Call = (method: string, args?: any) => Promise<any>;
@@ -84,6 +85,8 @@ export function ModelAnalysis({ call }: { call: Call }) {
       setDetail("");
       setSample("");
       setError("");
+      audioRequest.current++;
+      setClip(undefined);
       setRecord(picked);
     } catch (err) {
       setError(String(err));
@@ -91,7 +94,7 @@ export function ModelAnalysis({ call }: { call: Call }) {
   }
 
   useEffect(() => {
-    if (!record) return;
+    if (!record || record.run.type === "behavior") return;
     let active = true,
       busy = false,
       closed = false;
@@ -208,7 +211,19 @@ export function ModelAnalysis({ call }: { call: Call }) {
         <button onClick={open}>打开实验记录</button>
       </header>
       {error && <p role="alert">{error}</p>}
-      {record && (
+      {record?.run.type === "behavior" && (
+        <ModelBehavior
+          record={record}
+          call={call}
+          listen={listen}
+          clip={clip}
+          stop={() => {
+            audioRequest.current++;
+            setClip(undefined);
+          }}
+        />
+      )}
+      {record && record.run.type !== "behavior" && (
         <>
           <h2>{record.run.runId}</h2>
           <p>

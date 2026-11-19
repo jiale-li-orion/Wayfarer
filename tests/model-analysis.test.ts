@@ -73,3 +73,21 @@ test("select sample and module on a matching run/rank/attempt", async () => {
     /不匹配/,
   );
 });
+
+test("fixed probe pairs preserve the Dev denominator when selecting a single sample", async () => {
+  const files = {
+    [ref.path]: JSON.stringify({ ...run, type: "behavior" }),
+    "/experiment/behavior.json": JSON.stringify({
+      ...run,
+      metrics: [{ denominator: 20, base: 9, adapter: 10 }],
+      pairs: [{ id: "one" }, { id: "two" }],
+    }),
+  };
+  const result = await modelAnalysis(registry(files), {
+    ref,
+    view: "behavior",
+    sample: "two",
+  });
+  assert.deepEqual(result.behavior.pairs, [{ id: "two" }]);
+  assert.equal(result.behavior.metrics[0].denominator, 20);
+});

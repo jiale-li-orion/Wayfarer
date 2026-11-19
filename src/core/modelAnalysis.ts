@@ -14,7 +14,7 @@ export async function modelAnalysis(
   endpoints: Endpoints,
   args: {
     ref: Ref;
-    view?: "run" | "events" | "step";
+    view?: "run" | "events" | "step" | "behavior";
     cursor?: number;
     attempt?: number;
     module?: string;
@@ -55,6 +55,25 @@ export async function modelAnalysis(
   )
     throw Error("请选择模型分析 v1 的 run.json");
   if (view === "run") return { ref, run };
+  if (view === "behavior") {
+    const behavior = await readJson(
+      paths.join(root, "behavior.json"),
+      1024 * 1024,
+    );
+    if (
+      run.type !== "behavior" ||
+      behavior.runId !== run.runId ||
+      behavior.segment !== run.segment ||
+      behavior.rank !== run.rank ||
+      !Array.isArray(behavior.pairs) ||
+      behavior.pairs.length > 32 ||
+      !Array.isArray(behavior.metrics)
+    )
+      throw Error("行为对照记录与所选实验不匹配");
+    if (args.sample)
+      behavior.pairs = behavior.pairs.filter((p: any) => p.id === args.sample);
+    return { ref, behavior };
+  }
   if (view === "step") {
     const attempt = integer(args.attempt, "更新尝试编号");
     const step = await readJson(
