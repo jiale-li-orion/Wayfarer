@@ -85,6 +85,7 @@ export interface Job {
   checkpoint: Record<string, any>;
 }
 export interface ViewState {
+  modelSelection?: {ref:Ref; attempt?:number; module?:string; sample?:string; follow:boolean};
   root?: Ref;
   expanded: string[];
   viewport: { x: number; y: number; zoom: number };

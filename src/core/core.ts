@@ -24,6 +24,7 @@ import { StorageAnalysis } from "./storage";
 import { SystemMonitor } from "./monitor";
 import { compareMachines, sameConfirmedShare } from "./fleet";
 import { Links } from "./links";
+import { modelAnalysis } from "./modelAnalysis";
 import { RunProfiles } from "./runProfiles";
 import { OperationsStore } from "./operations";
 import { PeerTransfer } from "./peerTransfer";
@@ -225,6 +226,10 @@ export class Core extends EventEmitter {
         await fs.rename(file + ".tmp", file);
       }));
   }
+  setModelSelection(value: NonNullable<ViewState["modelSelection"]>) {
+    this.view.modelSelection = value;
+    this.saveView();
+  }
   invalidateParent(r: Ref) {
     this.inspector.invalidate(r.endpoint);
     const c = this.endpoints.get(r.endpoint).config;
@@ -392,6 +397,9 @@ export class Core extends EventEmitter {
       case "linkProbe":
         this.links.validate(a);
         return submit("linkProbe", a, ["link-probe"]);
+      case "modelAnalysis":
+        if (!a.ref && !a.view) return this.view.modelSelection ?? null;
+        return modelAnalysis(this.endpoints, a.ref ? a : {...this.view.modelSelection,...a});
       case "runProfile":
         return a.ref ? this.runProfiles.read(a) : this.runProfiles.list();
       case "opsCatalog":

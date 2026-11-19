@@ -885,3 +885,16 @@ button.volume-bookmark[aria-pressed="true"] {
   color: var(--vscode-button-foreground);
 }
 .timeline [data-phase="direct"] { --phase: var(--vscode-charts-blue, var(--vscode-progressBar-background)); }
+
+.model-analysis { max-width: 100rem; margin: 1rem auto; padding: 1rem; overflow-x: auto; }
+.model-analysis header,.model-nav,.model-timeline { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.model-analysis header { justify-content:space-between; }
+.model-timeline { margin:1rem 0; gap:.25rem; }
+.model-analysis input[type=number] { width:6rem; }
+.model-analysis table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
+.model-analysis th,.model-analysis td { text-align:left; padding:.5rem; border-bottom:1px solid var(--vscode-panel-border); }
+.model-analysis h3,.model-analysis details { margin-top:1.6rem; }
+.model-timeline [aria-pressed=true] { outline:2px solid var(--vscode-focusBorder); }
+
+.model-analysis h2,.model-analysis details { margin:1.25rem 0 .5rem; }
+.model-analysis p,.model-nav { margin:.5rem 0; }

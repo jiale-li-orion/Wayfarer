@@ -1609,5 +1609,56 @@
       "readOnlyHint": true,
       "destructiveHint": false
     }
+  },
+  {
+    "name": "map_modelAnalysis",
+    "description": "Read a model observation segment manifest, page its live events, or inspect one optimizer attempt with optional sample and module filters. Omit all arguments for the current map selection; omit ref to query its selected run.",
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    "inputSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        },
+        "view": {
+          "enum": [
+            "run",
+            "events",
+            "step",
+            "behavior"
+          ]
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample": {
+          "type": "string"
+        },
+        "module": {
+          "type": "string"
+        }
+      }
+    }
   }
 ]

@@ -16,8 +16,9 @@ Node 22；Linux 使用完整测试集，Windows 执行 `npm run test:portable`�
 ```sh
 # 在通过验收的合并提交上执行
 # 示例版本与 package.json 保持一致
-git tag v0.3.0
-git push github v0.3.0
+tag="v$(node -p 'require("./package.json").version')"
+git tag "$tag"
+git push github "$tag"
 ```
 
 标签发布按仓库权限执行。修改已发布版本时递增版本并创建新标签；每个 Release 与其提交、摘要、机器验收结果对应。Marketplace 另行安排。
