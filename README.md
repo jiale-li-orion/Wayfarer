@@ -1,115 +1,78 @@
-# Workspace Map
+<h1 align="center">Wayfarer</h1>
 
-Windows、WSL、SSH 共用的目录画布与 Agent 文件管理器。文件系统是真实数据源；画布、VS Code 编辑器与 MCP 使用同一个操作核心。
+<p align="center"><strong>在一张地图上，和 Agent 一起管理 Windows、WSL 与 SSH 主机。</strong></p>
 
-安装 VSIX 后执行 **Workspace Map: 打开目录地图**。空白处拖动平移，滚轮缩放，箭头展开目录，双击进入子树。文件右侧的手柄用于真实搬移；单击选择后可新建、编辑、重命名、多选复制／移动、删除、统计大小和管理软件。隐藏文件默认显示。
+<p align="center">
+  <a href="https://github.com/jiale-li-orion/Wayfarer/releases/latest"><b>下载 VSIX</b></a> ·
+  <a href="#快速开始">快速开始</a> ·
+  <a href="#与-agent-共用地图">接入 Agent</a> ·
+  <a href="docs/MODEL_ANALYSIS.md">模型分析</a> ·
+  <a href="CHANGELOG.md">版本记录</a>
+</p>
 
-## 连接与 Agent
+![VS Code 编辑器与 MCP 客户端通过同一张地图访问 Windows、WSL 和 SSH 主机](docs/images/readme/workspace.svg)
 
-Windows 磁盘和 WSL 发行版自动发现。通过 **Workspace Map: 添加 SSH 连接** 选择 SSH 配置所在环境，导入具体 Host 或输入 `user@host`。使用该环境原有的 OpenSSH 配置、密钥和已知主机记录。首版 SSH 文件端点支持 Linux／POSIX，助手兼容 Python 3.6+。
+Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows 窗口打开训练机上的源文件，让 Codex 在同一目录查找实验记录，再从侧边栏查看远端 GPU、磁盘余量和传输进度。编辑、文件操作和 Agent 查询都使用所选机器的路径与账号权限。
 
-**接入 Codex** 使用已发现的 Codex CLI 增改 `workspace-map` MCP 项；**接入 dsh** 列出实际环境中的 profile，仅修改选中 profile 的本插件项。当前 dsh bundle profile 写入 `cordis.patch.yml` 的插件插入项；旧 profile 保留 `cordis.yml` 接法。现有插件、注释和授权策略继续保留。**获取 MCP 配置** 提供 WSL 与 Windows 调用形式。
+## 能用它做什么
 
-每个 VS Code 窗口有独立地图。`mapId` 是持久身份，`id` 表示本次运行；Agent 通过 `map_sessions` 查看、`map_bind` 切换。快捷接入生成 `--map` 稳定绑定，重载后自动接回同一地图；`map_connection` 查询连接状态与交接快照。升级后重新执行接入命令可更新原插件项，旧 `--session` 接法和分页继续兼容。跟随默认关闭，开启后显示 Agent 当前目录／文件位置；手动操作退出跟随。
+| 工作场景 | 在 Wayfarer 里怎么做 |
+| --- | --- |
+| **浏览和编辑远端项目** | 在目录画布展开 Windows、WSL 或 SSH 节点，双击目录进入子树，在 VS Code 编辑器里打开文件。将常用目录、文件或多根工作区加入收藏。 [项目与收藏](docs/PROJECT_ENVIRONMENTS.md) |
+| **在机器之间搬文件** | 用文件手柄拖到目标目录，任务面板显示进度、校验和暂停位置。已授权的 SSH 机器对可通过私网直传大文件；网络恢复后可接着传。 [传输与恢复](docs/OPERATIONS_AND_TRANSFER.md) |
+| **管理项目环境** | 在项目目录查看清单、锁文件、解释器和工具路径。Python 默认用 uv；Node、JDK、Gradle、Flutter、Android SDK、Rust 和 winget 按端点查询。执行包操作前可看见实际机器、目录和命令。 [工具与环境](docs/PROJECT_ENVIRONMENTS.md) |
+| **巡检机器，找出资源热点** | 将训练机和推理机存为巡检组，对照 CPU、内存、每张 GPU、挂载余量和私网链路。选中进程、传输任务或运行记录，再看资源归属和阶段耗时。 [机器资源](docs/SYSTEM_RESOURCES.md) · [多机性能](docs/MULTI_MACHINE_PERFORMANCE.md) |
+| **查清磁盘空间去了哪里** | 对指定目录发起扫描，按占用下钻，查看最大文件、硬链接与实际占盘。对比同一根目录的两次快照，分清目录增长与卷余量变化。 [存储分析](docs/STORAGE.md) |
+| **回放一次模型更新** | 选择训练端的实验记录，沿 optimizer step 查看参与的 microbatch、样本损失、裁剪前后梯度和有效参数变化。固定样本可跨 checkpoint 比较输出，有播放录音时可 A/B 试听。 [记录格式与 MCP](docs/MODEL_ANALYSIS.md) |
 
-MCP 提供端点、分页目录、文件元数据／内容、导航、搜索、文件操作、包操作、资源统计和任务状态。`map_diagnostics` 直接返回缓存、监听、未完成分页和任务计数；`map_resources` 返回指定端点的进程资源与连接累计通信计数。文件读取返回 Base64，支持字节偏移与长度。后台提交持久化后返回任务 ID 和 operationId；相同 token 查询原任务，确认中断先用 `map_operation` 查收据。`map_job` 查询结果，`map_jobControl` 暂停／继续／取消，日志通知推送任务进度。
+<table>
+  <tr>
+    <td width="50%"><a href="docs/images/resources/01-overview.png"><img src="docs/images/resources/01-overview.png" alt="VS Code 中 Windows、WSL 和两台 SSH 主机的资源总览"></a></td>
+    <td width="50%"><a href="docs/images/storage-060/02-storage-directory.png"><img src="docs/images/storage-060/02-storage-directory.png" alt="存储扫描结果中的子目录占用排名"></a></td>
+  </tr>
+  <tr><td align="center">多端资源总览</td><td align="center">目录占用下钻</td></tr>
+</table>
 
-## 文件与软件操作
+### 从一次 LoRA 更新看模型分析
 
-同端移动优先原生重命名；跨文件系统／跨端使用任务私有暂存文件，校验内容与源版本后提交，再删除源。窗口、进程和网络中断的传输自动接续；主动暂停和主动断开保持暂停，用户点击继续。取消清理登记的私有暂存，失败项随任务保留，可从任务面板或 `map_jobCleanup` 明确重试。同名规则包括跳过、改名，以及合并目录并覆盖同名文件。目录合并保留目标中其他条目。目录与普通文件的类型冲突单独报告。
+在 CPU 验收用的小型 LoRA 模型里，连续两次更新都累积了四个 microbatch。第一次，B 的梯度范数从 **4.33** 裁剪到 **1.00**，学习率为 **0**，有效权重变化也是 **0**。第二次，学习率升到 **0.005**，同一模块的有效权重变化达到底座范数的 **1.77%**。展开一个 microbatch 的样本，用各自的损失分子、权重和与模式权重，就能复算该批次的 loss。 [查看这次更新的完整界面](docs/images/readme/model-replay.png)
 
-Windows 删除进入回收站；WSL／Linux SSH 删除为永久删除。软链接按链接复制，进入链接目录需要明确导航。Windows／WSL 盘符映射用于识别重复路径。程序只搬移文件系统内容；项目配置、环境变量和 Git worktree 引用由用户或 Agent 另行处理。
+实验项目产生观测记录；Wayfarer 按需读取。训练中可以跟随最新更新，手动点选后停在该步，稍后重开仍可回放。Agent 用 `map_modelAnalysis` 读同一份记录。 [训练端接入](docs/MODEL_ANALYSIS.md)
 
-包管理面板绑定选中目录和端点，显示实际 argv、来源、退出码及日志；可指定解释器或管理器的绝对路径。支持 uv／pip、npm／pnpm／bun、JDK／Gradle／Maven 缓存、Android sdkmanager、Flutter、rustup／cargo、winget。能力表由适配器声明，管理器安装状态在用户查询时发现。运行修改命令使用当前端点账号。
+## 快速开始
 
-## 性能与记录
+1. 从 [GitHub Releases](https://github.com/jiale-li-orion/Wayfarer/releases/latest) 下载 `workspace-map.vsix`。在 Windows 的 VS Code **扩展 → … → 从 VSIX 安装**中选择它。
+2. 点击活动栏的地图图标，选择 **常用操作 → 打开地图**，或按 `Ctrl+Alt+M`。Windows 磁盘和 WSL 发行版会自动出现。空白处拖动平移，滚轮缩放；文件旁的手柄用于真实搬移。
+3. 要接入服务器，选择 **添加 SSH 连接**，输入 `user@host`，在终端确认主机、登录并为机器命名。也可以从 **诊断与接入 → 导入已有 SSH 配置** 加入现有主机。 [SSH 配置与权限](docs/SSH.md)
+4. 在机器上展开一个项目目录，打开文件，或选择 **详情与环境** 查看它使用的解释器。**机器资源**、**存储占用**和**传输与后台任务**均可从侧边栏进入。
 
-- 每页默认 200 条；画布、编辑器和 Agent 独立持有分页游标。
-- D3 布局在 Web Worker；普通视角按可见区域渲染，远景用 Canvas 表示目录结构。
-- 目录缓存上限 128 个分支、16,000 条首屏记录；本机文件事件和 Linux inotify 监测已展开分支，远端读取事件队列。
-- 复制任务复用 4 × 1 MiB 数据缓冲；任务检查点增量写入，避免按文件数反复序列化整份历史。
-- 默认两个传输任务并行；冲突路径串行。包环境和项目分别参与互斥，目录读取走独立调用。
-- **查看性能日志** 打开 OutputChannel，包含目录读取、布局、任务排队／吞吐、包命令、Extension Host CPU／RSS、Webview heap／长任务、端点助手 CPU／RSS。
+Windows 删除进入回收站，WSL 和 Linux SSH 删除为永久删除。跨端移动在目标内容校验和提交后处理源文件。编辑器读取上限为 64 MiB，更大的文件可以通过传输任务处理。 [安装、升级与回退](docs/RELEASE.md)
 
-运行状态位于 VS Code globalStorage。任务 `*.json` 保存状态，`*.input.json` 保存提交参数，`*.checkpoint.jsonl` 保存增量检查点，`*.log` 保存收到的命令输出；`operations/` 保存 operationId 对应归档位置，`history/` 保存完成与取消记录。任务详情显示日志尾部。WSL 的私有 socket 与 MCP 客户端入口位于 `~/.local/share/workspace-map/`；助手随连接／窗口关闭退出。大文件传输使用按任务租用的数据助手，目录与编辑操作保留独立控制通道；最后一个传输结束、暂停或取消后释放数据助手。
+## 与 Agent 共用地图
 
-## 构建与验收
+执行 **接入 Codex** 或 **接入 dsh**；其他 MCP 客户端可从侧边栏的 **诊断与接入 → MCP 配置** 取得启动配置。每个 VS Code 窗口有自己的 `mapId`。Agent 绑定后，你们能看到同一个目录、同一个后台任务或同一条实验记录。需要对齐视角时打开「跟随 Agent」，手动导航即可接管。
 
-开发环境：Node.js 22+、Python 3.6+；VS Code 1.95+。统一构建入口可执行：
+可以直接从一个只读问题开始：
+
+> 看一下我当前地图里选中的训练更新。列出参与的 microbatch，再告诉我 q_proj 裁剪后的 B 梯度和这一步实际改变的权重范数。
+
+| Agent 要取得的信息 | 工具 |
+| --- | --- |
+| 当前绑定的地图、连接状态 | `map_connection`、`map_sessions` |
+| 项目标记、环境与工具清单 | `map_inspect`、`map_inventory` |
+| 巡检组、机器资源与卷占用排名 | `map_patrolGroups`、`map_systemResources`、`map_storageResult` |
+| 后台任务、传输进度与控制 | `map_jobsPage`、`map_job`、`map_jobControl` |
+| 作业阶段耗时、选中更新的科学记录 | `map_runProfile`、`map_modelAnalysis` |
+
+## 开发与验收
+
+使用 Node.js 22 和 npm 构建。Windows UI 扩展宿主连接 WSL 和 Linux／POSIX SSH 端点，远端助手使用 Python 3.6+。目录按需分页，布局在 Web Worker 中计算；资源页隐藏后停止自动采样，已提交的后台任务有独立的生命周期。
 
 ```sh
 npm ci
 npm run typecheck
-npm test
-npm run package
+npm test              # Linux；Windows 使用 npm run test:portable
+npm run package       # artifacts/workspace-map.vsix
 ```
 
-产物：`artifacts/workspace-map.vsix`，附带 `dist/build-info.json` 记录提交、工作树状态与构建环境。性能命令：`npm run bench`；恢复与资源循环：`node --expose-gc --import tsx scripts/profile-resume.mjs <output.json>`；多小文件场景：`npx tsx scripts/benchmark-small.ts`。
-
-`ARCHITECTURE.md` 说明模块和恢复流程，`PERFORMANCE.md` 保留实测结果，`STATE.md` 记录交付状态。实际机器验收脚本位于 `scripts/`，使用独立临时文件／软件环境。
-
-首版边界：编辑器读取上限 64 MiB，较大文件可传输后使用本机工具打开；搜索最多保留 10,000 个匹配；目录游标闲置 120 秒后刷新。暂停／取消在当前执行段结束时生效；已经提交的文件保留，暂停时的暂存用于恢复，取消时按登记归属清理。包管理器支持取消，完成状态以实际退出信息为准。升级、SDK 安装等命令配方已接入；发布验收对修改操作使用隔离的 pip／npm 测试包，其他生态按本机安装环境使用。
-
-Marketplace 发布单独处理。
-
-
-### 详情与日常管理
-
-选中节点，点击工具栏的 **详情与环境**。路径按钮定位画布；文件在 VS Code 编辑器打开。目录面板显示当前层项目标记，可登记项目，查询工具路径／版本／环境；包安装、升级及缓存清理继续从 **包管理与命令预览** 进入，确认实际端点、解释器、目录和命令后执行。
-
-**占用** 中点击当前目录或缓存旁的 **统计**；后台显示文件数、已统计字节与取消入口。统计结果带查询时间，部分无权限路径计入结果提示。已登记项目、查询快照、书签及任务记录随地图会话保存。后台任务面板分页浏览完成和取消的任务，运行中及可恢复任务单列；详情与日志按需打开。
-
-MCP 客户端可调用 `map_inspect` / `map_inventory` / `map_jobsPage` 使用同一实现。库存查询返回任务 ID，用 `map_job` 查看输出，用 `map_jobControl` 取消。`map_packageDiscover` 支持 `refresh:true` 手动更新管理器路径。
-
-
-### 发布与维护
-
-源码仓库为 [Wayfarer](https://github.com/jiale-li-orion/Wayfarer)，插件继续显示 Workspace Map。构建、安装、升级、回退与 MCP 配置说明见 [docs/RELEASE.md](docs/RELEASE.md)，实际机器覆盖见 [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)。标签工作流交付 VSIX、SHA-256、提交身份和版本说明；PR 产物供审阅验收。
-
-## 侧边栏与快捷键（0.3.1）
-
-点击活动栏的地图图标，展开 **机器／书签／常用操作**。点击机器或书签在编辑区打开对应地图。标题栏提供打开地图、添加 SSH 和后台任务；常用操作还提供搜索、Codex／dsh 接入、MCP 配置和性能日志。侧边栏可通过 VS Code 的视图菜单移到右侧。
-
-| 操作 | Windows／Linux | 生效位置 |
-|---|---|---|
-| 打开／聚焦地图 | Ctrl+Alt+M | 全局 |
-| 聚焦侧边栏 | Ctrl+Alt+Shift+M | 全局 |
-| 返回／前进 | Alt+←／Alt+→ | 地图 |
-| 上一级 | Alt+↑ | 地图 |
-| 搜索当前子树 | Ctrl+F | 地图 |
-| 后台任务 | Ctrl+Shift+J | 地图 |
-| 定位已加载节点 | Ctrl+0 | 地图 |
-
-macOS 将 Ctrl 换成 Cmd。按键可在 VS Code「键盘快捷方式」中搜索 Workspace Map 后修改。侧边栏沿用 VS Code 的方向键、Enter 和展开／收起操作。
-
-### 机器资源
-
-侧边栏「常用操作 → 机器资源」查看 Windows、WSL 与 SSH 主机；四端摘要、进程分页、GPU 和磁盘／网络逐级展开。页面隐藏停止自动采样，明确开始的记录保留后台生命周期。MCP 使用只读 `map_systemResources`；具体口径、资源归属和导出见 [说明](docs/SYSTEM_RESOURCES.md)。
-
-### 与现有 VS Code 生态协作
-
-[日常扩展与资源记录](docs/ENVIRONMENT_AUDIT.md)记录实际精简与对照条件；[Codex／dsh 共享环境评审](docs/SHARED_ENVIRONMENT_REVIEW.md)梳理现有语言服务、扩展工具、Codex 实验 LSP MCP 与 Wayfarer 的接入边界。该评审记录现有能力与后续接入边界；产品现状见 STATE.md。
-
-### 常用工作区与项目环境（0.5.0）
-
-侧边栏收藏常用工作区，点击使用 VS Code 原生打开；右键可新窗口打开、加入当前工作区、定位地图及查看环境。目录详情与常用工作区共用“项目环境”视图，多根项目分别查看。Python 默认 uv，项目清单／锁文件与环境同步分开管理；版本、依赖和占用按需查询。具体行为见 [项目环境说明](docs/PROJECT_ENVIRONMENTS.md)。
-
-存储分析支持卷容量、目录排名、实际占盘与硬链接共享、WSL 承载关系、快照分页和导出。侧边栏“存储占用”进入，目录详情的统计按钮使用同一页面。接口与口径见 [存储分析](docs/STORAGE.md)。
-
-Windows离线交换文件维护与退出码见 [维护说明](docs/WSL_MAINTENANCE.md)，当前窗口内存分组及页面对照见 [性能记录](PERFORMANCE.md)。
-
-## 收藏、查找与 SSH
-
-侧边栏“收藏”统一保存项目目录和 `.code-workspace`；项目原生打开，右键“地图定位”回到同一目录。未绑定 Windows Remote SSH 的远端收藏先在地图定位，原生打开沿原有显式绑定方式。旧地图书签在打开该地图时迁移，现有名称和收藏保留。
-
-“按名称找文件”只在当前目录范围查找名称，显示实际机器和路径；源码内容搜索继续使用编辑器或 rg。“传输与后台任务”查看复制、移动、扫描、包命令的进度和恢复。“诊断日志”放在折叠的“诊断与接入”，机器 CPU／内存走“机器资源”。
-
-“添加 SSH 连接”：输入 `user@host`（可加 `:port`）→ 在 SSH 终端确认主机并输入密码 → 自动安装专用公钥、验证免密及 Python → 命名并保存连接。机器右键可重命名；已有 train/infer 等 OpenSSH 配置从“诊断与接入 → 导入已有 SSH 配置”导入。命名 SSH 机器在同一 VS Code 配置档案的窗口之间共享。详见 [SSH 连接](docs/SSH.md)。
-
-### 多机巡检与性能对照（0.8.0）
-
-机器资源页可对照多台机器、共享挂载和私网链路。传输性能详情和运行报告用横条及时间线展示阶段耗时。项目脚本写入版本化记录，Wayfarer 按需读取并定位原始日志。[使用与接口说明](docs/MULTI_MACHINE_PERFORMANCE.md)
-
-### 巡检组和跨机直传（0.9.0）
-
-保存常用机器、关注挂载和容量趋势。需要传大文件时可按机器对启用私网直传，保留原有冲突、校验和恢复流程。Agent 可按组查询资源或在单次任务选择 SSH 中转。[使用与接口说明](docs/OPERATIONS_AND_TRANSFER.md)
+[架构与数据流](ARCHITECTURE.md) · [性能实测](PERFORMANCE.md) · [实机验收范围](docs/ACCEPTANCE.md) · [构建发布](docs/RELEASE.md) · [MCP 工具定义](helpers/tools.json) · [许可证](LICENSE)
