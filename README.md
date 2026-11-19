@@ -2,7 +2,7 @@
 
 <p align="center"><strong>一张轻量的 VS Code 工作区地图，连接 Windows、WSL、SSH，以及与你并肩工作的 Agent。</strong></p>
 
-<p align="center"><em>Wayfarer，意为行路人。夜里在笔记本上写下几行代码，清晨去远端听模型生成的第一段声音。<br>机器各有各的地址，这段工作的来路，却可以画在同一张图上。</em></p>
+<p align="center"><em>一个尚未出口的音节，在那里过夜。</em>　<a href="#行路人">《行路人》</a></p>
 
 <p align="center">
   <a href="https://github.com/jiale-li-orion/Wayfarer/releases/latest"><b>下载 VSIX</b></a> ·
@@ -91,3 +91,17 @@ npm run package       # artifacts/workspace-map.vsix
 ```
 
 [架构与数据流](ARCHITECTURE.md) · [性能实测](PERFORMANCE.md) · [实机验收范围](docs/ACCEPTANCE.md) · [构建发布](docs/RELEASE.md) · [MCP 工具定义](helpers/tools.json) · [许可证](LICENSE)
+
+## 行路人
+
+天黑以后，每台机器都亮成一座岛。<br>
+你把海图摊在桌上。Agent 循着一道铅笔印，<br>
+在远岸，找到你昨晚写到一半的那一行。
+
+你收起海图，关了台灯。<br>
+远岸的风扇还在低低地转。<br>
+一个尚未出口的音节，在那里过夜。
+
+清晨，你戴上耳机。<br>
+那声音很轻，带着昨夜梯度的湿润。<br>
+你对着空房间，也轻轻说了声早。
