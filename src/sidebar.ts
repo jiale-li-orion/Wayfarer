@@ -16,7 +16,9 @@ type Item = {
 };
 
 /** Native navigation only: the editor canvas owns directory reads and watches. */
-export function createSidebar(core: Core, mapId: string): vscode.Disposable {
+export function createSidebar(core: Core, mapId: string,
+  codexBinding: () => Promise<{ mapId?: string; state: string }>,
+): vscode.Disposable {
   const changes = new vscode.EventEmitter<Item | undefined>();
   const groups: Item[] = [
     {
@@ -97,17 +99,20 @@ export function createSidebar(core: Core, mapId: string): vscode.Disposable {
           description: e.root,
           ref: { endpoint: e.id, path: e.root },
         }));
-      if (item.group === "actions" || item.group === "advanced")
+      if (item.group === "actions" || item.group === "advanced") {
+        const binding = item.group === "advanced" ? await codexBinding().catch(() => undefined) : undefined;
         return (item.group === "actions" ? actions : advanced).map(
           ([command, label, icon, tooltip]) => ({
             id: command,
             label,
             icon,
             command: "workspaceMap." + command,
-            description: command === "bindWindow" ? mapId.slice(0, 8) : undefined,
+            description: command === "bindWindow" ? "窗口 " + mapId.slice(0, 8) +
+              " · Codex " + (binding?.mapId?.slice(0, 8) ?? (binding?.state === "missing" ? "待绑定" : "状态待查")) : undefined,
             tooltip,
           }),
         );
+      }
       return [];
     },
     getTreeItem(item) {
@@ -150,7 +155,7 @@ export function createSidebar(core: Core, mapId: string): vscode.Disposable {
   });
   let dirty = false;
   const update = (event: { type: string }) => {
-    if (!["endpoints", "bookmarks", "workspaces"].includes(event.type)) return;
+    if (!["endpoints", "bookmarks", "workspaces", "agentBinding"].includes(event.type)) return;
     if (tree.visible) changes.fire(undefined);
     else dirty = true;
   };

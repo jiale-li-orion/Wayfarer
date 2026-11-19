@@ -110,6 +110,18 @@ export function createResourceView(
           case "compare":
             result = await core.dispatch("systemResources", m.args);
             break;
+          case "peerPairSave": {
+            const pair = m.args.pair;
+            const approved = m.args.remove === true || (await vscode.window.showQuickPick([
+              { label: "允许直传", description: pair.source.address + " ↔ " + pair.target.address, allow: true },
+              { label: "继续使用 SSH 中转", allow: false },
+            ], { title: "选择这两台机器的大文件传输方式" }))?.allow;
+            if (approved) result = await core.dispatch("peerPairSave", m.args);
+            break;
+          }
+          case "opsCatalog":
+          case "opsGroupSave":
+          case "opsGroupSelect":
           case "linkInterfaces":
           case "runProfile":
             result = await core.dispatch(m.method, m.args);

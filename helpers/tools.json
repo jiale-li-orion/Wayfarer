@@ -427,6 +427,14 @@
         "operationId": {
           "type": "string",
           "description": "Stable submission token; retrying the same token returns the original task."
+        },
+        "transport": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "relay"
+          ],
+          "description": "Auto uses an explicitly enabled Linux SSH peer route when eligible. Relay forces the existing host-mediated path."
         }
       },
       "required": [
@@ -1176,6 +1184,10 @@
             "type": "string"
           },
           "description": "Keys returned by comparison whose NFS network scope and export were explicitly verified as shared."
+        },
+        "groupId": {
+          "type": "string",
+          "description": "Saved patrol group ID. Use map_patrolGroups to look up saved groups."
         }
       },
       "additionalProperties": false
@@ -1582,6 +1594,19 @@
     },
     "annotations": {
       "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_patrolGroups",
+    "description": "List the current map’s saved patrol groups and selected group.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
       "destructiveHint": false
     }
   }

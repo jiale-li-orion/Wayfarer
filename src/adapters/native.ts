@@ -247,6 +247,7 @@ export class NativeEndpoint implements Endpoint {
         }
         break;
       }
+      case "hashPrefix":
       case "hash": {
         const h = createHash("sha256");
         const buffer = Buffer.allocUnsafe(
@@ -255,10 +256,17 @@ export class NativeEndpoint implements Endpoint {
         const f = await fs.open(p, "r");
         try {
           let offset = 0;
+          const length = method === "hashPrefix" ? a.length : undefined;
+          if (length !== undefined && (!Number.isSafeInteger(length) || length < 0))
+            throw Error("Invalid prefix length");
           for (;;) {
-            const n = (await f.read(buffer, 0, buffer.length, offset))
-              .bytesRead;
-            if (!n) break;
+            const size = length === undefined ? buffer.length : Math.min(buffer.length, length - offset);
+            if (!size) break;
+            const n = (await f.read(buffer, 0, size, offset)).bytesRead;
+            if (!n) {
+              if (length !== undefined && offset < length) throw Error("File shortened during prefix verification");
+              break;
+            }
             h.update(buffer.subarray(0, n));
             offset += n;
           }

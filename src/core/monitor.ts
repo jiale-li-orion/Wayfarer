@@ -37,6 +37,8 @@ type State = {
   cache: Map<string, { at: number; value: Sample }>;
   baseline?: any;
   last?: Sample;
+  lastComparison?: Sample;
+  volumeTrends?: Record<string, { stamp: number; available: number }[]>;
   history: Sample[];
 };
 export class SystemMonitor extends EventEmitter {
@@ -218,6 +220,12 @@ export class SystemMonitor extends EventEmitter {
       Array.from({ length: Math.min(4, queue.length) }, worker),
     );
   }
+  recentComparison(endpoint: string) {
+    const machine = this.machines().find((m) => m.roots.some((r) => r.endpoint === endpoint));
+    if (!machine || !this.enabled(machine.endpoint)) return undefined;
+    const sample = this.states.get(machine.id)?.lastComparison;
+    return sample && Date.now() - sample.stamp < 30000 ? sample : undefined;
+  }
   async snapshot(query: ResourceQuery = {}): Promise<Sample> {
     if (this.disposed) throw Error("Resource monitor closed");
     if (!query.endpoint) {
@@ -325,6 +333,23 @@ export class SystemMonitor extends EventEmitter {
           if (project)
             raw.detail.project = { ...project, source: "registered-project" };
         }
+        if (args.section === "comparison") {
+          const next: NonNullable<State["volumeTrends"]> = {};
+          for (const volume of raw.mounts ?? []) {
+            const key = JSON.stringify([volume.path, volume.source, volume.serverAddress, volume.route]);
+            if (volume.available == null) continue;
+            const points = s.volumeTrends?.[key] ?? [];
+            if (raw.stamp - (points.at(-1)?.stamp ?? 0) >= 4000)
+              points.push({ stamp: raw.stamp, available: volume.available });
+            while (points.length > 60 || points[0]?.stamp < raw.stamp - 600000)
+              points.shift();
+            next[key] = points;
+          }
+          s.volumeTrends = next;
+          raw.mounts = (raw.mounts ?? []).map((volume: any) => ({
+            ...volume, trend: next[JSON.stringify([volume.path, volume.source, volume.serverAddress, volume.route])]?.slice(),
+          }));
+        }
         const value = {
           ...raw,
           gpus: raw.gpus ?? s.last?.gpus,
@@ -337,6 +362,7 @@ export class SystemMonitor extends EventEmitter {
           query: args,
         };
         s.last = value;
+        if (args.section === "comparison") s.lastComparison = value;
         const point = {
           stamp: raw.stamp,
           cpuPercent: raw.system?.cpuPercent,
@@ -383,7 +409,7 @@ export class SystemMonitor extends EventEmitter {
       } catch (error) {
         await this.release(s);
         const value = {
-          ...s.last,
+          ...(args.section === "comparison" ? s.lastComparison ?? s.last : s.last),
           endpoint: machine.endpoint,
           machine: machine.id,
           name: machine.name,

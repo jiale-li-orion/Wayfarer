@@ -1,4 +1,4 @@
-# Workspace Map · 0.8.0
+# Workspace Map · 0.9.0
 
 训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。开发在训练机独立工作树，本机安装与验收，产物留D盘。
 
@@ -8,4 +8,6 @@ C盘离线维护已完成：53份旧交换文件回收75.24GiB，完成时C盘�
 
 本轮增加收藏查询条件、搜索结果归属、共享 SSH 机器及首次授权接续。工作区只读盘点、明确归属的迁移、缓存与性能复测记录位于 D:/Wayfarer-Acceptance/workspace-20261119。
 
-0.8.0 在训练机 2 的独立 worktree 开发。资源页增加多机对照、私网链路检查与短时测速、文件传输时间线及外部作业运行报告。当前窗口地图绑定入口复用 Codex／dsh 接入。在 PR 审阅和正式发布前，稳定版仍为 0.7.2。
+0.8.0 在训练机 2 的独立 worktree 开发。资源页增加多机对照、私网链路检查与短时测速、文件传输时间线及外部作业运行报告。当前窗口地图绑定入口复用 Codex／dsh 接入。0.8.0 已正式发布。
+
+0.9.0 在训练机 2 独立 worktree 开发，增加服务器直传、巡检组和地图绑定状态。发布前日常安装使用 0.8.0。

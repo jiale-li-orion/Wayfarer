@@ -867,3 +867,21 @@ small,
   background: var(--vscode-button-background);
   color: var(--vscode-button-foreground);
 }
+
+.capacity-chart { display: inline-block; min-width: 0; }
+.capacity-chart details { margin: 2px 0; }
+.capacity-chart summary { color: var(--vscode-descriptionForeground); }
+.capacity-low { color: var(--vscode-editorWarning-foreground); font-weight: 600; }
+.capacity-trend {
+  height: 27px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  max-width: 230px;
+}
+.capacity-trend i { background: var(--vscode-charts-blue); min-width: 2px; flex: 1 1 0; }
+button.volume-bookmark[aria-pressed="true"] {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+.timeline [data-phase="direct"] { --phase: var(--vscode-charts-blue, var(--vscode-progressBar-background)); }

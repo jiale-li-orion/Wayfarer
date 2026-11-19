@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -389,7 +389,7 @@
     "bench:lifecycle": "tsx scripts/benchmark-lifecycle.ts",
     "package": "vsce package --no-dependencies --allow-missing-repository --out artifacts/workspace-map.vsix && node scripts/release-assets.mjs",
     "vscode:prepublish": "npm run build",
-    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts tests/environments.test.ts tests/storage.test.ts tests/storage-protocol.test.ts tests/pressure.test.ts tests/maintenance.test.ts tests/fleet-performance.test.ts"
+    "test:portable": "tsx --test tests/portable.test.ts tests/monitor.test.ts tests/environments.test.ts tests/storage.test.ts tests/storage-protocol.test.ts tests/pressure.test.ts tests/maintenance.test.ts tests/fleet-performance.test.ts tests/operations.test.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",

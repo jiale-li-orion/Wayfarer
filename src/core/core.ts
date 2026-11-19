@@ -22,9 +22,11 @@ import { capabilities, recipe } from "../packages/catalog";
 import { Inspector } from "./inspect";
 import { StorageAnalysis } from "./storage";
 import { SystemMonitor } from "./monitor";
-import { compareMachines } from "./fleet";
+import { compareMachines, sameConfirmedShare } from "./fleet";
 import { Links } from "./links";
 import { RunProfiles } from "./runProfiles";
+import { OperationsStore } from "./operations";
+import { PeerTransfer } from "./peerTransfer";
 import { runPackage } from "../packages/runner";
 export class Core extends EventEmitter {
   agentStats?: () => any;
@@ -39,6 +41,8 @@ export class Core extends EventEmitter {
   readonly monitor: SystemMonitor;
   readonly links: Links;
   readonly runProfiles: RunProfiles;
+  readonly operations: OperationsStore;
+  readonly peer: PeerTransfer;
   readonly storageAnalysis: StorageAnalysis;
   private inventories = new Map<string, string>();
   view = defaultView();
@@ -146,8 +150,11 @@ export class Core extends EventEmitter {
     this.jobs.register("linkProbe", (context) => this.links.run(context));
     this.jobs.register("storage", (c) => this.storageAnalysis.run(c));
     this.jobs.register("inventory", (c) => this.inspector.inventory(c));
+    this.operations = new OperationsStore(path.join(storage, "operations-settings.json"), () => this.endpoints.configs());
+    this.peer = new PeerTransfer(path.join(path.dirname(helper), "peer_transfer.py"));
     const transfers = (this.transfers = new Transfers(this.endpoints, (r) =>
-      this.invalidateParent(r),
+      this.invalidateParent(r), this.operations, this.peer,
+      (a, b) => sameConfirmedShare(this.monitor, this.operations, a, b),
     ));
     this.jobs.register("transfer", (c) => transfers.run(c));
     this.jobs.registerCleanup("transfer", (j) => transfers.cleanup(j));
@@ -182,6 +189,7 @@ export class Core extends EventEmitter {
   async init(configs: EndpointConfig[] = []) {
     await fs.mkdir(this.storage, { recursive: true, mode: 0o700 });
     await this.endpoints.discover(configs);
+    await this.operations.init();
     await this.jobs.init();
     await this.inspector.init();
     try {
@@ -386,9 +394,33 @@ export class Core extends EventEmitter {
         return submit("linkProbe", a, ["link-probe"]);
       case "runProfile":
         return a.ref ? this.runProfiles.read(a) : this.runProfiles.list();
+      case "opsCatalog":
+        return this.operations.catalog();
+      case "patrolGroups": {
+        const { groups, selected } = this.operations.catalog();
+        return { groups: groups.map(({ id, name, endpoints, mounts }) =>
+          ({ id, name, endpoints, mounts })), selected };
+      }
+      case "opsGroupSave":
+        if (actor !== "user") throw Error("请通过资源页保存巡检组");
+        return this.operations.saveGroup(a);
+      case "opsGroupSelect":
+        if (actor !== "user") throw Error("请通过资源页切换巡检组");
+        return this.operations.select(a.id);
+      case "peerPairSave":
+        if (actor !== "user") throw Error("请通过资源页确认直传机器对");
+        return this.operations.savePair(a.pair, a.remove === true);
       case "systemResources": {
-        if (a.endpoints !== undefined)
-          return compareMachines(this.monitor, a.endpoints, a.confirmedShares);
+        const group = a.groupId ? this.operations.group(a.groupId) : undefined;
+        if (a.endpoints !== undefined || group) {
+          const known = new Set(this.endpoints.configs().map((endpoint) => endpoint.id));
+          const endpoints = a.endpoints ?? group!.endpoints.filter((id) => known.has(id));
+          const missing = group?.endpoints.filter((id) => !known.has(id)) ?? [];
+          return endpoints.length
+            ? { ...await compareMachines(this.monitor, endpoints,
+                a.confirmedShares ?? group?.confirmedShares, a.trends === true), missing }
+            : { machines: [], shares: [], missing };
+        }
         const { compact, ...query } = a;
         const value = await this.monitor.snapshot(query);
         return compact ? compactResourceSnapshot(value) : value;
@@ -407,6 +439,7 @@ export class Core extends EventEmitter {
           },
           agents: this.agentStats?.(),
           transfers: this.transfers.stats(),
+          direct: this.peer.stats(),
           lifecycle: {
             stage: this.stage,
             clients: this.clients.size,
@@ -611,6 +644,8 @@ export class Core extends EventEmitter {
         return this.view;
       }
       case "transfer": {
+        if (a.transport !== undefined && !["auto", "relay"].includes(a.transport))
+          throw Error("传输方式无效");
         const i = {
           ...a,
           sources: a.sources ? this.selectedRoots(a.sources) : [],
@@ -1022,6 +1057,7 @@ export class Core extends EventEmitter {
     await this.monitor.dispose();
     try {
       await this.jobs.dispose(() => {
+        this.peer.abort();
         this.endpoints.abort();
         this.storageAnalysis.abort();
       });

@@ -185,10 +185,18 @@ def run(method,a):
             f.seek(int(a.get('offset',0)));f.write(data)
             if a.get('truncate'): f.truncate(int(a.get('offset',0))+len(data))
         return len(data)
-    if method=='hash':
+    if method in ('hash', 'hashPrefix'):
         h=hashlib.sha256()
+        remain=int(a['length']) if method=='hashPrefix' else None
+        if remain is not None and remain<0: raise ValueError('Invalid prefix length')
         with open(getpath(a),'rb') as f:
-            for chunk in iter(lambda:f.read(max(4096,min(1048576,a.get('size',1048576)))),b''): h.update(chunk)
+            while remain is None or remain:
+                chunk=f.read(1048576 if remain is None else min(1048576,remain))
+                if not chunk:
+                    if remain: raise ValueError('File shortened during prefix verification')
+                    break
+                h.update(chunk)
+                if remain is not None: remain-=len(chunk)
         return h.hexdigest()
     if method=='metadata':
         p=getpath(a);os.chmod(p,int(a['mode']));os.utime(p,(a['mtime']/1000,a['mtime']/1000));return True
