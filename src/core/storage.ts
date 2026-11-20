@@ -297,7 +297,7 @@ export class StorageAnalysis {
       await this.prune();
     }
   }
-  async exportTo(id: string, output: string, before?: string) {
+  async exportTo(id: string, output: string, before?: string,check=()=>{}) {
     this.db(id);
     if (
       path.resolve(output).startsWith(path.resolve(this.directory) + path.sep)
@@ -317,6 +317,7 @@ export class StorageAnalysis {
       let offset = 0,
         first = true;
       while (true) {
+        check();
         const page = before
           ? await this.compare({ before, after: id, offset, limit: 200 })
           : await this.query({

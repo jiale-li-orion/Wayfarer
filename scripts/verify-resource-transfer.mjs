@@ -21,20 +21,11 @@ const expected = createHash("sha256").update(data).digest("hex");
 const remote = "/tmp/" + path.basename(dir),
   peers = ["train", "infer"];
 const results = { started: Date.now(), phases: [], cleanup: [] };
-let page;
-async function resourceButton(text) {
-  await live.command("Workspace Map: 查看机器资源");
-  page = await live.canvas();
-  await live.evaluate(
-    page,
-    `(()=>{const e=[...document.querySelectorAll('.toolbar-actions button')].find(e=>e.textContent.trim()===${JSON.stringify(text)});if(!e)throw Error('Record button missing');e.click()})()`,
-  );
-}
 try {
   await live.command("File: New Text File");
   for (const phase of ["baseline", "recording"]) {
     if (phase === "recording") {
-      await resourceButton("开始记录");
+      await live.ipc("recordingControl", { action: "start" });
       for (let i = 0; i < 50; i++) {
         if ((await live.ipc("systemResources")).recording) break;
         await sleep(100);
@@ -108,7 +99,7 @@ try {
       monitor: (await live.ipc("diagnostics")).monitor,
     });
   }
-  await resourceButton("停止记录");
+  await live.ipc("recordingControl", { action: "stop" });
   await sleep(200);
   assert.equal((await live.ipc("systemResources")).recording, undefined);
   results.completed = Date.now();

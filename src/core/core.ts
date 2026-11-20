@@ -25,6 +25,8 @@ import { SystemMonitor } from "./monitor";
 import { compareMachines, sameConfirmedShare } from "./fleet";
 import { Links } from "./links";
 import { modelAnalysis } from "./modelAnalysis";
+import { AgentRecords } from "./agentRecords";
+import { ProjectRuns } from "./projectRuns";
 import { Workloads, type ObserveRuns } from "./workloads";
 import { RunProfiles } from "./runProfiles";
 import { OperationsStore } from "./operations";
@@ -42,6 +44,8 @@ export class Core extends EventEmitter {
   readonly inspector: Inspector;
   readonly monitor: SystemMonitor;
   readonly links: Links;
+  readonly agentRecords: AgentRecords;
+  readonly projectRuns: ProjectRuns;
   readonly workloads: Workloads;
   readonly runProfiles: RunProfiles;
   readonly operations: OperationsStore;
@@ -166,6 +170,19 @@ export class Core extends EventEmitter {
               m.roots.some((r) => r.endpoint === b),
           ),
     );
+    this.agentRecords = new AgentRecords(
+      this.monitor,
+      this.storageAnalysis,
+      this.endpoints,
+      storage,
+    );
+    this.jobs.register("export", (c) => this.agentRecords.export(c));
+    this.jobs.registerCleanup("export", (j) => this.agentRecords.cleanup(j));
+    this.projectRuns = new ProjectRuns(
+      this.endpoints,
+      this.workloads,
+      (fields) => this.profile.record("run.index", fields),
+    );
     this.runProfiles = new RunProfiles(this.endpoints, storage);
     this.jobs.register("linkProbe", (context) => this.links.run(context));
     this.jobs.register("storage", (c) => this.storageAnalysis.run(c));
@@ -243,8 +260,10 @@ export class Core extends EventEmitter {
       });
     return { status, stamp, bootId, identities, reports };
   };
-  async surfaceRuns(root?: Ref, allowed?: Set<string>) {
+  async surfaceRuns(root?: Ref, allowed?: Set<string>, active = () => true) {
     const config = root && this.endpoints.items.get(root.endpoint)?.config;
+    await this.projectRuns.refresh(this.inspector.projects(), allowed);
+    if (!active()) return [];
     return this.workloads.surface((row) => {
       if (!root) return !allowed || allowed.has(row.endpoint);
       if (
@@ -346,6 +365,7 @@ export class Core extends EventEmitter {
         "package",
         "inventory",
         "search",
+        "artifactExport",
         "storageScan",
         "linkProbe",
         "size",
@@ -384,6 +404,7 @@ export class Core extends EventEmitter {
         "delete",
         "package",
         "inventory",
+        "artifactExport",
         "storageScan",
         "linkProbe",
         "size",
@@ -455,6 +476,20 @@ export class Core extends EventEmitter {
       case "linkProbe":
         this.links.validate(a);
         return submit("linkProbe", a, ["link-probe"]);
+      case "recordingControl":
+        return this.agentRecords.control(a.action, a);
+      case "recordingRead":
+        return this.agentRecords.page(a);
+      case "artifactExport": {
+        const ep = this.endpoints.get(a.target.endpoint);
+        if (
+          !a.source ||
+          !["resources", "recording", "storage"].includes(a.source.kind) ||
+          !["json", "csv"].includes(a.format ?? "json")
+        )
+          throw Error("导出参数无效");
+        return submit("export", a, [alias(ep.config, a.target.path)]);
+      }
       case "workloadRegister":
         if (!this.endpoints.items.has(a.endpoint))
           throw Error("作业端点未登记");
@@ -476,12 +511,19 @@ export class Core extends EventEmitter {
         }
         return this.workloads.register(a);
       case "workloadsPage":
-        return this.workloads.page(
-          a.cursor,
-          a.limit ?? 30,
-          a.observe === false ? undefined : this.observeRuns,
-        );
+        await this.projectRuns.refresh(this.inspector.projects());
+        return {
+          ...(await this.workloads.page(
+            a.cursor,
+            a.limit ?? 30,
+            a.observe === false ? undefined : this.observeRuns,
+          )),
+          indexPending: this.projectRuns.more,
+        };
       case "workloadDetail":
+        do {
+          await this.projectRuns.refresh(this.inspector.projects());
+        } while (!this.workloads.has(a.runId) && this.projectRuns.more);
         return this.workloads.detail(
           a.runId,
           a.observe ? this.observeRuns : undefined,
@@ -494,8 +536,15 @@ export class Core extends EventEmitter {
           this.endpoints,
           a.ref ? a : { ...this.view.modelSelection, ...a },
         );
-      case "runProfile":
-        return a.ref ? this.runProfiles.read(a) : this.runProfiles.list();
+      case "runProfile": {
+        if (a.ref) return this.runProfiles.read(a);
+        await this.projectRuns.refresh(this.inspector.projects());
+        const entries = [
+          ...this.workloads.profiles(),
+          ...(await this.runProfiles.list()),
+        ];
+        return [...new Map(entries.map((e) => [refKey(e.ref), e])).values()];
+      }
       case "opsCatalog":
         return this.operations.catalog();
       case "patrolGroups": {
@@ -568,6 +617,7 @@ export class Core extends EventEmitter {
           directories: this.directories.stats(),
           jobs: this.jobs.stats(),
           inspector: this.inspector.stats(),
+          projectRuns: this.projectRuns.stats(),
           workspaceUi: this.workspaceUiStats?.(),
           environmentUi: this.environmentUiStats?.(),
           monitor: this.monitor.stats(),
@@ -1193,6 +1243,7 @@ export class Core extends EventEmitter {
     for (const id of this.clients) this.releaseClient(id);
     const cache = this.directories.snapshot();
     this.directories.dispose();
+    const releasingIndex = this.projectRuns.release();
     await this.monitor.dispose();
     try {
       await this.jobs.dispose(() => {
@@ -1209,6 +1260,7 @@ export class Core extends EventEmitter {
       try {
         await this.storageAnalysis.dispose(deadline);
         await this.endpoints.dispose(deadline);
+        await releasingIndex;
         await this.directories.drain();
       } finally {
         this.stage = "closed";

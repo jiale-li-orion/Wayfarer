@@ -71,6 +71,7 @@ await cp("helpers", "dist/helpers", {
   filter: (source) =>
     !source.includes("__pycache__") && !source.endsWith(".pyc"),
 });
+await cp("scripts/index-workload.py","dist/helpers/index-workload.py");
 const metadata = {
   version: JSON.parse(await readFile("package.json", "utf8")).version,
   commit: execFileSync("git", ["rev-parse", "HEAD"], {

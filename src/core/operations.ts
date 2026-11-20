@@ -14,7 +14,12 @@ export type PatrolGroup = {
   confirmedShares: string[];
   mounts: Record<string, string[]>;
 };
-type Stored = { groups: PatrolGroup[]; pairs: SavedPair[]; selected?: string };
+type Stored = {
+  groups: PatrolGroup[];
+  pairs: SavedPair[];
+  selected?: string;
+  pins?: Record<string, string>;
+};
 
 export function signature(config: EndpointConfig) {
   return createHash("sha256")
@@ -102,6 +107,15 @@ export class OperationsStore {
     };
   }
 
+  pinned(endpoint: string) {
+    return this.state.pins?.[endpoint];
+  }
+  async pin(endpoint: string, path: string) {
+    await this.serialize((state) => ({
+      ...state,
+      pins: { ...state.pins, [endpoint]: path },
+    }));
+  }
   group(id: string) {
     const group = this.catalog().groups.find((item) => item.id === id);
     if (!group) throw Error("巡检组不存在");

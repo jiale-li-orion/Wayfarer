@@ -161,12 +161,10 @@ export function MachineInspector({
   pick,
   machine,
   call,
-  onRun,
 }: {
   pick: Pick;
   machine: MachineMetric;
   call: (m: string, a?: any) => Promise<any>;
-  onRun: (id: string) => void;
 }) {
   const endpoint = machine.endpoint;
   const [tab, setTab] = useState(
@@ -178,7 +176,7 @@ export function MachineInspector({
   const [data, setData] = useState<any>(),
     [processPage, setProcessPage] = useState<any>(),
     [search, setSearch] = useState(""),
-    [sort, setSort] = useState("rss"),
+    [sort, setSort] = useState<string>(pick.sort ?? "rss"),
     [offset, setOffset] = useState(0),
     [scroll, setScroll] = useState(0),
     [filter, setFilter] = useState(""),
@@ -243,6 +241,57 @@ export function MachineInspector({
     end = Math.min(rows.length, start + 26);
   return (
     <div className="machine-inspector">
+      {machine.kind === "wsl" && data?.wslBudget && (
+        <details>
+          <summary>Windows 预算与 WSL 实测</summary>
+          <dl>
+            {[
+              [
+                "配置的内存上限",
+                data.wslBudget.config.memory ??
+                  (data.wslBudget.config.source === "unavailable"
+                    ? "未读取"
+                    : "系统默认"),
+              ],
+              ["配置的 CPU", data.wslBudget.config.processors ?? "系统默认"],
+              ["配置的 swap", data.wslBudget.config.swap ?? "系统默认"],
+              ["WSL 实测 CPU", data.wslBudget.visibleCpus],
+              ["WSL 实测总内存", bytes(data.wslBudget.visibleMemory)],
+              ["Linux 可用内存", bytes(data.system?.memory?.available)],
+              [
+                "swap 已用 / 总量",
+                bytes(data.system?.memory?.swapUsed) +
+                  " / " +
+                  bytes(data.system?.memory?.swapTotal),
+              ],
+              ["宿主可用内存", bytes(data.wslBudget.hostAvailable)],
+              [
+                "宿主提交量 / 上限",
+                bytes(data.wslBudget.hostCommitUsed) +
+                  " / " +
+                  bytes(data.wslBudget.hostCommitLimit),
+              ],
+            ].map(([k, v]) => (
+              <React.Fragment key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </React.Fragment>
+            ))}
+            {data.wslBudget.hostProcesses?.map((p: any) => (
+              <React.Fragment key={p.pid}>
+                <dt>vmmemWSL · 工作集 / 私有提交量</dt>
+                <dd>
+                  {bytes(p.rss)} / {bytes(p.privateBytes)}
+                </dd>
+              </React.Fragment>
+            ))}
+          </dl>
+          <p>
+            配置来自 Windows .wslconfig，运行值由当前 WSL 2
+            虚拟机读取。各发行版共享虚拟机预算。
+          </p>
+        </details>
+      )}
       {failure && <p role="alert">{failure}</p>}
       {!selected && (
         <details>
@@ -507,22 +556,6 @@ export function MachineInspector({
               )}
             </div>
             <h3>{details?.name ?? selected.name}</h3>
-            {details && selected.kind === "process" && selected.identity && (
-              <button
-                onClick={async () => {
-                  const w = await act("observeProcess", {
-                    endpoint,
-                    pid: selected.pid,
-                    identity: selected.identity,
-                    name: selected.name,
-                    cwd: details.cwd,
-                  });
-                  if (w) onRun(w.runId);
-                }}
-              >
-                加入作业
-              </button>
-            )}
             {!details ? (
               <p>
                 {loading

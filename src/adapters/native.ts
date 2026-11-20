@@ -1,10 +1,12 @@
 import { grace, EXIT_GRACE_MS } from "../core/lifecycle";
 import fs from "node:fs/promises";
+import { constants } from "node:fs";
 import { type Dir } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { createHash, randomUUID } from "node:crypto";
-import { type ChildProcess } from "node:child_process";
+import { execFile, type ChildProcess } from "node:child_process";
+import { promisify } from "node:util";
 import spawn from "cross-spawn";
 import type { Endpoint, EndpointConfig, Entry } from "../shared/types";
 import { changed, normalized } from "../shared/paths";
@@ -212,6 +214,35 @@ export class NativeEndpoint implements Endpoint {
         await this.closeScan(a.cursor);
         r = true;
         break;
+      case "readRunIndex": {
+        const f = await fs.open(
+          p,
+          constants.O_RDONLY |
+            (constants.O_NOFOLLOW ?? 0) |
+            (constants.O_NONBLOCK ?? 0),
+        );
+        try {
+          const st = await f.stat();
+          if (!st.isFile() || st.size > 65536) throw Error("Invalid run index");
+          const b = Buffer.alloc(65537);
+          let bytesRead = 0;
+          while (bytesRead < b.length) {
+            const block = await f.read(
+              b,
+              bytesRead,
+              b.length - bytesRead,
+              bytesRead,
+            );
+            if (!block.bytesRead) break;
+            bytesRead += block.bytesRead;
+          }
+          if (bytesRead > 65536) throw Error("Index entry is too large");
+          r = b.subarray(0, bytesRead).toString("base64");
+        } finally {
+          await f.close();
+        }
+        break;
+      }
       case "read": {
         const f = await fs.open(p, "r");
         try {
@@ -257,14 +288,21 @@ export class NativeEndpoint implements Endpoint {
         try {
           let offset = 0;
           const length = method === "hashPrefix" ? a.length : undefined;
-          if (length !== undefined && (!Number.isSafeInteger(length) || length < 0))
+          if (
+            length !== undefined &&
+            (!Number.isSafeInteger(length) || length < 0)
+          )
             throw Error("Invalid prefix length");
           for (;;) {
-            const size = length === undefined ? buffer.length : Math.min(buffer.length, length - offset);
+            const size =
+              length === undefined
+                ? buffer.length
+                : Math.min(buffer.length, length - offset);
             if (!size) break;
             const n = (await f.read(buffer, 0, size, offset)).bytesRead;
             if (!n) {
-              if (length !== undefined && offset < length) throw Error("File shortened during prefix verification");
+              if (length !== undefined && offset < length)
+                throw Error("File shortened during prefix verification");
               break;
             }
             h.update(buffer.subarray(0, n));
@@ -281,6 +319,39 @@ export class NativeEndpoint implements Endpoint {
         await fs.utimes(p, a.mtime / 1000, a.mtime / 1000);
         r = true;
         break;
+      case "publishNewFile": {
+        const dest = normalized(this.config, a.dest);
+        try {
+          await fs.link(p, dest);
+        } catch (e: any) {
+          if (
+            process.platform !== "win32" ||
+            !["ENOTSUP", "EPERM", "EINVAL", "EOPNOTSUPP"].includes(e.code)
+          )
+            throw e;
+          // FAT volumes cannot create hard links. File.Move also refuses an existing destination.
+          await promisify(execFile)(
+            "powershell.exe",
+            [
+              "-NoProfile",
+              "-NonInteractive",
+              "-Command",
+              "$ErrorActionPreference='Stop';[IO.File]::Move($env:WAYFARER_EXPORT_PART,$env:WAYFARER_EXPORT_TARGET)",
+            ],
+            {
+              windowsHide: true,
+              timeout: 15000,
+              env: {
+                ...process.env,
+                WAYFARER_EXPORT_PART: p,
+                WAYFARER_EXPORT_TARGET: dest,
+              },
+            },
+          );
+        }
+        r = true;
+        break;
+      }
       case "rename": {
         const dest = normalized(this.config, a.dest);
         if (

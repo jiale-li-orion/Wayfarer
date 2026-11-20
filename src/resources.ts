@@ -1,11 +1,8 @@
 import { createHash } from "node:crypto";
 import * as vscode from "vscode";
 import { randomUUID } from "node:crypto";
-import fs from "node:fs/promises";
-import path from "node:path";
 import type { Core } from "./core/core";
 import { pathApi } from "./shared/paths";
-import { csvRows, csvHeader } from "./core/resourceExport";
 import type { FileProvider } from "./filesystem/provider";
 import type { Ref } from "./shared/types";
 
@@ -23,7 +20,6 @@ export function createResourceView(
 ) {
   let panel: vscode.WebviewPanel | undefined;
   let ready = false;
-  let recordingFile: string | undefined;
   let selection: ResourceOpen | undefined;
   async function action(m: { method: string; args: any }) {
     let result: any;
@@ -31,6 +27,14 @@ export function createResourceView(
       case "storage":
         result = await vscode.commands.executeCommand("workspaceMap.storage");
         break;
+      case "pinMount":{
+        const machine=core.monitor.machines().find(x=>x.roots.some(r=>r.endpoint===m.args.endpoint));
+        if(!machine)throw Error("未知机器");
+        const sample=await core.monitor.snapshot({endpoint:machine.endpoint,section:"comparison"});
+        if(!sample.mounts?.some((v:any)=>v.path===m.args.path))throw Error("挂载列表已更新");
+        await core.operations.pin(machine.endpoint,m.args.path);
+        core.emit("event",{type:"mountPin"});result=true;break;
+      }
       case "snapshot":
         result = await core.monitor.snapshot(m.args);
         break;
@@ -56,107 +60,6 @@ export function createResourceView(
             )
           )?.allow;
         if (approved) result = await core.dispatch("peerPairSave", m.args);
-        break;
-      }
-      case "observeProcess": {
-        const { endpoint, pid, identity, name } = m.args;
-        const proc = await core.monitor.snapshot({
-          endpoint,
-          section: "identities",
-          pids: [pid],
-        });
-        if (
-          proc.status !== "online" ||
-          !identity ||
-          proc.identities?.[pid] !== identity
-        )
-          throw Error("进程已退出或身份已变化");
-        const label = await vscode.window.showInputBox({
-          title: "加入作业",
-          value: name,
-        });
-        if (!label?.trim()) break;
-        const machine = core.monitor
-          .machines()
-          .find((m) => m.roots.some((r) => r.endpoint === endpoint));
-        const options = core.inspector
-          .projects()
-          .filter((p) => machine?.roots.some((r) => r.endpoint === p.endpoint));
-        let projectRef: Ref | undefined;
-        if (options.length) {
-          const matches =
-            typeof m.args.cwd === "string"
-              ? options.filter((p) => {
-                  const api = pathApi(core.endpoints.get(p.endpoint).config),
-                    rel = api.relative(p.path, m.args.cwd);
-                  return (
-                    !api.isAbsolute(rel) &&
-                    rel !== ".." &&
-                    !rel.startsWith(".." + api.sep)
-                  );
-                })
-              : [];
-          const suggested = matches.length === 1 ? matches[0] : undefined;
-          const choices = [
-            { label: "归到机器", ref: undefined as Ref | undefined },
-            ...options.map((p) => ({ label: p.path, ref: p })),
-          ];
-          if (suggested)
-            choices.sort(
-              (a, b) =>
-                Number(
-                  b.ref?.endpoint === suggested.endpoint &&
-                    b.ref?.path === suggested.path,
-                ) -
-                Number(
-                  a.ref?.endpoint === suggested.endpoint &&
-                    a.ref?.path === suggested.path,
-                ),
-            );
-          const chosen = await vscode.window.showQuickPick(choices, {
-            title: "作业所属项目",
-            placeHolder: "选择项目目录或归到机器",
-          });
-          if (!chosen) break;
-          projectRef = chosen.ref;
-        }
-        if (label?.trim())
-          result = await core.dispatch("workloadRegister", {
-            runId:
-              "process/" +
-              endpoint +
-              "/" +
-              (proc.bootId ?? "") +
-              "/" +
-              identity,
-            endpoint,
-            name: label.trim(),
-            projectRef,
-            process: { pid, identity, bootId: proc.bootId },
-          });
-        break;
-      }
-      case "forgetWorkload": {
-        const choice = await vscode.window.showWarningMessage(
-          "移除此作业的关注记录？运行中的进程和实验文件会保留。",
-          { modal: true },
-          "取消关注",
-        );
-        if (choice) {
-          await core.dispatch("workloadForget", m.args);
-          result = true;
-        }
-        break;
-      }
-      case "registerPickedRecord": {
-        const { ref, kind, runId, label } = m.args;
-        const row = await core.dispatch("workloadRegister", {
-          runId,
-          endpoint: ref.endpoint,
-          name: label ?? runId,
-          files: [{ ...ref, kind }],
-        });
-        result = row.runId;
         break;
       }
       case "fileTransfers":
@@ -232,58 +135,6 @@ export function createResourceView(
         }
         break;
       }
-      case "pickModelRun":
-      case "pickProfile": {
-        const targets = (await core.monitor.snapshot()).machines as {
-          endpoint: string;
-          name: string;
-          kind: string;
-        }[];
-        const pick = await vscode.window.showQuickPick(
-          [
-            { endpoint: "", label: "本机文件…" },
-            ...targets
-              .filter((m) => m.kind === "ssh" || m.kind === "wsl")
-              .map((m) => ({ endpoint: m.endpoint, label: m.name })),
-          ],
-          { title: "选择运行记录所在机器" },
-        );
-        if (!pick) break;
-        let ref: Ref;
-        if (pick.endpoint) {
-          const file = await vscode.window.showInputBox({
-            title: pick.label + " · 运行记录",
-            prompt: "记录文件的绝对路径",
-          });
-          if (!file) break;
-          ref = { endpoint: pick.endpoint, path: file };
-        } else {
-          const files = await vscode.window.showOpenDialog({
-            title: "打开运行记录",
-            canSelectMany: false,
-            filters: { 运行记录: ["json"] },
-          });
-          if (!files?.[0]) break;
-          const file = files[0].fsPath;
-          const native = core.endpoints
-            .configs()
-            .filter((m) => m.kind === "windows" || m.kind === "local")
-            .find((m) => {
-              const paths = pathApi(m);
-              return (
-                paths.parse(file).root.toLowerCase() ===
-                paths.parse(m.root).root.toLowerCase()
-              );
-            });
-          if (!native) throw Error("找不到此文件所在的本机端点");
-          ref = { endpoint: native.id, path: file };
-        }
-        result =
-          m.method === "pickModelRun"
-            ? await core.dispatch("modelAnalysis", { ref })
-            : await core.dispatch("runProfile", { ref, remember: true });
-        break;
-      }
       case "modelAudio": {
         const ref = m.args.ref as Ref;
         const ep = core.endpoints.get(ref.endpoint);
@@ -356,15 +207,6 @@ export function createResourceView(
         result = true;
         break;
       }
-      case "record":
-        if (m.args.start) {
-          result = await core.monitor.startRecording();
-          recordingFile = result.file;
-        } else {
-          result = await core.monitor.stopRecording();
-          recordingFile = result?.file ?? recordingFile;
-        }
-        break;
       case "locate": {
         const ref = { ...m.args.ref };
         if (m.args.file)
@@ -373,101 +215,6 @@ export function createResourceView(
           );
         await vscode.commands.executeCommand("workspaceMap.openLocation", ref);
         result = true;
-        break;
-      }
-      case "export": {
-        let source: string | undefined;
-        let format = m.args.format === "csv" ? "csv" : "json";
-        if (m.args.recording) {
-          const choice = recordingFile
-            ? await vscode.window.showQuickPick(["本次记录", "选择历史记录…"], {
-                title: "导出资源记录",
-              })
-            : "选择历史记录…";
-          if (!choice) {
-            result = false;
-            break;
-          }
-          if (choice === "本次记录") source = recordingFile;
-          else {
-            const files = await vscode.window.showOpenDialog({
-              title: "选择此地图的资源记录",
-              defaultUri: vscode.Uri.file(core.monitor.recordingDirectory()),
-              canSelectFiles: true,
-              canSelectFolders: false,
-              canSelectMany: false,
-              filters: { 资源记录: ["jsonl"] },
-            });
-            if (!files?.[0]) {
-              result = false;
-              break;
-            }
-            source = files[0].fsPath;
-          }
-          const selection = await vscode.window.showQuickPick(["JSON", "CSV"], {
-            title: "导出格式",
-          });
-          if (!selection) {
-            result = false;
-            break;
-          }
-          format = selection === "CSV" ? "csv" : "json";
-        }
-        const uri = await vscode.window.showSaveDialog({
-          title: "导出资源记录",
-          defaultUri: vscode.Uri.file(
-            path.join(
-              core.monitor.recordingDirectory(),
-              "workspace-resources-" +
-                new Date().toISOString().replace(/[:.]/g, "-") +
-                "." +
-                format,
-            ),
-          ),
-          filters: format === "csv" ? { CSV: ["csv"] } : { JSON: ["json"] },
-        });
-        if (!uri) {
-          result = false;
-          break;
-        }
-        if (uri.scheme !== "file") throw Error("请选择本机导出位置");
-        const target = await fs.open(uri.fsPath, "w");
-        try {
-          let first = true;
-          await target.write(format === "csv" ? csvHeader : "[\n");
-          if (source) {
-            const input = await core.monitor.readRecording(source);
-            try {
-              for await (const line of input.lines) {
-                if (!line.trim()) continue;
-                const value = JSON.parse(line);
-                await target.write(
-                  format === "csv"
-                    ? csvRows(value)
-                    : (first ? "" : ",\n") + JSON.stringify(value),
-                );
-                first = false;
-              }
-            } finally {
-              input.lines.close();
-              input.stream.destroy();
-            }
-          } else {
-            const state = await core.monitor.snapshot();
-            for (const value of state.snapshots) {
-              await target.write(
-                format === "csv"
-                  ? csvRows(value)
-                  : (first ? "" : ",\n") + JSON.stringify(value),
-              );
-              first = false;
-            }
-          }
-          if (format === "json") await target.write("\n]\n");
-        } finally {
-          await target.close();
-        }
-        result = { path: uri.fsPath };
         break;
       }
       default:

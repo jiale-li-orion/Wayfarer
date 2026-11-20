@@ -740,9 +740,8 @@ export function RunsPanel({ call, initialRef }: { call: Call; initialRef?:Ref })
     setFailure("");
     setLoading(true);
     try {
-      const result = ref
-        ? await call("runProfile", { ref })
-        : await call("pickProfile");
+      if(!ref)return;
+      const result=await call("runProfile",{ref});
       if (result) {
         (slot === 0 ? setFirst : setSecond)(result);
         if (slot === 0) setNode(undefined);
@@ -814,9 +813,7 @@ export function RunsPanel({ call, initialRef }: { call: Call; initialRef?:Ref })
                   ))}
                 </select>
               </label>
-              <button disabled={loading} onClick={() => void load(i)}>
-                打开文件…
-              </button>
+
             </div>
           ))}
         </div></details>

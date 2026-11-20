@@ -58,12 +58,12 @@ export function ModelAnalysis({
   const following = useRef(follow);
   following.current = follow;
 
-  const openGeneration = useRef(0);
+
   const restoreFocus = useRef<
     { attempt: number; module?: string; sample?: string } | undefined
   >(undefined);
   useEffect(() => {
-    const version = openGeneration.current;
+
     let active = true;
     (async () => {
       const previous = await call("modelAnalysis");
@@ -73,9 +73,9 @@ export function ModelAnalysis({
           initialRef.endpoint !== previous?.ref?.endpoint)
           ? { ref: initialRef, follow: true }
           : previous;
-      if (!saved?.ref || !active || version !== openGeneration.current) return;
+      if (!saved?.ref || !active) return;
       const run = await call("modelAnalysis", { ref: saved.ref });
-      if (!active || version !== openGeneration.current) return;
+      if (!active) return;
       restoreFocus.current = saved.attempt==null?undefined:saved;
       setFollow(saved.follow);
       select(saved.attempt);
@@ -87,30 +87,6 @@ export function ModelAnalysis({
       active = false;
     };
   }, [call, initialRef]);
-  async function open() {
-    openGeneration.current++;
-    restoreFocus.current = undefined;
-    try {
-      const picked = await call("pickModelRun");
-      if (!picked) return;
-      cursor.current = 0;
-      latest.current = undefined;
-      select(undefined);
-      setStep(undefined);
-      setEvents([]);
-      setProbes([]);
-      setFollow(true);
-      setDetail("");
-      setSample("");
-      setError("");
-      audioRequest.current++;
-      setClip(undefined);
-      setRecord(picked);
-    } catch (err) {
-      setError(String(err));
-    }
-  }
-
   useEffect(() => {
     if (!record || record.run.type === "behavior") return;
     let active = true,
@@ -240,7 +216,7 @@ export function ModelAnalysis({
     <section className="model-analysis">
       <header>
         <h1>模型分析</h1>
-        {!initialRef && <button onClick={open}>打开实验记录</button>}
+
       </header>
       {error && <p role="alert">{error}</p>}
       {record?.run.type === "behavior" && (

@@ -37,6 +37,10 @@ const columns = [
   "sendBytesPerSecond",
   "diskTotalBytes",
   "diskAvailableBytes",
+  "wslMemoryConfig",
+  "wslCpuConfig",
+  "wslVisibleCpus",
+  "wslVisibleMemoryBytes",
   "memorySource",
   "memoryStamp",
 ];
@@ -56,6 +60,10 @@ export function csvRows(s: any) {
     {
       ...common,
       name: "system",
+      wslMemoryConfig: s.wslBudget?.config?.memory,
+      wslCpuConfig: s.wslBudget?.config?.processors,
+      wslVisibleCpus: s.wslBudget?.visibleCpus,
+      wslVisibleMemoryBytes: s.wslBudget?.visibleMemory,
       systemCpuPercent: s.system?.cpuPercent,
       systemMemoryUsedBytes: s.system?.memory?.used,
       systemMemoryTotalBytes: s.system?.memory?.total,
@@ -140,7 +148,8 @@ export function compactResourceSnapshot(value: any): any {
       .map((k) => [k, value[k]]),
   );
   const sections: Record<string, string[]> = {
-    summary: ["system", "physicalBudget"],
+    summary: ["system", "physicalBudget", "wslBudget"],
+    comparison: ["system", "wslBudget", "physicalBudget", "gpus", "mounts"],
     processes: ["processes", "total", "offset", "limit"],
     process: ["detail", "detailStatus", "detailError"],
     gpus: ["gpus"],

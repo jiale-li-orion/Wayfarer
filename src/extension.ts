@@ -319,6 +319,7 @@ export async function activate(context: vscode.ExtensionContext) {
             const runs = await core.surfaceRuns(
               root,
               new Set(machines.flatMap((m) => m.roots.map((r) => r.endpoint))),
+              ()=>panel===ownedPanel&&ownedPanel.visible,
             );
             result = {
               machines: machines.map((machine) => ({
@@ -330,7 +331,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 name: machine.name,
                 kind: machine.kind,
                 roots: machine.roots,
-                mount: group?.mounts[machine.endpoint]?.[0],
+                mount: core.operations.pinned(machine.endpoint)??group?.mounts[machine.endpoint]?.[0],
               })),
               runs,
             };
@@ -452,12 +453,14 @@ export async function activate(context: vscode.ExtensionContext) {
         );
       if (!e.webviewPanel.visible) {
         core.monitor.retainComparison("directory-surface", []);
+        void core.projectRuns.release();
         jobsSubscribed = false;
         ready = false;
       }
     });
     panel.onDidDispose(() => {
       core.monitor.retainComparison("directory-surface", []);
+        void core.projectRuns.release();
       core.off("event", send);
       panel = undefined;
       void vscode.commands.executeCommand(

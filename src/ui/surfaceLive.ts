@@ -14,6 +14,7 @@ export type Run = {
   step?: number;
   updated: number;
   lastObserved?: number;
+  progressAt?: number;
   state?: string;
   observed?: string;
   connection?: string;
