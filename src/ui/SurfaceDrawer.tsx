@@ -122,7 +122,7 @@ function DiskRanks({ endpoint, path }: { endpoint: string; path: string }) {
         </button>
       )}
       {offset > 0 && <button onClick={() => turn(offset - 30)}>上一页</button>}
-      {page && offset + page.rows.length < page.total && (
+      {page?.hasMore && (
         <button onClick={() => turn(offset + 30)}>下一页</button>
       )}
       {job ? (

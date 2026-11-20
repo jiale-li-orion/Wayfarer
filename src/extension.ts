@@ -217,6 +217,7 @@ export async function activate(context: vscode.ExtensionContext) {
   };
   const open = (revived?: vscode.WebviewPanel) => {
     if (panel) {
+      if(revived && revived!==panel)revived.dispose();
       panel.reveal();
       return;
     }

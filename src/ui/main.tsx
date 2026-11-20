@@ -291,6 +291,12 @@ function App() {
     [],
   );
   const scope = view.root ? refKey(view.root) : "";
+  const previousScope=useRef(scope);
+  useEffect(()=>{
+    if(previousScope.current!==scope){
+      previousScope.current=scope;setDrawer(undefined);setDetailOpen(false);setPair([]);setJobsOpen(false);setSelected([]);
+    }
+  },[scope]);
   useVisibleQuery(
     () =>
       endpoints.length

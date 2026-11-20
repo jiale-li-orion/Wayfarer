@@ -20,6 +20,7 @@ export type Run = {
   projectRef?: Ref;
 };
 export function ended(r: Run) {
+  if (r.state === "failed") return false;
   return (
     r.state === "completed" ||
     r.state === "exited" ||

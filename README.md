@@ -57,13 +57,10 @@ Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows
 | **跟踪实验和外部作业** | 脚本或 Agent 可显式登记运行，也能从进程详情手动加入。按阶段查看相关传输，直接打开报告、日志和产物。取消关注时外部工作继续执行。 [作业与接口](docs/WORKLOADS.md) |
 | **回放一次模型更新** | 选择训练端的实验记录，沿 optimizer step 查看参与的 microbatch、样本损失、裁剪前后梯度和有效参数变化。固定样本可跨 checkpoint 比较输出，有播放录音时可 A/B 试听。 [记录格式与 MCP](docs/MODEL_ANALYSIS.md) |
 
-<table>
-  <tr>
-    <td width="50%"><a href="docs/images/resources/01-overview.png"><img src="docs/images/resources/01-overview.png" alt="VS Code 中 Windows、WSL 和两台 SSH 主机的资源总览"></a></td>
-    <td width="50%"><a href="docs/images/storage-060/02-storage-directory.png"><img src="docs/images/storage-060/02-storage-directory.png" alt="存储扫描结果中的子目录占用排名"></a></td>
-  </tr>
-  <tr><td align="center">多端资源总览</td><td align="center">目录占用下钻</td></tr>
-</table>
+<p align="center">
+  <a href="docs/images/readme/project-map.png"><img src="docs/images/readme/project-map.png" width="900" alt="目录地图：WSL 连接到 speech-demo，旁边是实际目录、文件和已登记的 CPU LoRA 回放"></a>
+  <br><sub>实机验收 · 同一张地图上的目录、GPU 和 CPU LoRA 回放</sub>
+</p>
 
 ### 从一次 LoRA 更新看模型分析
 
