@@ -1,0 +1,377 @@
+.wf-machine,
+.run-tile,
+.archive-tile {
+  box-sizing: border-box;
+  color: var(--vscode-foreground, #e2e7e9);
+  font: 13px/1.35 var(--vscode-font-family, system-ui);
+  background: var(--vscode-editorWidget-background, #22282d);
+  border: 1px solid var(--vscode-panel-border, #475057);
+  border-radius: 9px;
+}
+.wf-machine {
+  width: 344px;
+  padding: 12px;
+  overflow: hidden;
+}
+.wf-machine.paired {
+  outline: 2px solid var(--vscode-focusBorder, #368b96);
+}
+.wf-machine header,
+.machine-metrics,
+.device-caption,
+.wf-machine .mount,
+.device-grid button span,
+.run-tile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.wf-machine button,
+.run-tile button,
+.archive-tile {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+  min-height: 22px;
+  white-space: nowrap;
+}
+.wf-machine .machine-name {
+  font-size: 17px;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: flex-start;
+}
+.availability {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground, #a5afb3);
+}
+.availability.online:before {
+  content: "";
+  display: inline-block;
+  background: var(--vscode-testing-iconPassed, #67b99d);
+  width: 6px;
+  height: 6px;
+  border-radius: 100%;
+  margin-right: 5px;
+}
+.availability.offline,
+.needs-attention small {
+  color: var(--vscode-editorWarning-foreground, #daa657);
+}
+.machine-metrics {
+  justify-content: flex-start;
+  gap: 14px;
+  margin: 5px 0;
+}
+.machine-metrics b,
+.device-grid,
+.mount {
+  font-variant-numeric: tabular-nums;
+}
+.device-caption,
+.wf-machine .mount {
+  color: var(--vscode-descriptionForeground, #b4bec3);
+  font-size: 12px;
+}
+.device-caption {
+  padding: 0 3px;
+}
+.device-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin: 3px 0 5px;
+}
+.device-grid button {
+  position: relative;
+  display: block;
+  text-align: left;
+  height: 40px;
+  background: var(--vscode-editor-background, #182026);
+  overflow: hidden;
+  border-radius: 4px;
+}
+.device-grid b {
+  font-size: 12px;
+}
+.device-grid strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.device-grid i {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--vscode-charts-blue, #499cae);
+}
+.wf-machine .mount {
+  width: 100%;
+  border-top: 1px solid var(--vscode-panel-border, #475057);
+  border-radius: 0;
+}
+.mount span:first-child {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.run-tile {
+  width: 258px;
+  height: 58px;
+  border-left: 3px solid var(--vscode-charts-blue, #499cae);
+  padding: 4px 8px;
+}
+.run-tile > button:first-child {
+  min-width: 0;
+  display: block;
+  text-align: left;
+}
+.run-tile strong,
+.run-tile small {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.run-tile small {
+  color: var(--vscode-descriptionForeground, #adbabd);
+  font-size: 12px;
+}
+.archive-tile {
+  width: 182px;
+  height: 34px;
+}
+.wf-machine button:hover,
+.run-tile button:hover {
+  background: var(--vscode-toolbar-hoverBackground, #ffffff13);
+}
+.surface-drawer {
+  position: absolute;
+  z-index: 7;
+  right: 12px;
+  top: 65px;
+  bottom: 14px;
+  width: min(420px, calc(100% - 24px));
+  overflow: auto;
+  padding: 14px;
+  background: var(--vscode-sideBar-background, #202427);
+  border: 1px solid var(--vscode-panel-border, #445057);
+  border-radius: 9px;
+  box-shadow: 0 6px 18px #0003;
+}
+.surface-drawer > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.surface-drawer header h2 {
+  margin: 0;
+}
+.surface-drawer main {
+  height: auto;
+  overflow: visible;
+}
+.surface-drawer details {
+  margin: 6px 0;
+}
+.surface-drawer button {
+  white-space: normal;
+}
+.surface-drawer .fact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--vscode-panel-border, #445057);
+}
+.surface-drawer .performance-card {
+  padding: 8px 0;
+}
+.surface-drawer .link-selectors {
+  display: grid;
+  gap: 8px;
+}
+.surface-drawer .link-selectors fieldset {
+  min-width: 0;
+}
+.surface-drawer .performance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.surface-menu {
+  position: relative;
+}
+.surface-menu summary {
+  cursor: pointer;
+  padding: 6px;
+}
+.surface-menu > div {
+  position: absolute;
+  right: 0;
+  min-width: 155px;
+  z-index: 8;
+  display: grid;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px;
+}
+.surface-menu button {
+  justify-content: flex-start;
+}
+.surface-drawer input[type="checkbox"] {
+  width: auto;
+}
+.surface-drawer .resource-content {
+  min-width: 0;
+}
+.surface-drawer .process-table,
+.surface-drawer .process-scroll {
+  max-height: 320px;
+  overflow: auto;
+}
+.surface-drawer .process-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 7px;
+}
+.surface-drawer .device-inspection dl {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+}
+.surface-drawer dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.surface-drawer .summary-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.surface-drawer svg.trend,
+.surface-drawer .summary-strip svg {
+  width: 100%;
+  height: 30px;
+}
+.surface-drawer .workload-row {
+  display: grid;
+  width: 100%;
+}
+@media (max-width: 760px) {
+  .toolbar.top {
+    max-width: calc(100% - 25px);
+    overflow-x: auto;
+  }
+  .toolbar.top-right {
+    top: auto;
+    bottom: 12px;
+  }
+  .surface-menu > div {
+    top: auto;
+    bottom: 100%;
+  }
+  .surface-drawer {
+    bottom: 60px;
+  }
+}
+
+.project-tile {
+  width: 258px;
+  min-height: 42px;
+  justify-content: flex-start;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 600;
+}
+.project-tile i {
+  color: var(--vscode-charts-blue, #499cae);
+}
+
+.surface-drawer .process-scroll {
+  height: 285px;
+  overflow-y: auto;
+}
+.surface-drawer .process-row {
+  display: grid;
+  grid-template-columns: minmax(75px, 1fr) 46px 42px 70px 65px;
+  gap: 4px;
+  height: 38px;
+  width: 100%;
+  align-items: center;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.surface-drawer .process-name {
+  display: grid;
+  text-align: left;
+  overflow: hidden;
+}
+.surface-drawer .process-name > * {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.surface-drawer .process-controls {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: 4px;
+}
+.surface-drawer .summary-strip > div {
+  min-width: 0;
+  display: grid;
+}
+.surface-drawer dl {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+}
+.surface-drawer .gpu-row,
+.surface-drawer .gpu-process {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+}
+.surface-drawer .selected,
+.surface-drawer .resource-tabs [aria-pressed="true"] {
+  background: var(--vscode-toolbar-activeBackground, #ffffff20);
+}
+.surface-drawer .resource-tabs {
+  margin: 10px 0;
+}
+.surface-drawer .meter > span {
+  display: block;
+  height: 3px;
+  background: var(--vscode-charts-blue, #499cae);
+}
+.surface-drawer .machine-options label,
+.surface-drawer .performance-card details label {
+  display: block;
+}
+.surface-drawer .workload-row small {
+  color: var(--muted);
+}
+.surface-drawer .pressure-panel {
+  padding: 6px;
+}
+@media (max-width: 500px) {
+  .surface-drawer {
+    left: 6px;
+    right: 6px;
+    width: auto;
+  }
+  .selection > span {
+    display: none;
+  }
+  .surface-drawer .process-row {
+    grid-template-columns: minmax(40px, 1fr) 40px 36px 62px 56px;
+  }
+}

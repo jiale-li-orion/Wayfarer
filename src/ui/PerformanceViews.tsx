@@ -54,22 +54,12 @@ function Failure({ message }: { message: string }) {
   ) : null;
 }
 
-export function FleetPanel({
-  machines,
-  call,
-  onMachine,
-  refreshToken,
-}: {
-  machines: Machine[];
-  call: Call;
-  onMachine: (ep: string) => void;
-  refreshToken: number;
-}) {
+export function FleetTools({machines,selectedPair,call,filter,onFilter}:{machines:Machine[];selectedPair:string[];call:Call;filter:string;onFilter:(id:string)=>void}){
   const [chosen, setChosen] = useState<string[]>(() =>
     machines.slice(0, 8).map((m) => m.endpoint),
   );
-  const [groupFilter, setGroupFilter] = useState("");
-  const [pair, setPair] = useState<string[]>([]);
+  const groupFilter=filter, setGroupFilter=onFilter;
+
   const [confirmed, setConfirmed] = useState<string[]>([]);
   const [groups, setGroups] = useState<PatrolGroup[]>([]);
   const [groupId, setGroupId] = useState("daily");
@@ -144,23 +134,15 @@ export function FleetPanel({
     ? machines.filter((m) => chosen.includes(m.endpoint))
     : machines;
   const ids = visible.map((m) => m.endpoint);
-  const selectedPair = pair.filter((id) => ids.includes(id));
+
   const membership = JSON.stringify(ids);
   const pairKey = JSON.stringify(selectedPair);
-  useEffect(() => {
-    void call("watchComparison", { endpoints: ids }).catch((e) =>
-      setError(String(e)),
-    );
-    return () => {
-      void call("watchComparison", { endpoints: [] }).catch(() => {});
-    };
-  }, [membership, call]);
   useVisibleQuery(
     async () => {
       const fleet = [],
         shares = [];
       const paired = selectedPair.length === 2 ? selectedPair : [];
-      const rest = ids.filter((id) => !paired.includes(id));
+      const rest = paired.length?[]:ids;
       const batches = paired.length ? [paired] : [];
       for (let i = 0; i < rest.length; i += 8)
         batches.push(rest.slice(i, i + 8));
@@ -168,7 +150,7 @@ export function FleetPanel({
         const page = await call("compare", {
           endpoints,
           confirmedShares: confirmed,
-          trends: true,
+          trends: true,reuseRecent:true,
         });
         fleet.push(...page.machines);
         shares.push(...page.shares);
@@ -180,7 +162,7 @@ export function FleetPanel({
       setError("");
     },
     (e) => setError(String(e)),
-    [membership, pairKey, confirmed, refreshToken, call],
+    [membership, pairKey, confirmed, call],
   );
   const shared =
     selectedPair.length === 2
@@ -194,13 +176,13 @@ export function FleetPanel({
     <div className="performance-page">
       <section className="performance-card">
         <div className="performance-head">
-          <h1>机器</h1>
+          <h3>巡检组</h3>
           <select
             aria-label="巡检组筛选"
             value={groupFilter}
             onChange={async (e) => {
               const id = e.target.value;
-              setPair([]);
+
               try {
                 if (id) apply(await call("opsGroupSelect", { id }));
                 setGroupFilter(id);
@@ -259,114 +241,8 @@ export function FleetPanel({
           </button>
         </details>
         <Failure message={error} />
-        <div className="fleet-scroll">
-          <table className="fleet-table">
-            <thead>
-              <tr>
-                {[
-                  "配对",
-                  "机器",
-                  "状态",
-                  "CPU",
-                  "可用内存",
-                  "GPU 利用率 · 显存",
-                  "关注磁盘余量",
-                ].map((h) => (
-                  <th key={h}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map((machine) => {
-                const m = sample?.machines.find(
-                  (v: any) => v.endpoint === machine.endpoint,
-                );
-                const volumes = m?.volumes ?? [],
-                  pinned = mounts[machine.endpoint] ?? [];
-                const primary=volumes.find((v:any)=>v.path==="/")??volumes[0];
-                const displayed=pinned.length?volumes.filter((v:any)=>pinned.includes(v.path)):(primary?[primary]:[]);
-                return (
-                  <tr key={machine.endpoint}>
-                    <td>
-                      {machine.kind === "ssh" && (
-                        <input
-                          type="checkbox"
-                          aria-label={"配对 " + machine.name}
-                          checked={selectedPair.includes(machine.endpoint)}
-                          disabled={
-                            selectedPair.length === 2 &&
-                            !selectedPair.includes(machine.endpoint)
-                          }
-                          onChange={() =>
-                            setPair((old) =>
-                              old.includes(machine.endpoint)
-                                ? old.filter((id) => id !== machine.endpoint)
-                                : [...selectedPair, machine.endpoint],
-                            )
-                          }
-                        />
-                      )}
-                    </td>
-                    <td>
-                      <button onClick={() => onMachine(machine.endpoint)}>
-                        {machine.name}
-                      </button>
-                    </td>
-                    <td title={m?.error}>
-                      {m?.status === "offline" ? "离线" : m ? "在线" : "读取中"}
-                      {m?.stamp && <small>{stamp(m.stamp)}</small>}
-                    </td>
-                    <td>
-                      {m?.cpuPercent == null
-                        ? "—"
-                        : m.cpuPercent.toFixed(1) + "%"}
-                    </td>
-                    <td>{amount(m?.memoryAvailable)}</td>
-                    <td>
-                      <div className="fleet-devices">
-                        {m?.gpus.map((g: any, i: number) => (
-                          <small key={g.id}>
-                            GPU {i}　
-                            {g.utilization == null ? "—" : g.utilization + "%"}
-                            　{amount(g.memoryUsed)} / {amount(g.memoryTotal)}
-                          </small>
-                        ))}
-                      </div>
-                    </td>
-                    <td>
-                      {displayed
-                        .map((v: any) => (
-                          <div key={v.path}>
-                            {v.path} <Capacity value={v} />
-                          </div>
-                        ))}
-                      {!!volumes.length && (
-                        <details>
-                          <summary>选择挂载</summary>
-                          {volumes.map((v: any) => (
-                            <label key={v.path}>
-                              <input
-                                type="checkbox"
-                                checked={pinned.includes(v.path)}
-                                onChange={() =>
-                                  focusMount(machine.endpoint, v.path)
-                                }
-                              />
-                              {v.path} · {amount(v.available)}
-                            </label>
-                          ))}
-                          <button disabled={saving} onClick={() => void save()}>
-                            保存到巡检组
-                          </button>
-                        </details>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        {!selectedPair.length && sample?.machines?.map((m:any)=><details key={m.endpoint}><summary>{m.name} · 关注挂载</summary>{m.volumes.map((v:any)=><label key={v.path}><input type="checkbox" checked={(mounts[m.endpoint]??[]).includes(v.path)} onChange={()=>focusMount(m.endpoint,v.path)}/>{v.path}</label>)}</details>)}
+        <button disabled={saving||!chosen.length} onClick={()=>void save()}>保存挂载与确认</button>
       </section>
       {!!shared?.length && (
         <section className="performance-card">

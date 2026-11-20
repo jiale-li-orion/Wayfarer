@@ -157,6 +157,14 @@ export class Core extends EventEmitter {
       (ref) =>
         typeof ref.path === "string" &&
         pathApi(this.endpoints.get(ref.endpoint).config).isAbsolute(ref.path),
+      (a, b) =>
+        this.monitor
+          .machines()
+          .some(
+            (m) =>
+              m.roots.some((r) => r.endpoint === a) &&
+              m.roots.some((r) => r.endpoint === b),
+          ),
     );
     this.runProfiles = new RunProfiles(this.endpoints, storage);
     this.jobs.register("linkProbe", (context) => this.links.run(context));
@@ -235,6 +243,26 @@ export class Core extends EventEmitter {
       });
     return { status, stamp, bootId, identities, reports };
   };
+  async surfaceRuns(root?: Ref, allowed?: Set<string>) {
+    const config = root && this.endpoints.items.get(root.endpoint)?.config;
+    return this.workloads.surface((row) => {
+      if (!root) return !allowed || allowed.has(row.endpoint);
+      if (
+        row.projectRef &&
+        config &&
+        row.projectRef.endpoint === root.endpoint
+      ) {
+        const api = pathApi(config),
+          rel = api.relative(root.path, row.projectRef.path);
+        const within = (v: string) =>
+          !api.isAbsolute(v) && v !== ".." && !v.startsWith(".." + api.sep);
+        return (
+          within(rel) || within(api.relative(row.projectRef.path, root.path))
+        );
+      }
+      return root.endpoint === row.endpoint && root.path === config?.root;
+    }, this.observeRuns);
+  }
   private saveView() {
     clearTimeout(this.timer);
     if (this.closing) return;
@@ -430,6 +458,22 @@ export class Core extends EventEmitter {
       case "workloadRegister":
         if (!this.endpoints.items.has(a.endpoint))
           throw Error("作业端点未登记");
+        if (a.projectRef) {
+          const ep = this.endpoints.get(a.projectRef.endpoint);
+          if (!pathApi(ep.config).isAbsolute(a.projectRef.path))
+            throw Error("请选择绝对目录路径");
+          const stat = await ep.call<{ kind: string }>("stat", {
+            path: a.projectRef.path,
+          });
+          if (stat.kind !== "directory") throw Error("项目归属需要真实目录");
+          a = {
+            ...a,
+            projectRef: {
+              endpoint: a.projectRef.endpoint,
+              path: pathApi(ep.config).normalize(a.projectRef.path),
+            },
+          };
+        }
         return this.workloads.register(a);
       case "workloadsPage":
         return this.workloads.page(
@@ -491,6 +535,7 @@ export class Core extends EventEmitter {
                   endpoints,
                   a.confirmedShares ?? group?.confirmedShares,
                   a.trends === true,
+                  a.reuseRecent === true,
                 )),
                 missing,
               }
@@ -630,6 +675,10 @@ export class Core extends EventEmitter {
       case "view":
         return this.view;
       case "setView": {
+        if (typeof a.patrolFilter === "string") {
+          if (a.patrolFilter) this.operations.group(a.patrolFilter);
+          this.view.patrolFilter = a.patrolFilter;
+        }
         if (a.expanded) this.view.expanded = a.expanded;
         if (a.viewport) this.view.viewport = a.viewport;
         if (a.bookmarks) {

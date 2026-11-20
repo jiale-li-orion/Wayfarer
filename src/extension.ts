@@ -14,7 +14,12 @@ import { Core } from "./core/core";
 import { EXIT_GRACE_MS } from "./core/lifecycle";
 import { Profiler } from "./core/log";
 import { Bridge } from "./mcp/bridge";
-import { connectCodex, connectDsh, dshProfiles, readCodexBinding } from "./mcp/integrations";
+import {
+  connectCodex,
+  connectDsh,
+  dshProfiles,
+  readCodexBinding,
+} from "./mcp/integrations";
 import { FileProvider } from "./filesystem/provider";
 import type { Ref, EndpointConfig } from "./shared/types";
 import { pathApi } from "./shared/paths";
@@ -176,17 +181,23 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(createWorkspaceCommands(context, core));
   context.subscriptions.push(createEnvironmentView(context, core, provider));
-  let bindingCache: { stamp: number; value: ReturnType<typeof readCodexBinding> } | undefined;
+  let bindingCache:
+    { stamp: number; value: ReturnType<typeof readCodexBinding> } | undefined;
   const codexBinding = (refresh = false) => {
     const connection = bridge.connections[0];
-    if (!connection) return Promise.resolve({ state: "unavailable" as const, mapId: undefined });
-    if (!refresh && bindingCache && Date.now() - bindingCache.stamp < 60000) return bindingCache.value;
+    if (!connection)
+      return Promise.resolve({
+        state: "unavailable" as const,
+        mapId: undefined,
+      });
+    if (!refresh && bindingCache && Date.now() - bindingCache.stamp < 60000)
+      return bindingCache.value;
     const value = readCodexBinding(core, connection.endpoint);
     bindingCache = { stamp: Date.now(), value };
     return value;
   };
-  context.subscriptions.push(createSidebar(core, bridge.mapId, codexBinding));
-  context.subscriptions.push(createResourceView(context, core, provider));
+  const reports = createResourceView(context, core, provider);
+  context.subscriptions.push(reports);
   context.subscriptions.push(createStorageView(context, core));
   await vscode.commands.executeCommand(
     "setContext",
@@ -195,6 +206,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   let panel: vscode.WebviewPanel | undefined;
   let ready = false;
+  let mapHadViewport = false;
   let pendingAction: string | undefined;
   const flushAction = () => {
     if (ready && panel?.visible && pendingAction) {
@@ -256,6 +268,7 @@ export async function activate(context: vscode.ExtensionContext) {
       '" src="' +
       asset("ui.js") +
       '"></script></body></html>';
+    const ownedPanel = panel;
     let jobsSubscribed = false;
     const send = (event: any) => {
       if (panel?.visible && (event.type !== "job" || jobsSubscribed))
@@ -265,7 +278,73 @@ export async function activate(context: vscode.ExtensionContext) {
     webview.onDidReceiveMessage(async (m) => {
       try {
         let result: any;
+        if (m.method === "setView" && m.args.viewport) mapHadViewport = true;
         switch (m.method) {
+          case "surfaceSnapshot": {
+            if (panel !== ownedPanel || !ownedPanel.visible) {
+              result = null;
+              break;
+            }
+            const root = m.args.root as Ref | undefined;
+            const catalog = core.operations.catalog();
+            const filter =
+              !root &&
+              catalog.groups.find((g) => g.id === core.view.patrolFilter);
+            const machines = core.monitor
+              .machines()
+              .filter((machine) =>
+                root
+                  ? machine.roots.some((r) => r.endpoint === root.endpoint)
+                  : !filter ||
+                    machine.roots.some((r) =>
+                      filter.endpoints.includes(r.endpoint),
+                    ),
+              );
+            const ids = machines.map((machine) => machine.endpoint);
+            core.monitor.retainComparison("directory-surface", ids);
+            const group = catalog.groups.find((g) => g.id === catalog.selected);
+            const samples: any[] = [];
+            for (let i = 0; i < ids.length && panel?.visible; i += 8) {
+              const page = await core.dispatch("systemResources", {
+                endpoints: ids.slice(i, i + 8),
+                trends: false,
+              });
+              samples.push(...page.machines);
+            }
+            if (panel !== ownedPanel || !ownedPanel.visible) {
+              result = null;
+              break;
+            }
+            const runs = await core.surfaceRuns(
+              root,
+              new Set(machines.flatMap((m) => m.roots.map((r) => r.endpoint))),
+            );
+            result = {
+              machines: machines.map((machine) => ({
+                gpus: [],
+                volumes: [],
+                ...samples.find((s) => s.endpoint === machine.endpoint),
+                id: machine.id,
+                endpoint: machine.endpoint,
+                name: machine.name,
+                kind: machine.kind,
+                roots: machine.roots,
+                mount: group?.mounts[machine.endpoint]?.[0],
+              })),
+              runs,
+            };
+            break;
+          }
+          case "surfaceError":
+            result = vscode.window.showErrorMessage(String(m.args.message));
+            break;
+          case "surfaceAction":
+            result = await reports.action(m.args);
+            break;
+          case "surfaceReport":
+            reports.open(m.args);
+            result = true;
+            break;
           case "textInputFocus":
             await vscode.commands.executeCommand(
               "setContext",
@@ -281,11 +360,14 @@ export async function activate(context: vscode.ExtensionContext) {
           case "bootstrap":
             result = {
               endpoints: core.endpoints.configs(),
+              machines: core.monitor
+                .machines()
+                .map(({ config, ...m }) => ({ ...m, gpus: [], volumes: [] })),
               view: core.view,
               jobs: core.jobs.active(),
               projects: core.inspector.projects(),
               capabilities,
-              restored: core.restored,
+              restored: core.restored || mapHadViewport,
             };
             break;
           case "favoriteDirectory":
@@ -329,7 +411,10 @@ export async function activate(context: vscode.ExtensionContext) {
           case "jobDetails": {
             const j = await core.jobs.details(m.args.id);
             if (j.kind === "transfer" || j.kind === "linkProbe") {
-              await vscode.commands.executeCommand("workspaceMap.resources", { view: "job", jobId: j.id });
+              await vscode.commands.executeCommand("workspaceMap.resources", {
+                view: "job",
+                jobId: j.id,
+              });
               result = true;
               break;
             }
@@ -365,11 +450,13 @@ export async function activate(context: vscode.ExtensionContext) {
           false,
         );
       if (!e.webviewPanel.visible) {
+        core.monitor.retainComparison("directory-surface", []);
         jobsSubscribed = false;
         ready = false;
       }
     });
     panel.onDidDispose(() => {
+      core.monitor.retainComparison("directory-surface", []);
       core.off("event", send);
       panel = undefined;
       void vscode.commands.executeCommand(
@@ -621,15 +708,38 @@ export async function activate(context: vscode.ExtensionContext) {
         }
       }),
     );
-  register("workspaceMap.workloads", () =>
-    vscode.commands.executeCommand("workspaceMap.resources", {
-      view: "workloads",
-    }),
+  register("workspaceMap.workloads", () => {
+    pendingAction = "runs";
+    open();
+    flushAction();
+  });
+  register(
+    "workspaceMap.resources",
+    (request?: {
+      view?: "machine" | "comparison" | "model" | "job" | "runs" | "workloads";
+      jobId?: string;
+      runId?: string;
+      ref?: Ref;
+    }) => {
+      if (request?.view && ["model", "job", "runs"].includes(request.view)) {
+        reports.open(request);
+        return;
+      }
+      pendingAction =
+        request?.view === "workloads"
+          ? request.runId
+            ? "run:" + request.runId
+            : "runs"
+          : "machines";
+      open();
+      flushAction();
+    },
   );
   register("workspaceMap.open", () => open());
-  register("workspaceMap.sidebar", () =>
-    vscode.commands.executeCommand("workspaceMap.locations.focus"),
-  );
+  register("workspaceMap.sidebar", async () => {
+    await vscode.commands.executeCommand("workspaceMap.locations.focus");
+    open();
+  });
   register("workspaceMap.openLocation", async (ref: Ref) => {
     await core.dispatch("navigate", { ref });
     open();
@@ -695,17 +805,32 @@ export async function activate(context: vscode.ExtensionContext) {
   register("workspaceMap.mcpConfig", () => commands("config"));
   register("workspaceMap.bindWindow", async () => {
     const current = bridge.stats();
-    const configured = await codexBinding(true).catch(() => ({ mapId: undefined }));
-    const choice = await vscode.window.showQuickPick([
-      { label: "绑定 Codex 到此窗口", name: "codex" },
-      { label: "绑定 dsh 到此窗口", name: "dsh" },
-      { label: "复制当前地图 ID", name: "copy" },
-    ], { title: "窗口 " + current.mapId.slice(0, 8) + " · Codex " + (configured.mapId?.slice(0, 8) ?? "状态待查"),
-         placeHolder: current.clients ? `${current.clients} 个 Agent 已连接` : "等待 Agent 连接" });
-    if (choice?.name === "copy") await vscode.env.clipboard.writeText(current.mapId);
+    const configured = await codexBinding(true).catch(() => ({
+      mapId: undefined,
+    }));
+    const choice = await vscode.window.showQuickPick(
+      [
+        { label: "绑定 Codex 到此窗口", name: "codex" },
+        { label: "绑定 dsh 到此窗口", name: "dsh" },
+        { label: "复制当前地图 ID", name: "copy" },
+      ],
+      {
+        title:
+          "窗口 " +
+          current.mapId.slice(0, 8) +
+          " · Codex " +
+          (configured.mapId?.slice(0, 8) ?? "状态待查"),
+        placeHolder: current.clients
+          ? `${current.clients} 个 Agent 已连接`
+          : "等待 Agent 连接",
+      },
+    );
+    if (choice?.name === "copy")
+      await vscode.env.clipboard.writeText(current.mapId);
     else if (choice) await commands(choice.name);
   });
   register("workspaceMap.logs", () => commands("logs"));
+  context.subscriptions.push(createSidebar(core, bridge.mapId, codexBinding));
   let cpu = process.cpuUsage();
   let at = performance.now();
   const sampling = new Set<string>();

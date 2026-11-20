@@ -2,7 +2,7 @@
   "name": "workspace-map",
   "displayName": "Workspace Map",
   "description": "A navigable filesystem canvas across Windows, WSL and SSH, with shared Agent tools.",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "publisher": "orion-workspace",
   "engines": {
     "vscode": "^1.95.0"
@@ -312,14 +312,9 @@
           "group": "workspace@8"
         },
         {
-          "command": "workspaceMap.favoriteDirectory",
-          "when": "view == workspaceMap.locations && (viewItem == workspaceMap.directory || viewItem == workspaceMap.machine)",
-          "group": "workspace"
-        },
-        {
-          "command": "workspaceMap.renameMachine",
-          "when": "view == workspaceMap.locations && viewItem == workspaceMap.machine",
-          "group": "machine@0"
+          "command": "workspaceMap.addFavorite",
+          "when": "view == workspaceMap.locations && viewItem == workspaceMap.favoritesGroup",
+          "group": "inline"
         }
       ],
       "explorer/context": [

@@ -65,6 +65,7 @@ export async function compareMachines(
   endpoints: string[],
   confirmedShares: string[] = [],
   trends = false,
+  reuseRecent = false,
 ) {
   if (
     !Array.isArray(endpoints) ||
@@ -90,7 +91,7 @@ export async function compareMachines(
   }
   const machines = await Promise.all(
     [...selected.values()].map(async (endpoint) => {
-      const sample = await monitor.snapshot({
+      const sample = (reuseRecent && monitor.recentComparison(endpoint)) || await monitor.snapshot({
         endpoint,
         section: "comparison",
       });

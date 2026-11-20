@@ -14,7 +14,7 @@ const out = process.argv[2],
 if (!out || !endpoint)
   throw Error("Specify acceptance directory and WM_VERIFY_ENDPOINT");
 const live = await connect();
-assert(live.session.name.startsWith("acceptance-workloads "));
+assert(/^acceptance-(workloads|surface) /.test(live.session.name));
 const note = {};
 let child,
   suspended = false;

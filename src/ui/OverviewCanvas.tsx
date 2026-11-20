@@ -43,10 +43,10 @@ export const OverviewCanvas = memo(function OverviewCanvas({
         const a = map.get(edge.source),
           b = map.get(edge.target);
         if (!a || !b) continue;
-        const sx = a.position.x + 258,
-          sy = a.position.y + 25,
+        const sx = a.position.x + (a.measured?.width??a.width??258),
+          sy = a.position.y + (a.measured?.height??a.height??50)/2,
           tx = b.position.x,
-          ty = b.position.y + 25;
+          ty = b.position.y + (b.measured?.height??b.height??50)/2;
         ctx.moveTo(sx, sy);
         ctx.bezierCurveTo((sx + tx) / 2, sy, (sx + tx) / 2, ty, tx, ty);
       }
@@ -55,16 +55,17 @@ export const OverviewCanvas = memo(function OverviewCanvas({
       for (const n of nodes) {
         const px = n.position.x,
           py = n.position.y;
+        const width=n.measured?.width??n.width??258,height=n.measured?.height??n.height??50;
         if (
-          (px + 258) * z + x < 0 ||
+          (px + width) * z + x < 0 ||
           px * z + x > rect.width ||
-          (py + 50) * z + y < 0 ||
+          (py + height) * z + y < 0 ||
           py * z + y > rect.height
         )
           continue;
         ctx.fillStyle = n.selected ? accent : muted;
-        ctx.fillRect(px, py, 258, 50);
-        if (n.data.kind === "endpoint") {
+        ctx.fillRect(px, py, width,height);
+        if (n.data.kind === "machine") {
           ctx.fillStyle = foreground;
           ctx.font = 12 / z + "px " + style.fontFamily;
           ctx.textAlign = "right";

@@ -13,6 +13,7 @@ export type WorkloadInput = {
   name?: string;
   phase?: string;
   step?: number;
+  projectRef?: Ref;
   statusPath?: string;
   state?: "running" | "completed" | "failed" | "exited";
   process?: { pid: number; identity: string; bootId?: string };
@@ -67,6 +68,7 @@ export class Workloads {
   constructor(
     private file: string,
     private validPath: (ref: Ref) => boolean,
+    private sameMachine = (a: string, b: string) => a === b,
   ) {}
   async init() {
     try {
@@ -141,6 +143,12 @@ export class Workloads {
       )
     )
       throw Error("作业登记参数无效");
+    if (
+      input.projectRef &&
+      (!this.sameMachine(input.projectRef.endpoint, endpoint) ||
+        !this.validPath(input.projectRef))
+    )
+      throw Error("项目目录需位于作业端点");
     await this.write((rows) => {
       const old = rows.get(runId),
         now = Date.now();
@@ -196,6 +204,11 @@ export class Workloads {
               : undefined),
         };
       }
+      if (input.projectRef)
+        row.projectRef = {
+          endpoint: input.projectRef.endpoint,
+          path: input.projectRef.path,
+        };
       rows.set(runId, row);
       return true;
     });
@@ -256,6 +269,25 @@ export class Workloads {
           : undefined,
       total: all.length,
     };
+  }
+  async surface(include: (row: Workload) => boolean, reader: ObserveRuns) {
+    await this.pending;
+    const rows = [...this.rows.values()].filter(include);
+    const result = [];
+    for (let i = 0; i < rows.length; i += 100) {
+      const slice = rows.slice(i, i + 100),
+        readings = await this.observe(slice, reader);
+      for (const old of slice) {
+        const row = this.rows.get(old.runId);
+        if (!row) continue;
+        const { files, statusPath, process, ...summary } = row;
+        result.push({
+          ...summary,
+          connection: connection(row, readings.get(row.endpoint)),
+        });
+      }
+    }
+    return result;
   }
   async detail(runId: string, reader?: ObserveRuns) {
     await this.pending;
