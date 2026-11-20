@@ -521,7 +521,9 @@ export class Core extends EventEmitter {
           indexPending: this.projectRuns.more,
         };
       case "workloadDetail":
-        await this.projectRuns.refresh(this.inspector.projects());
+        do {
+          await this.projectRuns.refresh(this.inspector.projects());
+        } while (!this.workloads.has(a.runId) && this.projectRuns.more);
         return this.workloads.detail(
           a.runId,
           a.observe ? this.observeRuns : undefined,

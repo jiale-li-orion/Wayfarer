@@ -46,6 +46,17 @@ try {
   await live.ipc("navigate", {});
   await live.ipc("setView", { follow: false });
   await wait(() => read('document.querySelectorAll(".wf-machine").length===5'));
+  const projects = await live.ipc("projects");
+  const project = projects.find(
+    (p) => p.endpoint === process.env.WM_VERIFY_ENDPOINT,
+  );
+  assert(project);
+  await live.ipc("setView", { follow: true });
+  await live.ipc("navigate", { ref: project });
+  await live.ipc("setView", { follow: false });
+  await wait(() =>
+    read('document.querySelector(".status")?.textContent.includes("节点")'),
+  );
   await clickFit();
   await wait(() =>
     read(
@@ -53,6 +64,12 @@ try {
     ),
   );
   result.offlineVisible = true;
+  await live.ipc("setView", { follow: true });
+  await live.ipc("navigate", {});
+  await live.ipc("setView", { follow: false });
+  await sleep(900);
+  await clickFit();
+  await wait(() => read('document.querySelectorAll(".wf-machine").length===5'));
   result.wsl = await read(
     "document.querySelector('[data-machine=\"wsl-ubuntu\"]').innerText",
   );

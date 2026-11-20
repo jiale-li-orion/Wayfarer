@@ -52,37 +52,45 @@ export class ProjectRuns {
         await this.close(state);
       }
     }
+    const queue = projects.filter((p) => !allowed || allowed.has(p.endpoint));
+    const generation = this.generation;
+    const inspect = (project: Ref) => {
+      const key = refKey(project),
+        existing = this.inflight.get(key);
+      if (existing) return existing;
+      const state = this.states.get(key) ?? {
+        project,
+        next: 0,
+        seen: new Map<string, string>(),
+      };
+      this.states.set(key, state);
+      if (!this.endpoints.enabled(project.endpoint)) {
+        state.stamp = undefined;
+        return this.close(state);
+      }
+      if (state.next > Date.now()) return;
+      const gen = this.generation;
+      const work = this.read(state, gen)
+        .catch(async (e) => {
+          await this.close(state);
+          state.stamp = undefined;
+          state.next = Date.now() + 10000;
+          if (
+            !["ENOENT", "FileNotFoundError"].includes(String(e.code ?? e.type))
+          )
+            this.log({ project, error: String(e) });
+        })
+        .finally(() => this.inflight.delete(key));
+      this.inflight.set(key, work);
+      return work;
+    };
+    let position = 0;
+    const worker = async () => {
+      while (position < queue.length && generation === this.generation)
+        await inspect(queue[position++]);
+    };
     await Promise.all(
-      projects
-        .filter((p) => !allowed || allowed.has(p.endpoint))
-        .map((project) => {
-          const key = refKey(project),
-            existing = this.inflight.get(key);
-          if (existing) return existing;
-          const state = this.states.get(key) ?? {
-            project,
-            next: 0,
-            seen: new Map<string, string>(),
-          };
-          this.states.set(key, state);
-          if (state.next > Date.now()) return;
-          const gen = this.generation;
-          const work = this.read(state, gen)
-            .catch(async (e) => {
-              await this.close(state);
-              state.stamp = undefined;
-              state.next = Date.now() + 10000;
-              if (
-                !["ENOENT", "FileNotFoundError"].includes(
-                  String(e.code ?? e.type),
-                )
-              )
-                this.log({ project, error: String(e) });
-            })
-            .finally(() => this.inflight.delete(key));
-          this.inflight.set(key, work);
-          return work;
-        }),
+      Array.from({ length: Math.min(4, queue.length) }, worker),
     );
   }
   private async close(s: { project: Ref; cursor?: string }) {

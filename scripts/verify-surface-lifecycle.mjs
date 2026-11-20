@@ -87,7 +87,7 @@ try {
   await click(".run-tile button:last-child");
   await wait(() =>
     read(
-      'document.querySelector(".surface-drawer")?.innerText.includes("取消关注")',
+      'document.querySelector(".surface-drawer")?.innerText.includes("CPU LoRA 回放")',
     ),
   );
   await click('button[aria-label="关闭地图详情"]');

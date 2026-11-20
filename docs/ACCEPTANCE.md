@@ -124,4 +124,8 @@ Windows 清理使用实际管理器：pip purge、npm cache clean、uv cache pru
 
 ## 0.12.0 · 目录地图验收
 
-五端节点、八卡排布、750 px 宽编辑区、临时项目、归档展开、单报告直达、双机操作和 50 轮开关／隐藏采样，见 scripts/verify-surface-lifecycle.mjs。千文件对照使用 scripts/verify-directory-surface.mjs。scripts/verify-surface-actions.mjs 通过真实进程详情登记作业，核对工作目录预填、项目归属和磁盘详情；verify-workload-bindings.mjs 检查 SSH 断开、恢复、取消关注和临时进程退出。所有实验文件与进程使用独立验收目录。
+五端节点、八卡排布、750 px 宽编辑区、临时项目、归档展开、单报告直达、双机操作和 50 轮开关／隐藏采样，见 scripts/verify-surface-lifecycle.mjs。千文件对照使用 scripts/verify-directory-surface.mjs。[0.12.0 的手动登记脚本](https://github.com/jiale-li-orion/Wayfarer/blob/v0.12.0/scripts/verify-surface-actions.mjs) 通过真实进程详情登记作业，核对工作目录预填、项目归属和磁盘详情；verify-workload-bindings.mjs 检查 SSH 断开、恢复、取消关注和临时进程退出。所有实验文件与进程使用独立验收目录。
+
+## 0.13.0 · 离线交接
+
+关闭独立 Windows 窗口后，在训练机 2 的已登记项目中由两个生产者分别写入同一运行的模型和 profile 引用。重开后在地图上找到运行。真实 MCP 客户端按运行读取 CPU LoRA step 2 的四个 microbatch 和 profile 计算阶段，完成录制、分页读取及跨端文件导出并核对 SHA-256。录制与导出使用独立测试目录。见 scripts/verify-agent-records.py、scripts/verify-records-ui.mjs。

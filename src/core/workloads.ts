@@ -73,41 +73,58 @@ export class Workloads {
     private validPath: (ref: Ref) => boolean,
     private sameMachine = (a: string, b: string) => a === b,
   ) {}
+  private get ignoredFile() {
+    return this.file + ".ignored";
+  }
   async init() {
+    const read = async (file: string, fallback: any) =>
+      fs.readFile(file, "utf8").then(JSON.parse, (e) => {
+        if (e.code === "ENOENT") return fallback;
+        throw e;
+      });
+    const data = await read(this.file, []);
+    const rows: Workload[] = Array.isArray(data) ? data : data.rows;
+    this.ignored = new Set(await read(this.ignoredFile, data.ignored ?? []));
+    this.rows = new Map(
+      rows.filter((w) => !this.ignored.has(w.runId)).map((w) => [w.runId, w]),
+    );
+  }
+  private async replace(file: string, value: unknown) {
+    const tmp = file + "." + randomUUID() + ".tmp";
     try {
-      const data = JSON.parse(await fs.readFile(this.file, "utf8"));
-      const rows: Workload[] = Array.isArray(data) ? data : data.rows;
-      this.rows = new Map(rows.map((w) => [w.runId, w]));
-      this.ignored = new Set(data.ignored ?? []);
-    } catch (e: any) {
-      if (e.code !== "ENOENT") throw e;
+      await fs.writeFile(tmp, JSON.stringify(value), { mode: 0o600 });
+      await fs.rename(tmp, file);
+    } finally {
+      await fs.rm(tmp, { force: true });
     }
   }
   private write(
     edit: (rows: Map<string, Workload>, ignored: Set<string>) => boolean,
   ) {
     const work = this.pending.then(async () => {
-      const rows = new Map(this.rows);
-      const ignored = new Set(this.ignored);
+      const rows = new Map(this.rows),
+        ignored = new Set(this.ignored);
       if (!edit(rows, ignored)) return;
-      const tmp = this.file + "." + randomUUID() + ".tmp";
       try {
-        await fs.writeFile(
-          tmp,
-          JSON.stringify({ rows: [...rows.values()], ignored: [...ignored] }),
-          {
-            mode: 0o600,
-          },
-        );
-        await fs.rename(tmp, this.file);
+        // Forget before removing the row; restore its contents before unforgetting.
+        // The catalog itself retains the array format used by earlier versions.
+        if (ignored.size > this.ignored.size)
+          await this.replace(this.ignoredFile, [...ignored]);
+        await this.replace(this.file, [...rows.values()]);
+        if (ignored.size < this.ignored.size)
+          await this.replace(this.ignoredFile, [...ignored]);
         this.rows = rows;
         this.ignored = ignored;
-      } finally {
-        await fs.rm(tmp, { force: true });
+      } catch (e) {
+        await this.init();
+        throw e;
       }
     });
     this.pending = work.catch(() => {});
     return work;
+  }
+  has(runId: string) {
+    return this.rows.has(runId);
   }
   durable() {
     return this.pending;
