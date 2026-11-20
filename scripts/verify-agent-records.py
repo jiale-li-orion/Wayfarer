@@ -63,10 +63,11 @@ def main():
                 if not result['wsl']:raise ValueError('WSL budget absent')
                 limit=time.monotonic()+30
                 while time.monotonic()<limit:
-                    page=tool('recordingRead',id=rec['id'],limit=1)
+                    page=tool('recordingRead',id=rec['id'],limit=1,fields=['stamp','endpoint','cpuPercent'])
                     if page['items']:break
                     time.sleep(1)
-                assert page['items']
+                assert page['items'] and set(page['items'][0])<={'stamp','endpoint','cpuPercent'}
+                result['sampleKeys']=sorted(page['items'][0])
             finally:tool('recordingControl',action='stop')
             assert rec['id'] in tool('recordingControl',action='list')['recordings']
             filename=args.project+'/'+run_id+'-samples.json'

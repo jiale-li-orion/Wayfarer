@@ -1,6 +1,7 @@
 # Agent 的实验交接、取数和导出
 
-先由 Agent 调用 `map_registerProject({ref:{endpoint,path}})` 接入项目。在实验机器上使用 Python 3.6+ 标准库脚本登记运行，编辑器关闭期间也可执行：
+先由 Agent 调用 `map_registerProject({ref:{endpoint,path}})` 接入项目。在实验机器上使用 Python 3.6+ 标准库脚本登记运行，编辑器关闭期间也可执行。仓库内入口是 scripts/index-workload.py；Release 同时提供同版本的独立脚本，VSIX 内位置是 dist/helpers/index-workload.py。
+
 
 ```sh
 python3 scripts/index-workload.py --project /experiments/audio --run-id audio/run-42 \

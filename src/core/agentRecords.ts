@@ -204,6 +204,20 @@ export class AgentRecords {
   }
   async export(ctx: JobContext) {
     const { source, format = "json", target } = ctx.job.input;
+    if (
+      source.kind === "resources" &&
+      source.query?.section &&
+      ![
+        "summary",
+        "processes",
+        "process",
+        "gpus",
+        "gpu",
+        "io",
+        "comparison",
+      ].includes(source.query.section)
+    )
+      throw Error("未知资源类别");
     const ep = this.endpoints.get(target.endpoint),
       api = pathApi(ep.config);
     if (!api.isAbsolute(target.path) || !api.basename(target.path))
