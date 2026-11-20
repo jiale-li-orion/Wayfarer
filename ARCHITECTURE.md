@@ -4,8 +4,8 @@ Windows UI Extension Host 持有 Core；磁盘读写使用 Node 原生文件接�
 
 ```mermaid
 flowchart LR
- UI["React Flow / 远景 Canvas"] -->|目录、导航、操作| CORE["Core · 会话视图"]
- UI -->|结构变化| WORKER["D3 Worker"]
+ UI["目录地图 · React Flow / 远景 Canvas"] -->|目录、导航、操作| CORE["Core · 会话视图"]
+ UI -->|结构变化| WORKER["可变节点尺寸 · 布局 Worker"]
  WORKER -->|坐标| UI
  EDITOR["VS Code FileSystemProvider"] --> CORE
  CLIENT["Codex / dsh / MCP"] --> PROXY["Python stdio MCP"]
@@ -249,3 +249,9 @@ Transfers 仍拥有业务事务、路径冲突和结果提交。PeerTransfer 由
 ## 作业观测
 
 脚本／Agent 或用户选中的外部进程 → Workloads（按 mapId 的持久运行目录）→ 作业列表与详情。SystemMonitor 批量读取同一端点的进程身份、显式登记的小型状态文件；报告继续交原来的模型与耗时读取器。Jobs 单独持有文件操作的执行和恢复，传输的 workloadId 与阶段随任务元数据存档。清除运行索引只处理本地登记。详见 [作业协议](docs/WORKLOADS.md)。
+
+## 目录地图
+
+端点和已展开目录由文件系统提供；机器、项目捷径、运行与归档分组分别使用独立的地图节点身份。projectRef 与真实目录匹配后，运行挂到目录上；目录尚未展开时显示可定位的项目捷径。机器卡格和实验行订阅同一个按 ID 索引的读数缓存。仅拓扑签名、实测节点尺寸或归档展开变化会触发布局请求。Worker 先计算各子树所需高度，再按层宽放置节点。目录编辑及拖放数据只来自有真实文件引用的选择。
+
+地图可见时按当前端点范围采样。完整报告使用独立编辑页。关闭或隐藏地图撤销目录和机器订阅，已经登记的外部进程与传输保留各自生命周期。

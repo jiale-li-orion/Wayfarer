@@ -76,7 +76,7 @@ export function ModelAnalysis({
       if (!saved?.ref || !active || version !== openGeneration.current) return;
       const run = await call("modelAnalysis", { ref: saved.ref });
       if (!active || version !== openGeneration.current) return;
-      restoreFocus.current = saved;
+      restoreFocus.current = saved.attempt==null?undefined:saved;
       setFollow(saved.follow);
       select(saved.attempt);
       setRecord(run);
@@ -227,7 +227,7 @@ export function ModelAnalysis({
     (e) => attempt == null || e.attempt <= attempt,
   );
   useEffect(() => {
-    if (record && !restoreFocus.current)
+    if (record && !restoreFocus.current && (attempt==null || step?.attempt===attempt))
       void call("modelSelection", {
         ref: record.ref,
         attempt,
@@ -235,7 +235,7 @@ export function ModelAnalysis({
         module: detail || undefined,
         sample: picked?.s.id,
       }).catch((err) => setError(String(err)));
-  }, [record, attempt, follow, detail, picked?.s.id, call]);
+  }, [record, step, attempt, follow, detail, picked?.s.id, call]);
   return (
     <section className="model-analysis">
       <header>

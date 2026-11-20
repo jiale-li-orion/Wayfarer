@@ -16,24 +16,13 @@ type Item = {
 };
 
 /** Native navigation only: the editor canvas owns directory reads and watches. */
-export function createSidebar(core: Core, mapId: string,
+export function createSidebar(
+  core: Core,
+  mapId: string,
   codexBinding: () => Promise<{ mapId?: string; state: string }>,
 ): vscode.Disposable {
   const changes = new vscode.EventEmitter<Item | undefined>();
   const groups: Item[] = [
-    { id: "map", label: "地图", icon: "map", command: "workspaceMap.open" },
-    {
-      id: "overview",
-      label: "机器",
-      icon: "pulse",
-      command: "workspaceMap.resources",
-    },
-    {
-      id: "workloads",
-      label: "作业",
-      icon: "list-tree",
-      command: "workspaceMap.workloads",
-    },
     {
       id: "workspaces",
       label: "收藏",
@@ -41,34 +30,14 @@ export function createSidebar(core: Core, mapId: string,
       group: "workspaces",
     },
     {
-      id: "machines",
-      label: "连接",
-      icon: "device-desktop",
-      group: "machines",
-    },
-    { id: "actions", label: "常用操作", icon: "tools", group: "actions" },
-    {
       id: "advanced",
       label: "诊断与接入",
       icon: "settings-gear",
       group: "advanced",
     },
   ];
-  const actions = [
-    ["addFavorite", "添加收藏", "add"],
-    ["environment", "当前工作区环境", "tools"],
-
-    ["home", "地图根目录", "home"],
-    [
-      "search",
-      "按名称找文件",
-      "search",
-      "在当前目录下查找文件或目录名称；点击结果定位或打开",
-    ],
-
-    ["storage", "存储占用", "database"],
-  ];
   const advanced = [
+    ["renameMachine", "重命名 SSH 机器", "edit"],
     ["importSSH", "导入已有 SSH 配置", "remote"],
     ["bindWindow", "绑定此窗口", "plug", "此窗口的持久地图 ID · " + mapId],
     ["mcpConfig", "MCP 配置", "settings-gear"],
@@ -92,32 +61,26 @@ export function createSidebar(core: Core, mapId: string,
           description: w.locations[0]?.endpoint.name ?? w.uri,
           command: "workspaceMap.openWorkspace",
         }));
-      if (item.group === "machines")
-        return core.endpoints.configs().map((e) => ({
-          id: "endpoint:" + e.id,
-          label: e.name,
-          icon:
-            e.kind === "ssh"
-              ? "remote"
-              : e.kind === "wsl"
-                ? "terminal-linux"
-                : "device-desktop",
-          description: e.root,
-          ref: { endpoint: e.id, path: e.root },
+      if (item.group === "advanced") {
+        const binding =
+          item.group === "advanced"
+            ? await codexBinding().catch(() => undefined)
+            : undefined;
+        return advanced.map(([command, label, icon, tooltip]) => ({
+          id: command,
+          label,
+          icon,
+          command: "workspaceMap." + command,
+          description:
+            command === "bindWindow"
+              ? "窗口 " +
+                mapId.slice(0, 8) +
+                " · Codex " +
+                (binding?.mapId?.slice(0, 8) ??
+                  (binding?.state === "missing" ? "待绑定" : "状态待查"))
+              : undefined,
+          tooltip,
         }));
-      if (item.group === "actions" || item.group === "advanced") {
-        const binding = item.group === "advanced" ? await codexBinding().catch(() => undefined) : undefined;
-        return (item.group === "actions" ? actions : advanced).map(
-          ([command, label, icon, tooltip]) => ({
-            id: command,
-            label,
-            icon,
-            command: "workspaceMap." + command,
-            description: command === "bindWindow" ? "窗口 " + mapId.slice(0, 8) +
-              " · Codex " + (binding?.mapId?.slice(0, 8) ?? (binding?.state === "missing" ? "待绑定" : "状态待查")) : undefined,
-            tooltip,
-          }),
-        );
       }
       return [];
     },
@@ -131,13 +94,16 @@ export function createSidebar(core: Core, mapId: string,
           : vscode.TreeItemCollapsibleState.None,
       );
       row.id = item.id;
-      row.contextValue = item.workspaceId
-        ? "workspaceMap.favorite"
-        : item.id.startsWith("endpoint:") && item.icon === "remote"
-          ? "workspaceMap.machine"
-          : item.ref
-            ? "workspaceMap.directory"
-            : undefined;
+      row.contextValue =
+        item.group === "workspaces"
+          ? "workspaceMap.favoritesGroup"
+          : item.workspaceId
+            ? "workspaceMap.favorite"
+            : item.id.startsWith("endpoint:") && item.icon === "remote"
+              ? "workspaceMap.machine"
+              : item.ref
+                ? "workspaceMap.directory"
+                : undefined;
       row.iconPath = new vscode.ThemeIcon(item.icon);
       row.description = item.description;
       row.tooltip = item.ref
@@ -161,7 +127,12 @@ export function createSidebar(core: Core, mapId: string,
   });
   let dirty = false;
   const update = (event: { type: string }) => {
-    if (!["endpoints", "bookmarks", "workspaces", "agentBinding"].includes(event.type)) return;
+    if (
+      !["endpoints", "bookmarks", "workspaces", "agentBinding"].includes(
+        event.type,
+      )
+    )
+      return;
     if (tree.visible) changes.fire(undefined);
     else dirty = true;
   };
@@ -184,7 +155,13 @@ export function createSidebar(core: Core, mapId: string,
     visible: tree.visible,
   });
   syncWatch();
+  const showMap = () =>
+    void vscode.commands
+      .executeCommand("workspaceMap.open")
+      .then(undefined, () => {});
+  if (tree.visible) queueMicrotask(showMap);
   const visible = tree.onDidChangeVisibility(() => {
+    if (tree.visible) showMap();
     syncWatch();
     if (tree.visible && dirty) {
       dirty = false;

@@ -121,3 +121,7 @@ Windows 清理使用实际管理器：pip purge、npm cache clean、uv cache pru
 独立 Windows VS Code 窗口连接 Windows、Ubuntu WSL、两台训练机及一台推理机。五行机器摘要均返回在线状态；两台训练机往返各传 4 MiB 完成链路测速。临时 SSH Python 进程验证了运行、断开、重连、取消关注后仍在运行，以及进程真正退出后的独立状态。Windows 采集器分别核对存活 PID 和已不存在 PID。
 
 一次独立传输和一次显式关联传输均按内容核对，作业详情只查到关联的那一条。既有 CPU LoRA 回放从作业详情打开；重新加载验收窗口后，stdio MCP 客户端仍能查到同一个运行与 step。Linux 完整测试覆盖 101 项；并发登记、多 rank、恢复 segment、PID 复用、延迟返回和终态使用定向用例补齐。复现入口为 scripts/verify-workloads.mjs 和 scripts/verify-workload-bindings.mjs。
+
+## 0.12.0 · 目录地图验收
+
+五端节点、八卡排布、750 px 宽编辑区、临时项目、归档展开、单报告直达、双机操作和 50 轮开关／隐藏采样，见 scripts/verify-surface-lifecycle.mjs。千文件对照使用 scripts/verify-directory-surface.mjs。scripts/verify-surface-actions.mjs 通过真实进程详情登记作业，核对工作目录预填、项目归属和磁盘详情；verify-workload-bindings.mjs 检查 SSH 断开、恢复、取消关注和临时进程退出。所有实验文件与进程使用独立验收目录。

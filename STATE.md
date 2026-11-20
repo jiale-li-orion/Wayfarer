@@ -1,4 +1,4 @@
-# Workspace Map · 0.11.0
+# Workspace Map · 0.12.0
 
 训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。开发在训练机独立工作树，本机安装与验收，产物留D盘。
 
@@ -15,3 +15,5 @@ C盘离线维护已完成：53份旧交换文件回收75.24GiB，完成时C盘�
 0.10.0 新增模型分析页和只读 map_modelAnalysis。Windows 本机已安装验收，CPU 小模型回放验证了两种 loss 归约、梯度累计和有效权重变化。实验端输入格式与使用入口见 [模型分析](docs/MODEL_ANALYSIS.md)。
 
 0.11.0 将机器总览和巡检合并，在作业详情关联模型回放、耗时和传输。生产端状态与进程身份分别记录。入口与兼容协议见 [作业说明](docs/WORKLOADS.md)。
+
+0.12.0 以目录地图承接机器与运行。实验项目可登记 projectRef；机器读数和运行进度按节点订阅，目录布局在结构或节点尺寸变化时更新。

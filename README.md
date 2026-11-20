@@ -52,18 +52,15 @@ Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows
 | **浏览和编辑远端项目** | 在目录画布展开 Windows、WSL 或 SSH 节点，双击目录进入子树，在 VS Code 编辑器里打开文件。将常用目录、文件或多根工作区加入收藏。 [项目与收藏](docs/PROJECT_ENVIRONMENTS.md) |
 | **在机器之间搬文件** | 用文件手柄拖到目标目录，任务面板显示进度、校验和暂停位置。已授权的 SSH 机器对可通过私网直传大文件；网络恢复后可接着传。 [传输与恢复](docs/OPERATIONS_AND_TRANSFER.md) |
 | **管理项目环境** | 在项目目录查看清单、锁文件、解释器和工具路径。Python 默认用 uv；Node、JDK、Gradle、Flutter、Android SDK、Rust 和 winget 按端点查询。执行包操作前可看见实际机器、目录和命令。 [工具与环境](docs/PROJECT_ENVIRONMENTS.md) |
-| **巡检机器，找出资源热点** | 机器总览每台一行，按巡检组筛选 CPU、内存、逐卡 GPU 和挂载余量。选中两台 SSH 机器后查看私网链路。选中进程、传输任务或运行记录，再看资源归属和阶段耗时。 [机器资源](docs/SYSTEM_RESOURCES.md) · [多机性能](docs/MULTI_MACHINE_PERFORMANCE.md) |
+| **巡检机器，找出资源热点** | 目录地图上每台机器直接显示 CPU、可用内存、逐卡利用率和可用显存，以及关注磁盘的余量。点两台 SSH 主机的配对图标查看私网链路。选中进程、传输任务或运行记录，再看资源归属和阶段耗时。 [机器资源](docs/SYSTEM_RESOURCES.md) · [多机性能](docs/MULTI_MACHINE_PERFORMANCE.md) |
 | **查清磁盘空间去了哪里** | 对指定目录发起扫描，按占用下钻，查看最大文件、硬链接与实际占盘。对比同一根目录的两次快照，分清目录增长与卷余量变化。 [存储分析](docs/STORAGE.md) |
 | **跟踪实验和外部作业** | 脚本或 Agent 可显式登记运行，也能从进程详情手动加入。按阶段查看相关传输，直接打开报告、日志和产物。取消关注时外部工作继续执行。 [作业与接口](docs/WORKLOADS.md) |
 | **回放一次模型更新** | 选择训练端的实验记录，沿 optimizer step 查看参与的 microbatch、样本损失、裁剪前后梯度和有效参数变化。固定样本可跨 checkpoint 比较输出，有播放录音时可 A/B 试听。 [记录格式与 MCP](docs/MODEL_ANALYSIS.md) |
 
-<table>
-  <tr>
-    <td width="50%"><a href="docs/images/resources/01-overview.png"><img src="docs/images/resources/01-overview.png" alt="VS Code 中 Windows、WSL 和两台 SSH 主机的资源总览"></a></td>
-    <td width="50%"><a href="docs/images/storage-060/02-storage-directory.png"><img src="docs/images/storage-060/02-storage-directory.png" alt="存储扫描结果中的子目录占用排名"></a></td>
-  </tr>
-  <tr><td align="center">多端资源总览</td><td align="center">目录占用下钻</td></tr>
-</table>
+<p align="center">
+  <a href="docs/images/readme/project-map.png"><img src="docs/images/readme/project-map.png" width="900" alt="目录地图：WSL 连接到 speech-demo，旁边是实际目录、文件和已登记的 CPU LoRA 回放"></a>
+  <br><sub>实机验收 · 同一张地图上的目录、GPU 和 CPU LoRA 回放</sub>
+</p>
 
 ### 从一次 LoRA 更新看模型分析
 
@@ -74,9 +71,9 @@ Wayfarer 在 VS Code 中的扩展名是 **Workspace Map**。你可以从 Windows
 ## 快速开始
 
 1. 从 [GitHub Releases](https://github.com/jiale-li-orion/Wayfarer/releases/latest) 下载 `workspace-map.vsix`。在 Windows 的 VS Code **扩展 → … → 从 VSIX 安装**中选择它。
-2. 点击活动栏的地图图标，选择 **常用操作 → 打开地图**，或按 `Ctrl+Alt+M`。Windows 磁盘和 WSL 发行版会自动出现。空白处拖动平移，滚轮缩放；文件旁的手柄用于真实搬移。
+2. 点击活动栏的地图图标即可恢复上次目录与视角，也可按 `Ctrl+Alt+M`。Windows 磁盘和 WSL 发行版会自动出现。空白处拖动平移，滚轮缩放；文件旁的手柄用于真实搬移。
 3. 要接入服务器，选择 **添加 SSH 连接**，输入 `user@host`，在终端确认主机、登录并为机器命名。也可以从 **诊断与接入 → 导入已有 SSH 配置** 加入现有主机。 [SSH 配置与权限](docs/SSH.md)
-4. 侧边栏的 **地图、机器、作业** 分别用于编辑文件、巡检设备和跟踪一次运行。在进程详情点「加入作业」，之后从作业直接打开模型分析、耗时和产物。
+4. 点机器的可用内存查看进程，点 GPU 卡格查看该卡。进程可以「加入作业」并选定项目；运行直接显示在目录旁，旧记录归在机器下。只有一份报告时，点击实验名直接打开，旁边的「⋯」查看日志与产物。
 
 Windows 删除进入回收站，WSL 和 Linux SSH 删除为永久删除。跨端移动在目标内容校验和提交后处理源文件。编辑器读取上限为 64 MiB，更大的文件可以通过传输任务处理。 [安装、升级与回退](docs/RELEASE.md)
 

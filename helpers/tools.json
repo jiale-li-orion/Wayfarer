@@ -1766,6 +1766,23 @@
         "statusPath": {
           "type": "string",
           "description": "Absolute path on the execution endpoint of a small atomically written status JSON; include runId, Unix millisecond updated and optionally state, phase and step."
+        },
+        "projectRef": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ],
+          "additionalProperties": false,
+          "description": "Optional project directory on the execution endpoint. Runs without a project appear under their machine."
         }
       },
       "required": [

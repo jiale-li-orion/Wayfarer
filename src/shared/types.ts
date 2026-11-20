@@ -87,6 +87,7 @@ export interface Job {
   checkpoint: Record<string, any>;
 }
 export interface ViewState {
+  patrolFilter?:string;
   modelSelection?: {ref:Ref; attempt?:number; module?:string; sample?:string; follow:boolean};
   root?: Ref;
   expanded: string[];
