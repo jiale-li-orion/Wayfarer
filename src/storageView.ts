@@ -139,28 +139,6 @@ export function createStorageView(
             m.args.ref,
           );
           result = true;
-        } else if (m.method === "export") {
-          const uri = await vscode.window.showSaveDialog({
-            title: "导出存储分析",
-            filters: { JSON: ["json"] },
-            defaultUri: vscode.Uri.file(
-              path.join(
-                vscode.workspace.workspaceFolders?.[0]?.uri.scheme === "file"
-                  ? vscode.workspace.workspaceFolders[0].uri.fsPath
-                  : core.storage,
-                "storage-analysis.json",
-              ),
-            ),
-          });
-          if (!uri) result = false;
-          else {
-            if (uri.scheme !== "file") throw Error("请选择本机导出位置");
-            result = await core.storageAnalysis.exportTo(
-              m.args.id,
-              uri.fsPath,
-              m.args.before,
-            );
-          }
         } else if (
           [
             "storageProbe",

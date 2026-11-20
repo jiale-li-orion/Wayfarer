@@ -1798,7 +1798,7 @@
   },
   {
     "name": "map_workloadsPage",
-    "description": "List registered workloads by creation cursor; batch-observe the registered process identities on this page.",
+    "description": "List registered workloads by creation cursor; batch-observe the registered process identities on this page. indexPending indicates more offline index pages; repeat the query to continue discovery.",
     "inputSchema": {
       "type": "object",
       "properties": {
@@ -1866,6 +1866,174 @@
     "annotations": {
       "readOnlyHint": false,
       "destructiveHint": true
+    }
+  },
+  {
+    "name": "map_recordingControl",
+    "description": "List, start or stop time/size-limited recording on this map. List returns IDs for direct reads.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "enum": [
+            "start",
+            "stop",
+            "list"
+          ]
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 600000
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "cursor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_recordingRead",
+    "description": "Read a compact page of recorded samples, filtered by endpoint and Unix millisecond range. Reuse the byte cursor.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "cursor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "from": {
+          "type": "integer"
+        },
+        "to": {
+          "type": "integer"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "stamp",
+              "endpoint",
+              "section",
+              "cpuPercent",
+              "memoryAvailable",
+              "commitUsed",
+              "commitLimit",
+              "swapUsed",
+              "wslBudget",
+              "gpus"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": true,
+      "destructiveHint": false
+    }
+  },
+  {
+    "name": "map_artifactExport",
+    "description": "Explicitly publish resource samples, a recording, storage analysis or storage comparison to a new file. Returns a background job. Its result contains ref, byte count and SHA-256.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpoint",
+            "path"
+          ]
+        },
+        "format": {
+          "enum": [
+            "json",
+            "csv"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "resources",
+                "recording",
+                "storage"
+              ]
+            },
+            "id": {
+              "type": "string"
+            },
+            "before": {
+              "type": "string"
+            },
+            "query": {
+              "type": "object"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "from": {
+              "type": "integer"
+            },
+            "to": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        "operationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "annotations": {
+      "readOnlyHint": false,
+      "destructiveHint": false
     }
   }
 ]

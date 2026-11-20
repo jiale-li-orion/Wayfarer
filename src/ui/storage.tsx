@@ -251,17 +251,7 @@ function App() {
           <h1>存储占用</h1>
           <p>目录、实际占盘与共享文件</p>
         </div>
-        <button
-          disabled={!id || !result}
-          onClick={() =>
-            void rpc("export", {
-              id,
-              before: comparison ? baseline : undefined,
-            }).catch((e) => setError(String(e)))
-          }
-        >
-          {comparison ? "导出对比" : "导出分析"}
-        </button>
+
       </header>
       <section className="controls">
         <button
@@ -389,7 +379,7 @@ function App() {
         )}
       </section>
       <p className="retention">
-        保留 3 份索引，共 100 MiB；可在新扫描前导出当前分析。
+        保留 3 份索引，共 100 MiB。
         {snapshots.find((s) => s.id === id)?.available === false && (
           <strong>
             {" "}

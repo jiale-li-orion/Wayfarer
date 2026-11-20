@@ -9,6 +9,64 @@ export const resourceCall = (method: string, args: any = {}) =>
   rpc("surfaceAction", { method, args });
 export const openResource = (view: string, extra: any = {}) =>
   rpc("surfaceReport", { view, ...extra });
+function MountPicker({
+  endpoint,
+  initial,
+  onPath,
+}: {
+  endpoint: string;
+  initial: string;
+  onPath: (s: string) => void;
+}) {
+  const [paths, setPaths] = useState<string[]>([]),
+    [choice, choose] = useState(initial),
+    [message, setMessage] = useState("");
+  useEffect(() => {
+    let active = true;
+    resourceCall("snapshot", { endpoint, section: "comparison" })
+      .then((s) => {
+        if (active) setPaths((s.mounts ?? []).map((v: any) => v.path));
+      })
+      .catch((e) => active && setMessage(String(e)));
+    return () => {
+      active = false;
+    };
+  }, [endpoint]);
+  return (
+    <div>
+      {paths.length > 0 && (
+        <>
+          <select
+            aria-label="挂载目录"
+            value={choice}
+            onChange={(e) => {
+              choose(e.target.value);
+              onPath(e.target.value);
+              setMessage("");
+            }}
+          >
+            {[...new Set([initial, ...paths])].map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </select>
+          {paths.includes(choice) && (
+            <button
+              onClick={() =>
+                resourceCall("pinMount", { endpoint, path: choice }).then(
+                  () => setMessage("已在机器卡显示"),
+                  (e) => setMessage(String(e)),
+                )
+              }
+            >
+              在机器卡显示
+            </button>
+          )}
+        </>
+      )}
+      {message && <span role="status">{message}</span>}
+    </div>
+  );
+}
 function DiskRanks({ endpoint, path }: { endpoint: string; path: string }) {
   const [page, set] = useState<any>(),
     [error, fail] = useState(""),
@@ -169,6 +227,7 @@ export function SurfaceDrawer({
   onPick: (p: Pick) => void;
   close: () => void;
 }) {
+  const [diskPath, setDiskPath] = useState(target.path);
   const m = topology.machines.find(
     (x) =>
       x.endpoint === target.endpoint ||
@@ -220,25 +279,28 @@ export function SurfaceDrawer({
           call={resourceCall}
         />
       ) : target.kind === "disk" && m ? (
-        <DiskRanks
-          endpoint={
-            m.roots.find(
-              (r) =>
-                m.kind === "windows" &&
-                target.path?.toLowerCase().startsWith(r.path.toLowerCase()),
-            )?.endpoint ??
-            target.endpoint ??
-            m.endpoint
-          }
-          path={target.path ?? m.roots[0].path}
-        />
+        <>
+          <MountPicker
+            endpoint={m.endpoint}
+            initial={target.path ?? m.roots[0].path}
+            onPath={setDiskPath}
+          />{" "}
+          <DiskRanks
+            key={diskPath}
+            endpoint={
+              m.roots.find(
+                (r) =>
+                  m.kind === "windows" &&
+                  diskPath?.toLowerCase().startsWith(r.path.toLowerCase()),
+              )?.endpoint ??
+              target.endpoint ??
+              m.endpoint
+            }
+            path={diskPath ?? m.roots[0].path}
+          />
+        </>
       ) : m ? (
-        <MachineInspector
-          machine={m}
-          pick={target}
-          call={resourceCall}
-          onRun={(id) => onPick({ kind: "run", id })}
-        />
+        <MachineInspector machine={m} pick={target} call={resourceCall} />
       ) : null}
     </aside>
   );

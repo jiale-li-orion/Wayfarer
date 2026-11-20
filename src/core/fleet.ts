@@ -16,35 +16,69 @@ interface Volume {
   trend?: { stamp: number; available: number }[];
 }
 
-const sharedVolume = (v: Volume) => v.filesystem === "nfs" || v.filesystem === "nfs4";
+const sharedVolume = (v: Volume) =>
+  v.filesystem === "nfs" || v.filesystem === "nfs4";
 
-function shareKey(source: string, members: { endpoint: string; signature: string; volume: Volume }[]) {
-  const identity = members.map((m) => JSON.stringify([m.endpoint, m.signature, m.volume.path,
-    m.volume.filesystem, m.volume.serverAddress, m.volume.route])).sort();
-  return createHash("sha256").update(JSON.stringify([source, identity])).digest("hex");
+function shareKey(
+  source: string,
+  members: { endpoint: string; signature: string; volume: Volume }[],
+) {
+  const identity = members
+    .map((m) =>
+      JSON.stringify([
+        m.endpoint,
+        m.signature,
+        m.volume.path,
+        m.volume.filesystem,
+        m.volume.serverAddress,
+        m.volume.route,
+      ]),
+    )
+    .sort();
+  return createHash("sha256")
+    .update(JSON.stringify([source, identity]))
+    .digest("hex");
 }
 
-export function sameConfirmedShare(monitor: SystemMonitor, operations: OperationsStore, from: Ref, to: Ref) {
+export function sameConfirmedShare(
+  monitor: SystemMonitor,
+  operations: OperationsStore,
+  from: Ref,
+  to: Ref,
+) {
   if (from.endpoint === to.endpoint) return false;
   const relative = (mount: string, file: string) => {
     const within = path.posix.relative(mount, file);
-    return within !== ".." && !within.startsWith("../") && !path.posix.isAbsolute(within) ? within : undefined;
+    return within !== ".." &&
+      !within.startsWith("../") &&
+      !path.posix.isAbsolute(within)
+      ? within
+      : undefined;
   };
   const fleet = monitor.machines();
   for (const group of operations.catalog().groups) {
-    if (!group.confirmedShares.length || !group.endpoints.includes(from.endpoint) ||
-        !group.endpoints.includes(to.endpoint)) continue;
+    if (
+      !group.confirmedShares.length ||
+      !group.endpoints.includes(from.endpoint) ||
+      !group.endpoints.includes(to.endpoint)
+    )
+      continue;
     const seen = group.endpoints.flatMap((endpoint) => {
       const sample = monitor.recentComparison(endpoint);
       const machine = fleet.find((m) => m.endpoint === endpoint);
       if (!sample || !machine) return [];
-      return ((sample.mounts ?? []) as Volume[]).filter(v => sharedVolume(v) && v.route?.src)
-        .map((volume) => ({ endpoint, volume, signature: signature(machine.config) }));
+      return ((sample.mounts ?? []) as Volume[])
+        .filter((v) => sharedVolume(v) && v.route?.src)
+        .map((volume) => ({
+          endpoint,
+          volume,
+          signature: signature(machine.config),
+        }));
     });
-    for (const a of seen.filter(v => v.endpoint === from.endpoint)) {
+    for (const a of seen.filter((v) => v.endpoint === from.endpoint)) {
       const sourcePath = relative(a.volume.path, from.path);
       if (sourcePath === undefined) continue;
-      const members = seen.filter(v => v.volume.source === a.volume.source);
+      const members = seen.filter((v) => v.volume.source === a.volume.source);
       const pairMembers = members.filter(
         (v) => v.endpoint === from.endpoint || v.endpoint === to.endpoint,
       );
@@ -53,8 +87,14 @@ export function sameConfirmedShare(monitor: SystemMonitor, operations: Operation
         !group.confirmedShares.includes(shareKey(a.volume.source, pairMembers))
       )
         continue;
-      if (members.some(b => b.endpoint === to.endpoint &&
-          relative(b.volume.path, to.path) === sourcePath)) return true;
+      if (
+        members.some(
+          (b) =>
+            b.endpoint === to.endpoint &&
+            relative(b.volume.path, to.path) === sourcePath,
+        )
+      )
+        return true;
     }
   }
   return false;
@@ -91,10 +131,12 @@ export async function compareMachines(
   }
   const machines = await Promise.all(
     [...selected.values()].map(async (endpoint) => {
-      const sample = (reuseRecent && monitor.recentComparison(endpoint)) || await monitor.snapshot({
-        endpoint,
-        section: "comparison",
-      });
+      const sample =
+        (reuseRecent && monitor.recentComparison(endpoint)) ||
+        (await monitor.snapshot({
+          endpoint,
+          section: "comparison",
+        }));
       return {
         endpoint,
         name: sample.name as string,
@@ -102,20 +144,23 @@ export async function compareMachines(
         gpuStamp: sample.gpuStamp as number | undefined,
         status: sample.status as "online" | "offline",
         cpuPercent: sample.system?.cpuPercent as number | undefined,
+        wslBudget: sample.wslBudget,
         memoryAvailable: sample.system?.memory?.available as number | undefined,
         gpus: ((sample.gpus ?? []) as any[]).map((gpu) => ({
           id: gpu.id as string,
           name: gpu.name as string,
           utilization: gpu.utilization as number | undefined,
           memoryUsed: (gpu.memoryUsed ?? gpu.dedicatedUsed) as
-            | number
-            | undefined,
+            number | undefined,
           memoryTotal: (gpu.memoryTotal ?? gpu.dedicatedTotal) as
-            | number
-            | undefined,
+            number | undefined,
         })),
-        volumes: ((sample.mounts ?? []) as Volume[]).map(({ trend, ...volume }) =>
-          ({ ...volume, ...(trends ? { trend } : {}) })),
+        volumes: ((sample.mounts ?? []) as Volume[]).map(
+          ({ trend, ...volume }) => ({
+            ...volume,
+            ...(trends ? { trend } : {}),
+          }),
+        ),
         error: (sample.error ?? sample.errors?.[0]) as string | undefined,
       };
     }),
@@ -138,7 +183,9 @@ export async function compareMachines(
       group.push({
         endpoint: machine.endpoint,
         signature: (() => {
-          const config = fleet.find((item) => item.endpoint === machine.endpoint)?.config;
+          const config = fleet.find(
+            (item) => item.endpoint === machine.endpoint,
+          )?.config;
           return config ? signature(config) : "";
         })(),
         name: machine.name,

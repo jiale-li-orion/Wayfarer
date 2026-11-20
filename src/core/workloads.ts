@@ -24,6 +24,8 @@ export type Workload = WorkloadInput & {
   created: number;
   updated: number;
   producerStamp?: number;
+  indexDigest?: string;
+  progressAt?: number;
   lastObserved?: number;
   files: WorkloadFile[];
   observed?: "alive" | "exited" | "changed";
@@ -63,6 +65,7 @@ function connection(row: Workload, reading?: IdentityReading) {
 }
 
 export class Workloads {
+  private ignored = new Set<string>();
   private rows = new Map<string, Workload>();
   private pending = Promise.resolve();
   constructor(
@@ -72,23 +75,33 @@ export class Workloads {
   ) {}
   async init() {
     try {
-      const data: Workload[] = JSON.parse(await fs.readFile(this.file, "utf8"));
-      this.rows = new Map(data.map((w) => [w.runId, w]));
+      const data = JSON.parse(await fs.readFile(this.file, "utf8"));
+      const rows: Workload[] = Array.isArray(data) ? data : data.rows;
+      this.rows = new Map(rows.map((w) => [w.runId, w]));
+      this.ignored = new Set(data.ignored ?? []);
     } catch (e: any) {
       if (e.code !== "ENOENT") throw e;
     }
   }
-  private write(edit: (rows: Map<string, Workload>) => boolean) {
+  private write(
+    edit: (rows: Map<string, Workload>, ignored: Set<string>) => boolean,
+  ) {
     const work = this.pending.then(async () => {
       const rows = new Map(this.rows);
-      if (!edit(rows)) return;
+      const ignored = new Set(this.ignored);
+      if (!edit(rows, ignored)) return;
       const tmp = this.file + "." + randomUUID() + ".tmp";
       try {
-        await fs.writeFile(tmp, JSON.stringify([...rows.values()]), {
-          mode: 0o600,
-        });
+        await fs.writeFile(
+          tmp,
+          JSON.stringify({ rows: [...rows.values()], ignored: [...ignored] }),
+          {
+            mode: 0o600,
+          },
+        );
         await fs.rename(tmp, this.file);
         this.rows = rows;
+        this.ignored = ignored;
       } finally {
         await fs.rm(tmp, { force: true });
       }
@@ -105,6 +118,18 @@ export class Workloads {
     return row;
   }
   async register(input: WorkloadInput) {
+    await this.upsert(input);
+    return this.get(input.runId);
+  }
+  async importRecord(input: WorkloadInput, digest: string) {
+    if (
+      this.ignored.has(input.runId) ||
+      this.rows.get(input.runId)?.indexDigest === digest
+    )
+      return;
+    await this.upsert(input, digest);
+  }
+  private async upsert(input: WorkloadInput, indexDigest?: string) {
     const { runId, endpoint, process: p, files = [] } = input;
     if (
       typeof runId !== "string" ||
@@ -149,9 +174,23 @@ export class Workloads {
         !this.validPath(input.projectRef))
     )
       throw Error("项目目录需位于作业端点");
-    await this.write((rows) => {
+    await this.write((rows, ignored) => {
+      if (
+        indexDigest &&
+        (ignored.has(runId) || rows.get(runId)?.indexDigest === indexDigest)
+      )
+        return false;
+      if (!indexDigest) ignored.delete(runId);
       const old = rows.get(runId),
         now = Date.now();
+      if (
+        indexDigest &&
+        old?.projectRef &&
+        input.projectRef &&
+        (input.projectRef.endpoint !== old.projectRef.endpoint ||
+          input.projectRef.path !== old.projectRef.path)
+      )
+        throw Error("运行编号已在另一个项目使用");
       if (old && old.endpoint !== endpoint)
         throw Error("运行编号已绑定其他端点");
       const merged = new Map(
@@ -183,6 +222,12 @@ export class Workloads {
         row.statusPath = input.statusPath;
         delete row.producerStamp;
       }
+      if (indexDigest) row.indexDigest = indexDigest;
+      if (
+        (input.step !== undefined && input.step !== old?.step) ||
+        (input.phase !== undefined && input.phase !== old?.phase)
+      )
+        row.progressAt = now;
       if (input.phase !== undefined) row.phase = input.phase;
       if (input.step !== undefined) row.step = input.step;
       if (input.state) row.state = input.state;
@@ -212,10 +257,13 @@ export class Workloads {
       rows.set(runId, row);
       return true;
     });
-    return this.get(runId);
   }
   forget(runId: string) {
-    return this.write((rows) => rows.delete(runId));
+    return this.write((rows, ignored) => {
+      if (!rows.delete(runId)) return false;
+      ignored.add(runId);
+      return true;
+    });
   }
   async page(cursor: string | undefined, limit: number, observe?: ObserveRuns) {
     await this.pending;
@@ -269,6 +317,24 @@ export class Workloads {
           : undefined,
       total: all.length,
     };
+  }
+  profiles() {
+    const refs = new Map<
+      string,
+      { ref: Ref; label: string; project: string; runId: string }
+    >();
+    for (const row of this.rows.values())
+      for (const f of row.files)
+        if (f.kind === "profile") {
+          const ref = { endpoint: f.endpoint, path: f.path };
+          refs.set(JSON.stringify([ref.endpoint, ref.path]), {
+            ref,
+            label: f.label ?? row.name,
+            project: row.projectRef?.path ?? row.endpoint,
+            runId: row.runId,
+          });
+        }
+    return [...refs.values()];
   }
   async surface(include: (row: Workload) => boolean, reader: ObserveRuns) {
     await this.pending;
@@ -355,6 +421,11 @@ export class Workloads {
               latest = {
                 ...latest,
                 producerStamp: report.updated,
+                progressAt:
+                  (report.step !== undefined && report.step !== latest.step) ||
+                  (report.phase !== undefined && report.phase !== latest.phase)
+                    ? report.updated
+                    : latest.progressAt,
                 updated: Math.max(latest.updated, report.updated),
                 phase: report.phase ?? latest.phase,
                 step: report.step ?? latest.step,

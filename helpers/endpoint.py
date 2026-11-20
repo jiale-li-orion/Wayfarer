@@ -170,6 +170,14 @@ def run(method,a):
     if method=='list': return scan_page(a)
     if method=='scanClose': scan_close(a['cursor']);return True
     if method=='mkdir': os.makedirs(getpath(a),exist_ok=True);return True
+    if method=='readRunIndex':
+        fd=os.open(getpath(a),os.O_RDONLY|getattr(os,'O_NOFOLLOW',0)|getattr(os,'O_NONBLOCK',0))
+        with os.fdopen(fd,'rb') as f:
+            info=os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode) or info.st_size>65536:raise ValueError("Invalid run index")
+            data=f.read(65537)
+            if len(data)>65536:raise ValueError("Index entry is too large")
+            return base64.b64encode(data).decode('ascii')
     if method=='read':
         with open(getpath(a),'rb') as f:
             f.seek(int(a.get('offset',0)));data=f.read(min(1048576,int(a.get('length',1048576))))
@@ -200,6 +208,22 @@ def run(method,a):
         return h.hexdigest()
     if method=='metadata':
         p=getpath(a);os.chmod(p,int(a['mode']));os.utime(p,(a['mtime']/1000,a['mtime']/1000));return True
+    if method=='publishNewFile':
+        src, dst = getpath(a), getpath(a,'dest')
+        try:
+            os.link(src,dst)
+        except OSError as e:
+            import errno
+            if e.errno not in (errno.EPERM,errno.ENOTSUP,errno.EINVAL):
+                raise
+            import ctypes
+            libc=ctypes.CDLL(None,use_errno=True)
+            rename=getattr(libc,'renameat2',None)
+            if rename is None:raise
+            if rename(-100,os.fsencode(src),-100,os.fsencode(dst),1)!=0:
+                code=ctypes.get_errno()
+                raise OSError(code,os.strerror(code),dst)
+        return True
     if method=='rename':
         p=getpath(a);dest=getpath(a,'dest')
         if not a.get('overwrite') and os.path.lexists(dest): raise FileExistsError(dest)

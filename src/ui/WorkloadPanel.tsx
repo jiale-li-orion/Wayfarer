@@ -121,7 +121,7 @@ export function WorkloadPanel({
                         </span>
                         <small>
                           {machineName(w.endpoint)} · {status(w)} ·{" "}
-                          {when(w.lastObserved ?? w.updated)}
+                          {when(w.progressAt ?? w.updated)}
                         </small>
                       </button>
                     ))}
@@ -129,9 +129,7 @@ export function WorkloadPanel({
                 )
               );
             })}
-            {!rows.length && !error && (
-              <p>在机器的进程详情中选择「加入作业」，或由实验脚本登记运行。</p>
-            )}
+            {!rows.length && !error && <p>此地图暂未收到实验运行。</p>}
             {pages.length > 1 && (
               <button
                 onClick={() => {
@@ -159,26 +157,16 @@ export function WorkloadPanel({
             <>
               <div className="performance-head">
                 <h2>{info.name}</h2>
-                <button
-                  onClick={async () => {
-                    try {
-                      if (await call("forgetWorkload", { runId })) select();
-                    } catch (e) {
-                      setError(String(e));
-                    }
-                  }}
-                >
-                  取消关注
-                </button>
               </div>
               <p>
                 {machineName(info.endpoint)} · {status(info)} · {info.phase}{" "}
                 {info.step != null ? "step " + info.step : ""} ·{" "}
-                {when(info.lastObserved ?? info.updated)}
+                {when(info.progressAt ?? info.updated)}
                 {info.connection === "offline" && info.observed === "alive"
                   ? " · 上次确认运行中"
                   : ""}
               </p>
+              {info.lastObserved && <p>最近观测　{when(info.lastObserved)}</p>}
               {info.process && (
                 <p>
                   PID {info.process.pid} · {info.process.identity}

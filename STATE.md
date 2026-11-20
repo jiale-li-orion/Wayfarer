@@ -1,4 +1,4 @@
-# Workspace Map · 0.12.0
+# Workspace Map · 0.13.0
 
 训练机主仓库 /data/users/lijiale/projects/agent-system-learning/workspace-map；本机镜像 /home/orion/agent-system-learning/workspace-map。开发在训练机独立工作树，本机安装与验收，产物留D盘。
 
@@ -17,3 +17,5 @@ C盘离线维护已完成：53份旧交换文件回收75.24GiB，完成时C盘�
 0.11.0 将机器总览和巡检合并，在作业详情关联模型回放、耗时和传输。生产端状态与进程身份分别记录。入口与兼容协议见 [作业说明](docs/WORKLOADS.md)。
 
 0.12.0 以目录地图承接机器与运行。实验项目可登记 projectRef；机器读数和运行进度按节点订阅，目录布局在结构或节点尺寸变化时更新。
+
+0.13.0 支持离线运行索引和 Agent 数据交付，WSL 卡显示宿主配置及虚拟机可见资源。

@@ -1,7 +1,7 @@
 import { SurfaceContext, SurfaceNode } from "./SurfaceNodes";
 import { assembleSurface } from "./surfaceTree";
 import { SurfaceLive, type Topology } from "./surfaceLive";
-import { SurfaceDrawer, openResource, resourceCall } from "./SurfaceDrawer";
+import { SurfaceDrawer, openResource } from "./SurfaceDrawer";
 import { useVisibleQuery } from "./visibleQuery";
 import type { Pick as SurfacePick } from "./SurfaceCards";
 import type { LayoutItem } from "../shared/surfaceLayout";
@@ -290,13 +290,19 @@ function App() {
   const [catalogMachines, setCatalogMachines] = useState<Topology["machines"]>(
     [],
   );
+  const [pinVersion, bumpPin] = useState(0);
   const scope = view.root ? refKey(view.root) : "";
-  const previousScope=useRef(scope);
-  useEffect(()=>{
-    if(previousScope.current!==scope){
-      previousScope.current=scope;setDrawer(undefined);setDetailOpen(false);setPair([]);setJobsOpen(false);setSelected([]);
+  const previousScope = useRef(scope);
+  useEffect(() => {
+    if (previousScope.current !== scope) {
+      previousScope.current = scope;
+      setDrawer(undefined);
+      setDetailOpen(false);
+      setPair([]);
+      setJobsOpen(false);
+      setSelected([]);
     }
-  },[scope]);
+  }, [scope]);
   useVisibleQuery(
     () =>
       endpoints.length
@@ -306,7 +312,7 @@ function App() {
       if (result && live.update(result)) setTopology(result);
     },
     (e) => setError(String(e)),
-    [scope, endpoints, live, view.patrolFilter],
+    [scope, endpoints, live, view.patrolFilter, pinVersion],
   );
   const pick = useCallback(
     (target: SurfacePick) => {
@@ -618,6 +624,7 @@ function App() {
         setView(m.view);
         if (m.focus) requestedFocus.current = true;
       }
+      if (m.type === "mountPin") bumpPin((n) => n + 1);
       if (m.type === "projects") setProjects(m.projects);
       if (m.type === "endpoints") setEndpoints(m.endpoints);
       if (
@@ -1119,9 +1126,9 @@ function App() {
           {overview && <OverviewCanvas nodes={nodes} edges={edges} />}
           <Controls
             position="bottom-left"
-            showFitView={false}
+            showFitView={true}
             showInteractive={false}
-            fitViewOptions={{ includeHiddenNodes: true }}
+            fitViewOptions={{ includeHiddenNodes: true, maxZoom: 1 }}
           />
         </ReactFlow>
         <nav className="toolbar top" aria-label="地图导航">
@@ -1131,33 +1138,17 @@ function App() {
           >
             <Icon name="arrow-left" />
           </button>
-          <button
-            onClick={() => safe(rpc("history", { direction: 1 }))}
-            title="前进"
-          >
-            <Icon name="arrow-right" />
-          </button>
-          <button onClick={() => navigate()} title="全部端点">
-            <Icon name="home" />
-          </button>
-          <button
-            title="刷新当前目录"
-            onClick={() => {
-              const targets = view.root
-                ? [view.root]
-                : endpoints.map((e) => ({ endpoint: e.id, path: e.root }));
-              for (const ref of targets) void load(ref, true);
-            }}
-          >
-            <Icon name="refresh" />
-          </button>
-          <span className="divider" />
-          {view.root ? (
-            <div className="breadcrumb-parts">
-              {breadcrumbs.map((b) => (
+          <div className="breadcrumb-parts">
+            {view.root && (
+              <button title="全部端点" onClick={() => navigate()}>
+                全部端点
+                <Icon name="chevron-right" />
+              </button>
+            )}
+            {view.root &&
+              breadcrumbs.slice(0, -1).map((b) => (
                 <button
                   key={b.path}
-                  title={b.path}
                   onClick={() =>
                     navigate({ endpoint: view.root!.endpoint, path: b.path })
                   }
@@ -1166,51 +1157,21 @@ function App() {
                   <Icon name="chevron-right" />
                 </button>
               ))}
-            </div>
-          ) : (
-            <span className="breadcrumb">全部端点</span>
-          )}
-          <button
-            title="输入路径定位"
-            onClick={() =>
-              safe(rpc("promptAction", { action: "locate", refs: [] }))
-            }
-          >
-            <Icon name="go-to-file" />
-          </button>
-          <button
-            title="上一级"
-            disabled={!view.root}
-            onClick={() =>
-              safe(rpc("parent", { ref: view.root }).then(navigate))
-            }
-          >
-            <Icon name="arrow-up" />
-          </button>
-          <button
-            title="定位全部已加载节点"
-            onClick={() =>
-              flow.fitView({
-                duration: 0,
-                padding: 0.2,
-                maxZoom: 1,
-                includeHiddenNodes: true,
-              })
-            }
-          >
-            <Icon name="screen-full" />
-          </button>
+            <button
+              title="输入路径定位"
+              onClick={() =>
+                safe(rpc("promptAction", { action: "locate", refs: [] }))
+              }
+            >
+              {view.root ? breadcrumbs.at(-1)?.label : "全部端点"}{" "}
+              <Icon name="edit" />
+            </button>
+          </div>
           <button
             title="按名称找文件"
             onClick={() => (searchOpen ? closeSearch() : setSearchOpen(true))}
           >
             <Icon name="search" />
-          </button>
-          <button
-            title="收藏"
-            onClick={() => void rpc("command", { name: "favorites" })}
-          >
-            <Icon name="bookmark" />
           </button>
         </nav>
         <div className="toolbar top-right">
@@ -1254,47 +1215,6 @@ function App() {
                 }}
               >
                 文件传输
-              </button>
-              <button onClick={() => void safe(openResource("model"))}>
-                打开模型记录
-              </button>
-              <button onClick={() => void safe(openResource("runs"))}>
-                打开耗时记录
-              </button>
-              <button
-                onClick={() =>
-                  void safe(resourceCall("record", { start: true }))
-                }
-              >
-                开始资源记录
-              </button>
-              <button
-                onClick={() =>
-                  void safe(resourceCall("record", { start: false }))
-                }
-              >
-                停止资源记录
-              </button>
-              <button
-                onClick={() =>
-                  void safe(resourceCall("export", { format: "json" }))
-                }
-              >
-                导出快照 JSON
-              </button>
-              <button
-                onClick={() =>
-                  void safe(resourceCall("export", { format: "csv" }))
-                }
-              >
-                导出快照 CSV
-              </button>
-              <button
-                onClick={() =>
-                  void safe(resourceCall("export", { recording: true }))
-                }
-              >
-                导出历史记录
               </button>
             </div>
           </details>
@@ -1340,6 +1260,9 @@ function App() {
                 {selected.length === 1 &&
                   ["endpoint", "directory"].includes(selectedKind ?? "") && (
                     <>
+                      <button onClick={() => void load(selected[0], true)}>
+                        重新读取目录
+                      </button>
                       <button
                         onClick={() =>
                           pick({

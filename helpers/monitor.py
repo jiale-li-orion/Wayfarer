@@ -634,6 +634,7 @@ else:
                 else None
             ),
             logicalCpus=os.cpu_count(),
+            kernelRelease=platform.release(),
             load=os.getloadavg(),
             pressure=linux_pressure(now),
             memory=dict(

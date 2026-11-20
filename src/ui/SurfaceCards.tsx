@@ -7,6 +7,16 @@ export type MachineMetric = {
   stamp?: number;
   cpuPercent?: number;
   memoryAvailable?: number;
+  wslBudget?: {
+    config: {
+      source: string;
+      invalid?: string[];
+      memory?: string;
+      processors?: number;
+    };
+    visibleCpus?: number;
+    visibleMemory?: number;
+  };
   gpus: {
     id: string;
     utilization?: number;
@@ -40,6 +50,7 @@ export type Pick = {
   id?: string;
   other?: string;
   path?: string;
+  sort?: "cpuPercent" | "rss";
 };
 export function MachineTile({
   m,
@@ -94,11 +105,27 @@ export function MachineTile({
         )}
       </header>
       <div className="machine-metrics">
-        <button onClick={() => open("processes")}>
+        <button onClick={() => open("processes", { sort: "cpuPercent" })}>
           CPU <b>{percent(m.cpuPercent)}</b>
+          {m.kind === "wsl" && m.wslBudget?.visibleCpus != null && (
+            <span> / {m.wslBudget.visibleCpus} 核</span>
+          )}
         </button>
-        <button onClick={() => open("processes")}>
-          可用内存 <b>{capacity(m.memoryAvailable)}</b>
+        <button onClick={() => open("processes", { sort: "rss" })}>
+          {m.kind === "wsl" && m.wslBudget ? "内存上限" : "可用内存"}{" "}
+          <b>
+            {m.kind === "wsl" && m.wslBudget
+              ? (m.wslBudget?.config.memory?.replace(
+                  /(\d)([KMGT]B)$/,
+                  "$1 $2",
+                ) ??
+                (!m.wslBudget || m.wslBudget.config.source === "unavailable"
+                  ? "未读取"
+                  : m.wslBudget.config.invalid?.includes("memory")
+                    ? "配置待核对"
+                    : "系统默认 · 实测 " + capacity(m.wslBudget.visibleMemory)))
+              : capacity(m.memoryAvailable)}
+          </b>
         </button>
       </div>
       {m.gpus.length > 0 && (
@@ -168,7 +195,7 @@ export function RunTile({
   name: string;
   phase?: string;
   step?: number;
-  updated: number;
+  updated?: number;
   attention: boolean;
   open: () => void;
   details: () => void;
@@ -182,8 +209,15 @@ export function RunTile({
       <button onClick={open}>
         <strong>{name}</strong>
         <small>
-          {phase} {step != null ? "· step " + step : ""} ·{" "}
-          {new Date(updated).toLocaleTimeString()}
+          {phase} {step != null ? "· step " + step : ""}{" "}
+          {updated != null && (
+            <span title={new Date(updated).toLocaleString()}>
+              ·{" "}
+              {Math.max(0, Math.floor((Date.now() - updated) / 60000)) ||
+                "刚刚"}
+              {Date.now() - updated >= 60000 ? " 分钟前" : ""}推进
+            </span>
+          )}
         </small>
       </button>
       <button

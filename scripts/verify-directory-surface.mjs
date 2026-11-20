@@ -52,7 +52,7 @@ try {
   note.loadMs = performance.now() - start;
   note.nodes = await read('document.querySelector(".status span").textContent');
   await read(
-    "document.querySelector('button[title=\"定位全部已加载节点\"]').click()",
+    "document.querySelector('.react-flow__controls-fitview,button[title=\"定位全部已加载节点\"]').click()",
   );
   await sleep(300);
   note.frames = await read(

@@ -1,3 +1,4 @@
+import { WslBudget } from "./wslBudget";
 import { EventEmitter } from "node:events";
 import path from "node:path";
 import fs from "node:fs/promises";
@@ -54,6 +55,7 @@ type State = {
 };
 export class SystemMonitor extends EventEmitter {
   projects?: () => { endpoint: string; path: string }[];
+  private wslConfig = new WslBudget();
   private states = new Map<string, State>();
   private readers = new Map<string, ResourceQuery>();
   private comparisons = new Map<string, Set<string>>();
@@ -152,15 +154,23 @@ export class SystemMonitor extends EventEmitter {
     if (this.disposed) return;
     const previous = this.comparisons.get(owner) ?? new Set<string>();
     const selected = new Set(endpoints);
-    const next = new Set(this.machines().filter((m) =>
-      selected.has(m.endpoint) || m.roots.some((r) => selected.has(r.endpoint))
-    ).map((m) => m.id));
+    const next = new Set(
+      this.machines()
+        .filter(
+          (m) =>
+            selected.has(m.endpoint) ||
+            m.roots.some((r) => selected.has(r.endpoint)),
+        )
+        .map((m) => m.id),
+    );
     if (next.size) this.comparisons.set(owner, next);
     else this.comparisons.delete(owner);
-    if (!this.active()) for (const id of previous) {
-      const state = this.states.get(id);
-      if (state && !state.pending.size && !this.held(id)) void this.release(state);
-    }
+    if (!this.active())
+      for (const id of previous) {
+        const state = this.states.get(id);
+        if (state && !state.pending.size && !this.held(id))
+          void this.release(state);
+      }
   }
 
   private held(id: string) {
@@ -234,7 +244,9 @@ export class SystemMonitor extends EventEmitter {
     );
   }
   recentComparison(endpoint: string) {
-    const machine = this.machines().find((m) => m.roots.some((r) => r.endpoint === endpoint));
+    const machine = this.machines().find((m) =>
+      m.roots.some((r) => r.endpoint === endpoint),
+    );
     if (!machine || !this.enabled(machine.endpoint)) return undefined;
     const sample = this.states.get(machine.id)?.lastComparison;
     return sample && Date.now() - sample.stamp < 30000 ? sample : undefined;
@@ -332,6 +344,39 @@ export class SystemMonitor extends EventEmitter {
                     endpoint: host.endpoint,
                     section: "summary",
                   });
+            const config =
+              process.platform === "win32"
+                ? await this.wslConfig.read()
+                : { source: "unavailable" };
+            if (
+              /wsl2|microsoft-standard/i.test(raw.system?.kernelRelease ?? "")
+            )
+              raw.wslBudget = {
+                scope: "wsl2-vm",
+                config,
+                hostStatus: windows.status,
+                visibleCpus: raw.system?.logicalCpus,
+                visibleMemory: raw.system?.memory?.total,
+                hostAvailable: windows.system?.memory?.available,
+                hostCommitUsed: windows.system?.memory?.commitUsed,
+                hostCommitLimit: windows.system?.memory?.commitLimit,
+                hostStamp: windows.stamp,
+              };
+            if (raw.wslBudget && args.section === "processes") {
+              const hostRows = await this.snapshot({
+                endpoint: host.endpoint,
+                section: "processes",
+                search: "vmmem",
+                limit: 8,
+              });
+              raw.wslBudget.hostProcesses = hostRows.processes
+                ?.filter((p: any) => p.name?.toLowerCase() === "vmmemwsl")
+                .map((p: any) => ({
+                  pid: p.pid,
+                  rss: p.rss,
+                  privateBytes: p.privateBytes,
+                }));
+            }
             const budget = windows.system?.storage?.wsl?.find(
               (v: any) => v.distribution === machine.config.distro,
             );
@@ -365,7 +410,12 @@ export class SystemMonitor extends EventEmitter {
         if (args.section === "comparison") {
           const next: NonNullable<State["volumeTrends"]> = {};
           for (const volume of raw.mounts ?? []) {
-            const key = JSON.stringify([volume.path, volume.source, volume.serverAddress, volume.route]);
+            const key = JSON.stringify([
+              volume.path,
+              volume.source,
+              volume.serverAddress,
+              volume.route,
+            ]);
             if (volume.available == null) continue;
             const points = s.volumeTrends?.[key] ?? [];
             if (raw.stamp - (points.at(-1)?.stamp ?? 0) >= 4000)
@@ -376,7 +426,16 @@ export class SystemMonitor extends EventEmitter {
           }
           s.volumeTrends = next;
           raw.mounts = (raw.mounts ?? []).map((volume: any) => ({
-            ...volume, trend: next[JSON.stringify([volume.path, volume.source, volume.serverAddress, volume.route])]?.slice(),
+            ...volume,
+            trend:
+              next[
+                JSON.stringify([
+                  volume.path,
+                  volume.source,
+                  volume.serverAddress,
+                  volume.route,
+                ])
+              ]?.slice(),
           }));
         }
         const value = {
@@ -444,7 +503,9 @@ export class SystemMonitor extends EventEmitter {
             error: String(error),
           };
         const value = {
-          ...(args.section === "comparison" ? s.lastComparison ?? s.last : s.last),
+          ...(args.section === "comparison"
+            ? (s.lastComparison ?? s.last)
+            : s.last),
           endpoint: machine.endpoint,
           machine: machine.id,
           name: machine.name,
@@ -466,7 +527,8 @@ export class SystemMonitor extends EventEmitter {
     void task
       .finally(() => {
         s.pending.delete(key);
-        if (!this.active() && !s.pending.size && !this.held(machine.id)) void this.release(s);
+        if (!this.active() && !s.pending.size && !this.held(machine.id))
+          void this.release(s);
       })
       .catch(() => {});
     return task;
@@ -485,9 +547,16 @@ export class SystemMonitor extends EventEmitter {
       await closing;
     }
   }
-  startRecording() {
+  startRecording(durationMs?: number) {
+    if (
+      durationMs !== undefined &&
+      (!Number.isInteger(durationMs) ||
+        durationMs < 1000 ||
+        durationMs > 600000)
+    )
+      throw Error("录制时长范围为 1–600 秒");
     if (this.recordingStart) return this.recordingStart;
-    this.recordingStart = this.beginRecording().finally(() => {
+    this.recordingStart = this.beginRecording(durationMs).finally(() => {
       this.recordingStart = undefined;
     });
     return this.recordingStart;
@@ -498,7 +567,7 @@ export class SystemMonitor extends EventEmitter {
       path.join(this.storage, "resource-recordings")
     );
   }
-  private async beginRecording() {
+  private async beginRecording(durationMs?: number) {
     if (this.disposed) throw Error("Resource monitor closed");
     if (this.recording) return this.recording;
     const directory = this.recordingDirectory();
@@ -523,7 +592,11 @@ export class SystemMonitor extends EventEmitter {
       bytes: 0,
       started,
       deadline:
-        started + Math.min(600000, this.recordingOptions.durationMs ?? 600000),
+        started +
+        Math.min(
+          durationMs ?? 600000,
+          this.recordingOptions.durationMs ?? 600000,
+        ),
       last: new Map(),
     };
     this.recordingTimer = setTimeout(
@@ -586,7 +659,7 @@ export class SystemMonitor extends EventEmitter {
         this.queuedWrites--;
       });
   }
-  async readRecording(file: string) {
+  async readRecording(file: string, offset = 0, fence?: number) {
     await this.writes;
     // Callers can only export files created in this map's recording directory.
     const root = this.recordingDirectory();
@@ -597,9 +670,12 @@ export class SystemMonitor extends EventEmitter {
     )
       throw Error("Unknown recording");
     const readline = await import("node:readline");
-    const size = (await fs.stat(file)).size;
+    const stat = await fs.lstat(file);
+    if (!stat.isFile()) throw Error("Unknown recording");
+    const size = Math.min(stat.size, fence ?? stat.size);
     const stream = (await import("node:fs")).createReadStream(file, {
-      end: Math.max(0, size - 1),
+      start: offset,
+      end: Math.max(offset, size - 1),
     });
     return {
       stream,

@@ -47,7 +47,7 @@ export function SurfaceNode({
         name={r.name}
         phase={runStatus(r)}
         step={r.step}
-        updated={r.lastObserved ?? r.updated}
+        updated={r.step!=null||r.phase?r.progressAt:undefined}
         attention={r.state === "failed" || r.connection === "offline"}
         open={() => ctx.openRun(r.runId)}
         details={() => ctx.pick({ kind: "run", id: r.runId })}
